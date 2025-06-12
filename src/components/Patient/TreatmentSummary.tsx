@@ -479,7 +479,7 @@ export default function TreatmentSummary({
                         ? new Date(
                             diagnosis.onset.onset_datetime,
                           ).toLocaleDateString()
-                        : undefined,
+                        : "- ",
                       notes: diagnosis.note,
                       logged_by: formatName(diagnosis.created_by),
                     }))}

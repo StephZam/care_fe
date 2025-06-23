@@ -64,10 +64,10 @@ export const PractitionerSelector = ({
             <div className="flex items-center gap-2">
               <Avatar
                 imageUrl={selected.profile_picture_url}
-                name={formatName(selected, true)}
+                name={formatName(selected, true) || "-"}
                 className="size-6 rounded-full"
               />
-              <span>{formatName(selected)}</span>
+              <span>{formatName(selected) || "-"}</span>
             </div>
           ) : (
             <span>{t("show_all")}</span>
@@ -107,7 +107,7 @@ export const PractitionerSelector = ({
               {practitioners?.users.map((user) => (
                 <CommandItem
                   key={user.id}
-                  value={formatName(user)}
+                  value={formatName(user) || "-"}
                   onSelect={() => {
                     onSelect(user);
                     setOpen(false);
@@ -117,15 +117,15 @@ export const PractitionerSelector = ({
                   <div className="flex items-center gap-2 w-full">
                     <Avatar
                       imageUrl={user.profile_picture_url}
-                      name={formatName(user, true)}
+                      name={formatName(user, true) || "-"}
                       className="size-6 rounded-full"
                     />
                     <div className="flex flex-col min-w-0">
                       <span
                         className="truncate text-sm font-medium"
-                        title={formatName(user)}
+                        title={formatName(user) || "-"}
                       >
-                        {formatName(user)}
+                        {formatName(user) || "-"}
                       </span>
                       <span className="text-xs text-gray-500 truncate">
                         {user.username}

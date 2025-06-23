@@ -364,9 +364,7 @@ export default function useFileManager(
               },
               {
                 label: "Uploaded By",
-                content: archiveDialogueOpen?.uploaded_by
-                  ? formatName(archiveDialogueOpen.uploaded_by)
-                  : "-",
+                content: formatName(archiveDialogueOpen?.uploaded_by) || "-",
                 icon: "l-user",
               },
               {
@@ -381,9 +379,7 @@ export default function useFileManager(
               },
               {
                 label: "Archived By",
-                content: archiveDialogueOpen?.archived_by
-                  ? formatName(archiveDialogueOpen.archived_by)
-                  : "-",
+                content: formatName(archiveDialogueOpen?.archived_by) || "-",
                 icon: "l-user",
               },
               {

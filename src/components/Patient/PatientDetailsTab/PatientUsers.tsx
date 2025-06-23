@@ -137,14 +137,14 @@ function AddUserSheet({ patientId }: AddUserSheetProps) {
               <div className="rounded-lg border border-gray-200 p-4 space-y-4">
                 <div className="flex items-start gap-4">
                   <Avatar
-                    name={formatName(selectedUser, true)}
+                    name={formatName(selectedUser, true) || "-"}
                     imageUrl={selectedUser.profile_picture_url}
                     className="size-12"
                   />
                   <div className="flex flex-col flex-1">
-                    <TooltipComponent content={formatName(selectedUser)}>
+                    <TooltipComponent content={formatName(selectedUser) || "-"}>
                       <p className="font-medium text-gray-900 truncate max-w-56 sm:max-w-48 md:max-w-64 lg:max-w-64 xl:max-w-36">
-                        {formatName(selectedUser)}
+                        {formatName(selectedUser) || "-"}
                       </p>
                     </TooltipComponent>
                     <span className="text-sm text-gray-500">
@@ -280,15 +280,15 @@ export const PatientUsers = ({ patientData }: PatientProps) => {
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4">
                 <Avatar
-                  name={formatName(user, true)}
+                  name={formatName(user, true) || "-"}
                   className="size-10"
                   imageUrl={user.profile_picture_url}
                 />
                 <div>
                   <h3 className="inline-flex">
-                    <TooltipComponent content={formatName(user)}>
+                    <TooltipComponent content={formatName(user) || "-"}>
                       <p className="text-sm font-medium text-gray-900 truncate max-w-32 sm:max-w-96 md:max-w-32 lg:max-w-28 xl:max-w-36">
-                        {formatName(user)}
+                        {formatName(user) || "-"}
                       </p>
                     </TooltipComponent>
                   </h3>

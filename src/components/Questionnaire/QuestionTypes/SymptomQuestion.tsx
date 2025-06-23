@@ -839,7 +839,7 @@ export function SymptomQuestion({
               {
                 key: "created_by",
                 label: t("recorded_by"),
-                render: (created_by) => formatName(created_by),
+                render: (created_by) => formatName(created_by) || "-",
               },
             ],
             queryKey: ["symptoms", patientId],

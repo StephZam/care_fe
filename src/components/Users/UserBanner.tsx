@@ -17,14 +17,14 @@ export default function UserBanner({ userData }: { userData: UserBase }) {
       <div className="flex flex-row gap-2 self-center">
         <Avatar
           imageUrl={userData?.profile_picture_url}
-          name={formatName(userData, true)}
+          name={formatName(userData, true) || "-"}
           className="size-20 md:mr-2 shrink-0"
         />
         <div className="grid grid-cols-1 self-center">
           <div className="flex flex-row items-center gap-3">
-            <TooltipComponent content={formatName(userData)} side="top">
+            <TooltipComponent content={formatName(userData) || "-"} side="top">
               <h1 className="text-xl font-bold truncate" id="users-name">
-                {formatName(userData)}
+                {formatName(userData) || "-"}
               </h1>
             </TooltipComponent>
             <div className="min-width-50 shrink-0 text-sm text-secondary-600">

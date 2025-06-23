@@ -143,12 +143,12 @@ export default function LinkFacilityUserSheet({
                 <div className="flex gap-4 flex-row">
                   <Avatar
                     imageUrl={selectedUser.profile_picture_url}
-                    name={formatName(selectedUser, true)}
+                    name={formatName(selectedUser, true) || "-"}
                     className="size-12"
                   />
                   <div className="w-3/4">
                     <p className="font-medium text-lg truncate">
-                      {formatName(selectedUser)}
+                      {formatName(selectedUser) || "-"}
                     </p>
                     <span className="text-sm text-gray-500">
                       {selectedUser.email}

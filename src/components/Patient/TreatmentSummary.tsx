@@ -423,7 +423,7 @@ export default function TreatmentSummary({
                       criticality: t(allergy.criticality),
                       verification: t(allergy.verification_status),
                       notes: allergy.note,
-                      logged_by: formatName(allergy.created_by),
+                      logged_by: formatName(allergy.created_by) || "-",
                     }))}
                   />
                 </SectionLayout>
@@ -453,7 +453,7 @@ export default function TreatmentSummary({
                           ).toLocaleDateString()
                         : "-",
                       notes: symptom.note,
-                      logged_by: formatName(symptom.created_by),
+                      logged_by: formatName(symptom.created_by) || "-",
                     }))}
                   />
                 </SectionLayout>
@@ -481,7 +481,7 @@ export default function TreatmentSummary({
                           ).toLocaleDateString()
                         : undefined,
                       notes: diagnosis.note,
-                      logged_by: formatName(diagnosis.created_by),
+                      logged_by: formatName(diagnosis.created_by) || "-",
                     }))}
                   />
                 </SectionLayout>
@@ -573,7 +573,7 @@ export default function TreatmentSummary({
                         .join(" - "),
                       reason: medication.reason,
                       notes: medication.note,
-                      logged_by: formatName(medication.created_by),
+                      logged_by: formatName(medication.created_by) || "-",
                     }))}
                   />
                 </SectionLayout>

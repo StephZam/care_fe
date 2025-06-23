@@ -139,13 +139,13 @@ export function SymptomTable({ symptoms }: SymptomTableProps) {
             <TableCell className="last:rounded-r-md">
               <div className="flex items-center gap-2">
                 <Avatar
-                  name={formatName(symptom.created_by)}
+                  name={formatName(symptom.created_by) || "-"}
                   className="size-4"
                   imageUrl={symptom.created_by.profile_picture_url}
                 />
 
                 <span className="text-sm">
-                  {formatName(symptom.created_by)}
+                  {formatName(symptom.created_by) || "-"}
                 </span>
               </div>
             </TableCell>

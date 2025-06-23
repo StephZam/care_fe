@@ -267,9 +267,7 @@ export const DrawingPage = ({
                       </p>
                       <p className="flex items-center gap-1">
                         <CareIcon icon="l-user" className="text-gray-400" />
-                        {drawing.created_by
-                          ? formatName(drawing.created_by)
-                          : "-"}
+                        {formatName(drawing.created_by) || "-"}
                       </p>
                     </div>
                   </CardContent>

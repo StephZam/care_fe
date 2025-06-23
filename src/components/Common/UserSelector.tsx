@@ -119,12 +119,15 @@ export default function UserSelector({
             <div className="flex items-center gap-2">
               <Avatar
                 imageUrl={selected.profile_picture_url}
-                name={formatName(selected, true)}
+                name={formatName(selected, true) || "-"}
                 className="size-6 rounded-full"
               />
-              <TooltipComponent content={formatName(selected)} side="bottom">
+              <TooltipComponent
+                content={formatName(selected) || "-"}
+                side="bottom"
+              >
                 <p className="font-medium text-gray-900 truncate max-w-48 sm:max-w-56 md:max-w-64">
-                  {formatName(selected)}
+                  {formatName(selected) || "-"}
                 </p>
               </TooltipComponent>
             </div>
@@ -166,15 +169,15 @@ export default function UserSelector({
                   <div className="flex items-center gap-2 w-full">
                     <Avatar
                       imageUrl={user.profile_picture_url}
-                      name={formatName(user, true)}
+                      name={formatName(user, true) || "-"}
                       className="size-6 rounded-full"
                     />
                     <div className="flex flex-col min-w-0">
                       <span
                         className="truncate text-sm font-medium"
-                        title={formatName(user)}
+                        title={formatName(user) || "-"}
                       >
-                        {formatName(user)}
+                        {formatName(user) || "-"}
                       </span>
                       <span className="text-xs text-gray-500 truncate">
                         {user.username}

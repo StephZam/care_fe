@@ -35,6 +35,10 @@ import { LocationSheet } from "@/components/Location/LocationSheet";
 import { LocationTree } from "@/components/Location/LocationTree";
 import LinkDepartmentsSheet from "@/components/Patient/LinkDepartmentsSheet";
 
+import useAuthUser from "@/hooks/useAuthUser";
+
+import { getPermissions } from "@/common/Permissions";
+
 import { PLUGIN_Component } from "@/PluginEngine";
 import dayjs from "@/Utils/dayjs";
 import { formatDateTime, formatPatientAge } from "@/Utils/utils";
@@ -59,6 +63,16 @@ export default function PatientInfoCard(props: PatientInfoCardProps) {
   const subpathMatch = usePathParams("/facility/:facilityId/*");
   const facilityIdExists = !!subpathMatch?.facilityId;
   const { t } = useTranslation();
+  const user = useAuthUser();
+  const permissions = getPermissions(
+    (perm, perms) => perms.includes(perm),
+    user?.permissions || [],
+  );
+  const canViewPatient = permissions.canViewPatients;
+  const isAdmin =
+    user.user_type === "administrator" || user.is_superuser === true;
+  const isCompleted = completedEncounterStatus.includes(encounter.status);
+  const canShowLink = isAdmin || (canViewPatient && !isCompleted);
 
   return (
     <>
@@ -78,18 +92,24 @@ export default function PatientInfoCard(props: PatientInfoCardProps) {
                 className="mb-2 flex flex-col text-base md:text-xl font-semibold capitalize lg:hidden"
                 id="patient-name-consultation"
               >
-                <Link
-                  href={`/facility/${encounter.facility.id}/patient/${encounter.patient.id}`}
-                  className="text-gray-950 font-semibold flex items-start leading-tight"
-                  id="patient-details"
-                  data-cy="patient-details-button"
-                >
-                  {patient.name}
-                  <CareIcon
-                    icon="l-external-link-alt"
-                    className="size-3 opacity-50 mt-1"
-                  />
-                </Link>
+                {canShowLink ? (
+                  <Link
+                    href={`/facility/${encounter.facility.id}/patient/${encounter.patient.id}`}
+                    className="text-gray-950 font-semibold flex items-start leading-tight"
+                    id="patient-details"
+                    data-cy="patient-details-button"
+                  >
+                    {patient.name}
+                    <CareIcon
+                      icon="l-external-link-alt"
+                      className="size-3 opacity-50 mt-1"
+                    />
+                  </Link>
+                ) : (
+                  <span className="text-gray-950 font-semibold flex items-start leading-tight">
+                    {patient.name}
+                  </span>
+                )}
                 <div className="my-[2px] text-sm font-semibold text-secondary-600">
                   {formatPatientAge(patient, true)} •{" "}
                   {t(`GENDER__${patient.gender}`)}
@@ -117,18 +137,24 @@ export default function PatientInfoCard(props: PatientInfoCardProps) {
                 className="hidden flex-row text-xl font-semibold capitalize lg:flex"
                 id="patient-name-consultation"
               >
-                <Link
-                  href={`/facility/${encounter.facility.id}/patient/${encounter.patient.id}`}
-                  className="font-semibold flex items-center gap-1"
-                  id="patient-details"
-                  data-cy="patient-details-button"
-                >
-                  {patient.name}
-                  <CareIcon
-                    icon="l-external-link-alt"
-                    className="size-4 opacity-70"
-                  />
-                </Link>
+                {canShowLink ? (
+                  <Link
+                    href={`/facility/${encounter.facility.id}/patient/${encounter.patient.id}`}
+                    className="font-semibold flex items-center gap-1"
+                    id="patient-details"
+                    data-cy="patient-details-button"
+                  >
+                    {patient.name}
+                    <CareIcon
+                      icon="l-external-link-alt"
+                      className="size-4 opacity-70"
+                    />
+                  </Link>
+                ) : (
+                  <span className="font-semibold flex items-center gap-1">
+                    {patient.name}
+                  </span>
+                )}
                 <div className="ml-3 mr-2 mt-[6px] text-sm font-semibold text-secondary-600">
                   {formatPatientAge(patient, true)} •{" "}
                   {t(`GENDER__${patient.gender}`)}

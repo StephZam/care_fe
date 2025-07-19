@@ -367,7 +367,7 @@ export function CareTeamSheet({
               </AlertDialogTitle>
               <AlertDialogDescription>
                 {t("confirm_removing_member_description", {
-                  member: formatName(memberToRemove) || "",
+                  member: memberToRemove ? formatName(memberToRemove) : "",
                 })}
               </AlertDialogDescription>
             </AlertDialogHeader>

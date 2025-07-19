@@ -57,7 +57,7 @@ export const formatName = (
   },
   hidePrefixSuffix: boolean = false,
 ) => {
-  if (!user) return null;
+  if (!user) return "-";
   const name = [
     hidePrefixSuffix ? undefined : user.prefix,
     user.first_name,
@@ -67,7 +67,7 @@ export const formatName = (
     .map((s) => s?.trim())
     .filter(Boolean)
     .join(" ");
-  return name || user.username || null;
+  return name || user.username || "-";
 };
 
 export const relativeTime = (time?: DateLike) => {

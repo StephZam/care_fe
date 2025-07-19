@@ -121,10 +121,10 @@ export const Appointments = (props: PatientProps) => {
                       <div className="flex items-center gap-2">
                         <Avatar
                           imageUrl={appointment.booked_by?.profile_picture_url}
-                          name={formatName(appointment.booked_by, true) || "-"}
+                          name={formatName(appointment.booked_by, true)}
                           className="size-6 rounded-full"
                         />
-                        <span>{formatName(appointment.booked_by) || "-"}</span>
+                        <span>{formatName(appointment.booked_by)}</span>
                       </div>
                     ) : (
                       <span className="text-gray-500">{t("self_booked")}</span>

@@ -43,13 +43,13 @@ export function UserCard({ user, className, facilityId }: Props) {
           <div className="flex flex-col sm:flex-row gap-4">
             <Avatar
               imageUrl={user.profile_picture_url}
-              name={formatName(user, true) || "-"}
+              name={formatName(user, true)}
               className="size-32 rounded-lg"
             />
 
             <div className="flex grow flex-col min-w-0">
               <h3 className="truncate text-xl font-semibold">
-                {formatName(user) || "-"}
+                {formatName(user)}
               </h3>
               <p className="text-sm text-gray-500">{user.user_type}</p>
             </div>

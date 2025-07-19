@@ -145,7 +145,7 @@ export const Comment = ({
     )}
   >
     <div className="flex items-start gap-3">
-      <TooltipComponent content={formatName(created_by) || "-"}>
+      <TooltipComponent content={formatName(created_by)}>
         <div className="flex">
           <Avatar
             name={`${created_by.first_name} ${created_by.last_name}`}
@@ -156,7 +156,7 @@ export const Comment = ({
       <div className="flex flex-col grow mt-1">
         <div className="flex items-center justify-between w-full">
           <span className="text-gray-700 font-medium text-xs md:text-sm">
-            {formatName(created_by) || "-"}
+            {formatName(created_by)}
           </span>
           <RelativeDateTooltip
             date={created_date}

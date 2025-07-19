@@ -540,7 +540,7 @@ export function DiagnosisQuestion({
               {
                 key: "created_by",
                 label: t("recorded_by"),
-                render: (created_by) => formatName(created_by) || "-",
+                render: (created_by) => formatName(created_by),
               },
             ],
             queryKey: ["diagnoses_and_chronic_conditions", patientId],

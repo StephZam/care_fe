@@ -257,14 +257,14 @@ export function CareTeamSheet({
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <Avatar
-                            name={formatName(member.member) || "-"}
+                            name={formatName(member.member)}
                             imageUrl={member.member?.profile_picture_url}
                             className="size-8"
                           />
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-medium">
-                                {formatName(member.member) || "-"}
+                                {formatName(member.member)}
                               </p>
                               {index === 0 && (
                                 <Badge

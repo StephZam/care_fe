@@ -23,17 +23,17 @@ import query from "@/Utils/request/query";
 import { formatName } from "@/Utils/utils";
 import { usePermissions } from "@/context/PermissionContext";
 import {
-  Encounter,
+  EncounterRead,
   inactiveEncounterStatus,
 } from "@/types/emr/encounter/encounter";
-import { Patient } from "@/types/emr/patient/patient";
+import { PatientRead } from "@/types/emr/patient/patient";
 import patientApi from "@/types/emr/patient/patientApi";
 import metaArtifactApi from "@/types/metaAritifact/metaArtifactApi";
 
 export interface DrawingsTabProps {
   type: "encounter" | "patient";
-  patient?: Patient;
-  encounter?: Encounter;
+  patient?: PatientRead;
+  encounter?: EncounterRead;
   patientId?: string;
   readOnly?: boolean;
 }

@@ -757,7 +757,6 @@ function ActivityDefinitionFormContent({
                         description={t(
                           "select_or_create_specimen_requirements",
                         )}
-                        allowDuplicate={true}
                         value={form.watch("specimen_requirements") || []}
                         onChange={(values) =>
                           form.setValue("specimen_requirements", values)
@@ -893,7 +892,6 @@ function ActivityDefinitionFormContent({
                         description={t(
                           "select_or_create_charge_item_definitions",
                         )}
-                        allowDuplicate={true}
                         value={form.watch("charge_item_definitions") || []}
                         onChange={(values) =>
                           form.setValue("charge_item_definitions", values)

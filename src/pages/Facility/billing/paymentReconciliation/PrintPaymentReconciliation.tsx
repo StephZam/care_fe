@@ -8,6 +8,14 @@ import PrintPreview from "@/CAREUI/misc/PrintPreview";
 import { Badge } from "@/components/ui/badge";
 import { MonetaryDisplay } from "@/components/ui/monetary-display";
 import { Separator } from "@/components/ui/separator";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import Loading from "@/components/Common/Loading";
 
@@ -75,18 +83,20 @@ export function PrintPaymentReconciliation({
 
   return (
     <PrintPreview title={`${t("payment_receipt")} #${payment.id}`}>
-      <div className="min-h-screen md:p-2 max-w-4xl mx-auto">
+      <div className="w-full max-w-full min-w-0 box-border px-2 sm:px-4">
         <div>
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 pb-2 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-4 pb-2 border-b border-gray-200 space-y-2 sm:space-y-0">
             <img
               src={careConfig.mainLogo?.dark}
               alt="Care Logo"
               className="h-10 w-auto object-contain mb-2 sm:mb-0 sm:order-2"
             />
-            <div className="text-center sm:text-left sm:order-1">
-              <h1 className="text-3xl font-semibold">{t("payment_receipt")}</h1>
-              <h2 className="text-gray-500 uppercase text-sm tracking-wide mt-1 font-semibold">
+            <div className="text-center sm:text-left w-full sm:w-auto order-2 sm:order-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold break-words">
+                {t("payment_receipt")}
+              </h1>
+              <h2 className="text-gray-500 uppercase text-xs sm:text-sm tracking-wide mt-1 font-semibold">
                 {t("payment")} #{payment.id}
                 <span className="ml-2">
                   <Badge
@@ -110,9 +120,9 @@ export function PrintPaymentReconciliation({
           </div>
 
           {/* Payment Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
-            <div>
-              <div className="font-semibold text-gray-500 mb-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 text-sm">
+            <div className="min-w-0">
+              <div className="font-semibold text-gray-500 mb-1 text-xs sm:text-sm">
                 {t("payment_date")}
               </div>
               <div>
@@ -123,27 +133,29 @@ export function PrintPaymentReconciliation({
                 </p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="font-semibold text-gray-500 mb-1">
+            <div className="text-left sm:text-right min-w-0">
+              <div className="font-semibold text-gray-500 mb-1 text-xs sm:text-sm">
                 {t("payment_method")}
               </div>
               <div>
-                <p className="font-medium">{methodMap[payment.method]}</p>
+                <p className="font-medium text-sm break-words">
+                  {methodMap[payment.method]}
+                </p>
               </div>
             </div>
             {(payment.reference_number || payment.authorization) && (
-              <div>
-                <div className="font-semibold text-gray-500 mb-1">
+              <div className="sm:col-span-2 min-w-0">
+                <div className="font-semibold text-gray-500 mb-1 text-xs sm:text-sm">
                   {t("reference_details")}
                 </div>
-                <div>
+                <div className="space-y-1">
                   {payment.reference_number && (
-                    <p>
+                    <p className="text-sm break-all">
                       {t("reference")}: {payment.reference_number}
                     </p>
                   )}
                   {payment.authorization && (
-                    <p>
+                    <p className="text-sm break-all">
                       {t("authorization")}: {payment.authorization}
                     </p>
                   )}
@@ -152,94 +164,100 @@ export function PrintPaymentReconciliation({
             )}
           </div>
 
-          <Separator className="my-6" />
+          <Separator className="my-4 sm:my-6" />
 
           {/* Related Invoice */}
           {payment.target_invoice && (
             <>
-              <h3 className="font-medium text-lg mb-2">
+              <h3 className="font-medium text-base sm:text-lg mb-3 break-words">
                 {t("related_invoice")}
               </h3>
-              <div className="overflow-x-auto mb-6">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b text-sm">
-                      <th className="pb-2 text-left font-medium text-gray-500">
+              <div className="mb-4 sm:mb-6">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-left min-w-0">
                         {t("invoice_number")}
-                      </th>
-                      <th className="pb-2 text-left font-medium text-gray-500">
+                      </TableHead>
+                      <TableHead className="text-left min-w-0">
                         {t("title")}
-                      </th>
-                      <th className="pb-2 text-left font-medium text-gray-500">
+                      </TableHead>
+                      <TableHead className="text-left min-w-0">
                         {t("status")}
-                      </th>
-                      <th className="pb-2 text-right font-medium text-gray-500">
+                      </TableHead>
+                      <TableHead className="text-right min-w-0">
                         {t("amount")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="py-4">
-                        <div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="min-w-0">
+                        <div className="text-xs sm:text-sm break-all">
                           <div>#{payment.target_invoice.id}</div>
                         </div>
-                      </td>
-                      <td className="py-4">{payment.target_invoice.number}</td>
-                      <td className="py-4">{payment.target_invoice.status}</td>
-                      <td className="py-4 text-right">
+                      </TableCell>
+                      <TableCell className="min-w-0">
+                        {payment.target_invoice.number}
+                      </TableCell>
+                      <TableCell className="min-w-0">
+                        {payment.target_invoice.status}
+                      </TableCell>
+                      <TableCell className="min-w-0 text-right">
                         <MonetaryDisplay
                           amount={String(payment.target_invoice.total_gross)}
                         />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </div>
             </>
           )}
 
           {/* Additional Details */}
-          <div className="mb-6">
-            <h3 className="font-medium text-lg mb-2">{t("payment_details")}</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-sm">
-                    <th className="pb-2 text-left font-medium text-gray-500">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="font-medium text-base sm:text-lg mb-3 break-words">
+              {t("payment_details")}
+            </h3>
+            <div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-left min-w-0">
                       {t("type")}
-                    </th>
-                    <th className="pb-2 text-left font-medium text-gray-500">
+                    </TableHead>
+                    <TableHead className="text-left min-w-0">
                       {t("kind")}
-                    </th>
-                    <th className="pb-2 text-left font-medium text-gray-500">
+                    </TableHead>
+                    <TableHead className="text-left min-w-0">
                       {t("issuer_type")}
-                    </th>
-                    <th className="pb-2 text-right font-medium text-gray-500">
+                    </TableHead>
+                    <TableHead className="text-right min-w-0">
                       {t("amount")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b">
-                    <td className="py-4">
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell className="min-w-0">
                       {payment.reconciliation_type.charAt(0).toUpperCase() +
                         payment.reconciliation_type.slice(1)}
-                    </td>
-                    <td className="py-4">
+                    </TableCell>
+                    <TableCell className="min-w-0">
                       {payment.kind.charAt(0).toUpperCase() +
                         payment.kind.slice(1)}
-                    </td>
-                    <td className="py-4">
+                    </TableCell>
+                    <TableCell className="min-w-0">
                       {payment.issuer_type.charAt(0).toUpperCase() +
                         payment.issuer_type.slice(1)}
-                    </td>
-                    <td className="py-4 text-right">
+                    </TableCell>
+                    <TableCell className="min-w-0 text-right">
                       <MonetaryDisplay amount={payment.amount} />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           </div>
 
@@ -269,14 +287,14 @@ export function PrintPaymentReconciliation({
 
           {/* Notes */}
           {payment.note && (
-            <div className="mt-8 text-sm text-gray-600 border-t pt-4">
-              <h3 className="font-medium mb-2">{t("notes")}</h3>
-              <p>{payment.note}</p>
+            <div className="mt-6 sm:mt-8 text-sm text-gray-600 border-t pt-3 sm:pt-4 min-w-0">
+              <h3 className="font-medium mb-2 break-words">{t("notes")}</h3>
+              <p className="break-words whitespace-pre-wrap">{payment.note}</p>
             </div>
           )}
 
           {/* Footer */}
-          <div className="mt-12 border-t pt-4 text-center text-sm text-gray-500">
+          <div className="mt-12 sm:mt-12 border-t pt-3 sm:pt-4 text-center text-xs sm:text-sm text-gray-500">
             <p>{t("thank_you_for_your_payment")}</p>
             <p>{format(new Date(), "PPP")}</p>
           </div>

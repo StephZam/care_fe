@@ -176,34 +176,26 @@ export function PrintPaymentReconciliation({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-left min-w-0">
+                      <TableHead className="text-left">
                         {t("invoice_number")}
                       </TableHead>
-                      <TableHead className="text-left min-w-0">
-                        {t("title")}
-                      </TableHead>
-                      <TableHead className="text-left min-w-0">
-                        {t("status")}
-                      </TableHead>
-                      <TableHead className="text-right min-w-0">
+                      <TableHead className="text-left">{t("title")}</TableHead>
+                      <TableHead className="text-left">{t("status")}</TableHead>
+                      <TableHead className="text-right">
                         {t("amount")}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="min-w-0">
+                      <TableCell>
                         <div className="text-xs sm:text-sm break-all">
                           <div>#{payment.target_invoice.id}</div>
                         </div>
                       </TableCell>
-                      <TableCell className="min-w-0">
-                        {payment.target_invoice.number}
-                      </TableCell>
-                      <TableCell className="min-w-0">
-                        {payment.target_invoice.status}
-                      </TableCell>
-                      <TableCell className="min-w-0 text-right">
+                      <TableCell>{payment.target_invoice.number}</TableCell>
+                      <TableCell>{payment.target_invoice.status}</TableCell>
+                      <TableCell className="text-right">
                         <MonetaryDisplay
                           amount={String(payment.target_invoice.total_gross)}
                         />
@@ -224,35 +216,29 @@ export function PrintPaymentReconciliation({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-left min-w-0">
-                      {t("type")}
-                    </TableHead>
-                    <TableHead className="text-left min-w-0">
-                      {t("kind")}
-                    </TableHead>
-                    <TableHead className="text-left min-w-0">
+                    <TableHead className="text-left">{t("type")}</TableHead>
+                    <TableHead className="text-left">{t("kind")}</TableHead>
+                    <TableHead className="text-left">
                       {t("issuer_type")}
                     </TableHead>
-                    <TableHead className="text-right min-w-0">
-                      {t("amount")}
-                    </TableHead>
+                    <TableHead className="text-right">{t("amount")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell className="min-w-0">
+                    <TableCell>
                       {payment.reconciliation_type.charAt(0).toUpperCase() +
                         payment.reconciliation_type.slice(1)}
                     </TableCell>
-                    <TableCell className="min-w-0">
+                    <TableCell>
                       {payment.kind.charAt(0).toUpperCase() +
                         payment.kind.slice(1)}
                     </TableCell>
-                    <TableCell className="min-w-0">
+                    <TableCell>
                       {payment.issuer_type.charAt(0).toUpperCase() +
                         payment.issuer_type.slice(1)}
                     </TableCell>
-                    <TableCell className="min-w-0 text-right">
+                    <TableCell className="text-right">
                       <MonetaryDisplay amount={payment.amount} />
                     </TableCell>
                   </TableRow>

@@ -139,7 +139,7 @@ export default function FacilityOrganizationNavbar({
   const topLevelOrganizations = allOrganizations?.results || [];
 
   return (
-    <div className="min-w-64 h-full shadow-lg bg-white rounded-lg hidden md:block">
+    <div className="min-w-[16rem] h-full shadow-lg bg-white rounded-lg">
       <ScrollArea className="h-[calc(100vh-14rem)]">
         <div className="p-4">
           {isLoadingOrganizations ? (

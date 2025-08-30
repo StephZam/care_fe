@@ -326,10 +326,23 @@ const initializeResponses = (
     if (q.type === "group" && q.questions) {
       q.questions.forEach(processQuestion);
     } else {
+      let defaultValues: ResponseValue[] = [];
+      if (q.answer_option) {
+        const defaultOption = q.answer_option.find((o) => o.initial_selected);
+        if (defaultOption) {
+          defaultValues = [
+            {
+              type: "string",
+              value: defaultOption.value,
+              coding: defaultOption.code ? defaultOption.code : undefined,
+            },
+          ];
+        }
+      }
       responses.push({
         question_id: q.id,
         link_id: q.link_id,
-        values: [],
+        values: defaultValues,
         structured_type: q.structured_type ?? null,
       });
     }
@@ -953,7 +966,7 @@ export function QuestionnaireForm({
 
         <DebugPreview
           data={questionnaireForms}
-          title={t("from")}
+          title={t("questionnaire_form")}
           className="p-4 space-y-6 max-w-4xl m-2"
         />
       </div>

@@ -164,15 +164,19 @@ export default function FacilityOrganizationList({
                 defaultSize={20}
                 minSize={15}
                 maxSize={30}
-                className="hidden md:flex flex-col"
+                className="hidden md:flex flex-col overflow-hidden"
               >
-                <FacilityOrganizationNavbar
-                  facilityId={facilityId}
-                  selectedOrganizationId={organizationId || null}
-                  expandedOrganizations={expandedOrganizations}
-                  onToggleExpand={handleToggleExpand}
-                  onOrganizationSelect={handleOrganizationSelect}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <div className="min-w-max pr-4">
+                    <FacilityOrganizationNavbar
+                      facilityId={facilityId}
+                      selectedOrganizationId={organizationId || null}
+                      expandedOrganizations={expandedOrganizations}
+                      onToggleExpand={handleToggleExpand}
+                      onOrganizationSelect={handleOrganizationSelect}
+                    />
+                  </div>
+                </div>
               </ResizablePanel>
               <ResizableHandle
                 withHandle

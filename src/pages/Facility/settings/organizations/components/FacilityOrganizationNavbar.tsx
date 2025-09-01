@@ -49,8 +49,8 @@ function OrganizationTreeNode({
     <div className="space-y-1">
       <div
         className={cn(
-          "flex items-center py-1 px-2 rounded-md cursor-pointer hover:bg-gray-100",
-          isSelected && "bg-blue-100 text-blue-800",
+          "flex items-center py-1 px-2 rounded-md cursor-pointer",
+          isSelected ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
         )}
         style={{ paddingLeft: `${level}rem` }}
       >
@@ -58,7 +58,7 @@ function OrganizationTreeNode({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
+            className="h-6 w-6 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               onToggleExpand(organization.id);
@@ -73,7 +73,7 @@ function OrganizationTreeNode({
             )}
           </Button>
         ) : (
-          <span className="w-6" />
+          <span className="w-6 flex-shrink-0" />
         )}
         <div
           onClick={() => {
@@ -83,9 +83,17 @@ function OrganizationTreeNode({
             }
           }}
           data-cy="organization-tree-node-parent"
-          className="flex items-center flex-1 text-sm gap-2 cursor-pointer"
+          className="flex items-center flex-1 text-sm gap-2 cursor-pointer min-w-0"
         >
-          <span className="truncate">{organization.name}</span>
+          <span
+            title={organization.name}
+            className={cn(
+              "flex items-center text-sm gap-2 cursor-pointer rounded-md px-2 py-1 whitespace-nowrap",
+              isSelected ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
+            )}
+          >
+            {organization.name}
+          </span>
         </div>
       </div>
       {isExpanded && children?.results && children.results.length > 0 && (
@@ -139,9 +147,9 @@ export default function FacilityOrganizationNavbar({
   const topLevelOrganizations = allOrganizations?.results || [];
 
   return (
-    <div className="min-w-[16rem] h-full shadow-lg bg-white rounded-lg">
+    <div className="w-full h-full shadow-lg bg-white rounded-lg">
       <ScrollArea className="h-[calc(100vh-14rem)]">
-        <div className="p-4">
+        <div className="p-4 overflow-x-auto">
           {isLoadingOrganizations ? (
             <div className="p-4">
               <Skeleton className="h-8 w-full" />

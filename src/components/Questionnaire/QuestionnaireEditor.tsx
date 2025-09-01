@@ -2391,11 +2391,10 @@ function QuestionEditor({
                     {annotatedAnswerOptions.map((opt, idx) => (
                       <AnimatedWrapper key={opt._id} keyValue={opt._id}>
                         <div className="flex items-center gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             name={`default-choice-${question.id}`}
                             checked={opt.initialSelected}
-                            onChange={() => {
+                            onCheckedChange={() => {
                               const newOptions = annotatedAnswerOptions.map(
                                 (o, i) => ({
                                   ...o,
@@ -2405,7 +2404,7 @@ function QuestionEditor({
                               );
                               updateField("answer_option", newOptions);
                             }}
-                            className="mt-1 appearance-radio"
+                            className="mt-1"
                           />
                           <div className="flex flex-1 gap-4">
                             <div className="w-1/2">

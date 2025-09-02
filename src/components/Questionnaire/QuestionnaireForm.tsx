@@ -33,6 +33,7 @@ import type {
 } from "@/types/questionnaire/form";
 import {
   type Question,
+  AnswerOption,
   findQuestionById,
 } from "@/types/questionnaire/question";
 import { QuestionnaireDetail } from "@/types/questionnaire/questionnaire";
@@ -327,16 +328,16 @@ const initializeResponses = (
       q.questions.forEach(processQuestion);
     } else {
       let defaultValues: ResponseValue[] = [];
-      if (q.answer_option) {
-        const defaultOption = q.answer_option.find((o) => o.initial_selected);
-        if (defaultOption) {
-          defaultValues = [
-            {
-              type: "string",
-              value: defaultOption.value,
-              coding: defaultOption.code ? defaultOption.code : undefined,
-            },
-          ];
+      if (q.answer_option && q.answer_option.length > 0) {
+        const defaultOptions: AnswerOption[] = q.answer_option.filter(
+          (o) => o.initial_selected === true,
+        );
+        if (defaultOptions.length > 0) {
+          defaultValues = defaultOptions.map((opt) => ({
+            type: "string",
+            value: opt.value,
+            coding: opt.code ?? undefined,
+          }));
         }
       }
       responses.push({

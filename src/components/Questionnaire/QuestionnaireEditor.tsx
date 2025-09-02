@@ -92,6 +92,7 @@ import { HTTPError } from "@/Utils/request/types";
 import { swapElements } from "@/Utils/request/utils";
 import organizationApi from "@/types/organization/organizationApi";
 import {
+  AnswerOption,
   EnableWhen,
   Question,
   QuestionType,
@@ -1614,12 +1615,16 @@ function QuestionEditor({
     let transformedValue = value;
 
     if (field === "answer_option" && Array.isArray(value)) {
-      transformedValue = value.map((opt: any) => {
-        const { initialSelected, ...rest } = opt;
-        return {
-          ...rest,
-          initial_selected: initialSelected ?? false,
-        };
+      const answerOptions = value as AnswerOption[];
+      transformedValue = answerOptions.map((opt) => {
+        if ("initialSelected" in opt) {
+          const { initialSelected, ...rest } = opt;
+          return {
+            ...rest,
+            initial_selected: initialSelected ?? false,
+          };
+        }
+        return opt;
       }) as Question[K];
     }
 
@@ -2369,84 +2374,137 @@ function QuestionEditor({
                 {question.type === "choice" && !question.answer_value_set ? (
                   <CardContent className="sm:space-y-4 space-y-3">
                     {annotatedAnswerOptions.length !== 0 && (
-                      <div className="flex justify-end">
-                        <Button
-                          variant="outline"
-                          type="button"
-                          size="sm"
-                          onClick={() => {
-                            const sorted = annotatedAnswerOptions
-                              ? [...annotatedAnswerOptions].sort((a, b) =>
-                                  a.value.localeCompare(b.value),
-                                )
-                              : [];
-                            updateField("answer_option", sorted);
-                          }}
-                        >
-                          <AArrowDown className="size-4" />
-                          {t("sort_alphabetically")}
-                        </Button>
+                      <div className="grid grid-cols-12 items-center border-b pb-2">
+                        <span className="text-sm col-span-1">
+                          {t("default")}
+                        </span>
+                        <div className="col-span-11 flex items-center justify-end gap-4 text-sm text-gray-600">
+                          <span>
+                            {
+                              annotatedAnswerOptions.filter(
+                                (opt) => opt.initialSelected,
+                              ).length
+                            }{" "}
+                            {question.repeats
+                              ? t("defaults_selected")
+                              : t("default_selected")}
+                          </span>
+                          {annotatedAnswerOptions.some(
+                            (opt) => opt.initialSelected,
+                          ) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const cleared = annotatedAnswerOptions.map(
+                                  (o) => ({
+                                    ...o,
+                                    initialSelected: false,
+                                  }),
+                                );
+                                updateField("answer_option", cleared);
+                              }}
+                            >
+                              {question.repeats
+                                ? t("clear_all_defaults")
+                                : t("clear_default")}
+                            </Button>
+                          )}
+                          <Button
+                            variant="outline"
+                            type="button"
+                            size="sm"
+                            onClick={() => {
+                              const sorted = annotatedAnswerOptions
+                                ? [...annotatedAnswerOptions].sort((a, b) =>
+                                    a.value.localeCompare(b.value),
+                                  )
+                                : [];
+                              updateField("answer_option", sorted);
+                            }}
+                          >
+                            <AArrowDown className="size-4" />
+                            {t("sort_alphabetically")}
+                          </Button>
+                        </div>
                       </div>
                     )}
                     {annotatedAnswerOptions.map((opt, idx) => (
                       <AnimatedWrapper key={opt._id} keyValue={opt._id}>
-                        <div className="flex items-center gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0">
-                          <Checkbox
-                            name={`default-choice-${question.id}`}
-                            checked={opt.initialSelected}
-                            onCheckedChange={() => {
-                              const newOptions = annotatedAnswerOptions.map(
-                                (o, i) => ({
-                                  ...o,
-                                  initialSelected:
-                                    i === idx ? !opt.initialSelected : false,
-                                }),
-                              );
-                              updateField("answer_option", newOptions);
-                            }}
-                            className="mt-1"
-                          />
-                          <div className="flex flex-1 gap-4">
-                            <div className="w-1/2">
-                              <Label className="mb-2">
-                                {idx + 1} {" . "} {t("value")}
-                              </Label>
-                              <Input
-                                value={opt.value}
-                                onChange={(e) => {
-                                  const newOptions = [
-                                    ...annotatedAnswerOptions,
-                                  ];
-                                  newOptions[idx] = {
-                                    ...opt,
-                                    value: e.target.value,
-                                  };
+                        <div
+                          className={cn(
+                            "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-2",
+                            opt.initialSelected &&
+                              "bg-gray-100 border border-gray-400",
+                          )}
+                        >
+                          <div className="col-span-1 flex justify-start pt-8">
+                            {question.repeats ? (
+                              <Checkbox
+                                checked={opt.initialSelected}
+                                onCheckedChange={(checked) => {
+                                  const newOptions = annotatedAnswerOptions.map(
+                                    (o, i) =>
+                                      i === idx
+                                        ? { ...o, initialSelected: !!checked }
+                                        : o,
+                                  );
                                   updateField("answer_option", newOptions);
                                 }}
-                                placeholder={t("option_value")}
                               />
-                            </div>
-                            <div className="flex-1">
-                              <Label className="mb-2">
-                                {t("display_text")}
-                              </Label>
-                              <Input
-                                value={opt.display || ""}
-                                onChange={(e) => {
-                                  const newOptions = [
-                                    ...annotatedAnswerOptions,
-                                  ];
-                                  newOptions[idx] = {
-                                    ...opt,
-                                    display: e.target.value,
-                                  };
+                            ) : (
+                              <input
+                                type="radio"
+                                name={`default-choice-${question.id}`}
+                                checked={opt.initialSelected}
+                                onChange={() => {
+                                  const newOptions = annotatedAnswerOptions.map(
+                                    (o, i) => ({
+                                      ...o,
+                                      initialSelected: i === idx,
+                                    }),
+                                  );
                                   updateField("answer_option", newOptions);
                                 }}
-                                placeholder={t("display_text_placeholder")}
+                                className="h-4 w-4 mt-1 text-blue-600"
                               />
-                            </div>
+                            )}
                           </div>
-                          <div className="flex justify-end">
+                          <div className="col-span-5">
+                            <Label className="mb-2 block">
+                              {idx + 1} {" . "} {t("value")}
+                            </Label>
+                            <Input
+                              value={opt.value}
+                              onChange={(e) => {
+                                const newOptions = [...annotatedAnswerOptions];
+                                newOptions[idx] = {
+                                  ...opt,
+                                  value: e.target.value,
+                                };
+                                updateField("answer_option", newOptions);
+                              }}
+                              placeholder={t("option_value")}
+                            />
+                          </div>
+                          <div className="col-span-5">
+                            <Label className="mb-2 block">
+                              {t("display_text")}
+                            </Label>
+                            <Input
+                              value={opt.display || ""}
+                              onChange={(e) => {
+                                const newOptions = [...annotatedAnswerOptions];
+                                newOptions[idx] = {
+                                  ...opt,
+                                  display: e.target.value,
+                                };
+                                updateField("answer_option", newOptions);
+                              }}
+                              placeholder={t("display_text_placeholder")}
+                            />
+                          </div>
+                          <div className="col-span-1 flex justify-end pt-8">
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button

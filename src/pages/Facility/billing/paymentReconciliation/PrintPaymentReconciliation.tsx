@@ -136,7 +136,7 @@ export function PrintPaymentReconciliation({
                 </p>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <div className="font-semibold text-gray-500 mb-1">
                 {t("payment_method")}
               </div>

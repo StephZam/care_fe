@@ -4,7 +4,6 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import query from "@/Utils/request/query";
@@ -147,9 +146,9 @@ export default function FacilityOrganizationNavbar({
   const topLevelOrganizations = allOrganizations?.results || [];
 
   return (
-    <div className="w-full h-full shadow-lg bg-white rounded-lg">
-      <ScrollArea className="h-[calc(100vh-14rem)]">
-        <div className="p-4 overflow-x-auto">
+    <div className="w-full h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
+      <div className="flex-1 overflow-x-auto overflow-y-auto pl-4 pt-4 pr-4">
+        <div className="inline-block min-w-max">
           {isLoadingOrganizations ? (
             <div className="p-4">
               <Skeleton className="h-8 w-full" />
@@ -168,7 +167,7 @@ export default function FacilityOrganizationNavbar({
             ))
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

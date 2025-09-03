@@ -166,8 +166,8 @@ export default function FacilityOrganizationList({
                 maxSize={30}
                 className="hidden md:flex flex-col overflow-hidden"
               >
-                <div className="flex-1 overflow-y-auto">
-                  <div className="min-w-max pr-4">
+                <div className="flex-1">
+                  <div className="h-full w-full">
                     <FacilityOrganizationNavbar
                       facilityId={facilityId}
                       selectedOrganizationId={organizationId || null}

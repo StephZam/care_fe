@@ -3801,7 +3801,7 @@
   "questionnaire_diagnosis_no_encounter": "Diagnosis cannot be recorded without an active encounter",
   "questionnaire_error_loading": "Failed to load questionnaire. Please try again later.",
   "questionnaire_files_no_encounter": "Create an encounter first to upload files",
-  "questionnaire_form": "QuestionnaireForm",
+  "questionnaire_form": "Questionnaire Form",
   "questionnaire_imported_successfully": "Questionnaire Imported Successfully",
   "questionnaire_json_url": "Questionnaire JSON URL",
   "questionnaire_json_url_placeholder": "https://example.com/questionnaire.json",

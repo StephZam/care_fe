@@ -123,7 +123,7 @@ export function PrintPaymentReconciliation({
           </div>
 
           {/* Payment Information */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
+          <div className="flex justify-between items-start mb-6 text-sm">
             <div>
               <div className="font-semibold text-gray-500 mb-1">
                 {t("payment_date")}

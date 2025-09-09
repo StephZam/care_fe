@@ -2374,72 +2374,81 @@ function QuestionEditor({
                 {question.type === "choice" && !question.answer_value_set ? (
                   <CardContent className="sm:space-y-4 space-y-3">
                     {annotatedAnswerOptions.length !== 0 && (
-                      <div className="grid grid-cols-12 items-center border-b pb-2">
-                        <span className="text-sm col-span-1">
-                          {t("default")}
-                        </span>
-                        <div className="col-span-11 flex items-center justify-end gap-4 text-sm text-gray-600">
-                          <span>
-                            {
-                              annotatedAnswerOptions.filter(
-                                (opt) => opt.initialSelected,
-                              ).length
-                            }{" "}
-                            {question.repeats
-                              ? t("defaults_selected")
-                              : t("default_selected")}
-                          </span>
-                          {annotatedAnswerOptions.some(
-                            (opt) => opt.initialSelected,
-                          ) && (
+                      <>
+                        <div className="grid grid-cols-12 items-center border-b pb-2">
+                          <div className="col-span-12 flex items-center justify-end gap-4 text-sm text-gray-600">
+                            <span>
+                              {
+                                annotatedAnswerOptions.filter(
+                                  (opt) => opt.initialSelected,
+                                ).length
+                              }{" "}
+                              {question.repeats
+                                ? t("defaults_selected")
+                                : t("default_selected")}
+                            </span>
+                            {annotatedAnswerOptions.some(
+                              (opt) => opt.initialSelected,
+                            ) && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const cleared = annotatedAnswerOptions.map(
+                                    (o) => ({
+                                      ...o,
+                                      initialSelected: false,
+                                    }),
+                                  );
+                                  updateField("answer_option", cleared);
+                                }}
+                              >
+                                {question.repeats
+                                  ? t("clear_all_defaults")
+                                  : t("clear_default")}
+                              </Button>
+                            )}
                             <Button
                               variant="outline"
+                              type="button"
                               size="sm"
                               onClick={() => {
-                                const cleared = annotatedAnswerOptions.map(
-                                  (o) => ({
-                                    ...o,
-                                    initialSelected: false,
-                                  }),
-                                );
-                                updateField("answer_option", cleared);
+                                const sorted = annotatedAnswerOptions
+                                  ? [...annotatedAnswerOptions].sort((a, b) =>
+                                      a.value.localeCompare(b.value),
+                                    )
+                                  : [];
+                                updateField("answer_option", sorted);
                               }}
                             >
-                              {question.repeats
-                                ? t("clear_all_defaults")
-                                : t("clear_default")}
+                              <AArrowDown className="size-4" />
+                              {t("sort_alphabetically")}
                             </Button>
-                          )}
-                          <Button
-                            variant="outline"
-                            type="button"
-                            size="sm"
-                            onClick={() => {
-                              const sorted = annotatedAnswerOptions
-                                ? [...annotatedAnswerOptions].sort((a, b) =>
-                                    a.value.localeCompare(b.value),
-                                  )
-                                : [];
-                              updateField("answer_option", sorted);
-                            }}
-                          >
-                            <AArrowDown className="size-4" />
-                            {t("sort_alphabetically")}
-                          </Button>
+                          </div>
                         </div>
-                      </div>
+                        <div className="grid grid-cols-12 items-center border-b pb-2 font-medium text-sm text-gray-700">
+                          <div className="col-span-1">{t("default")}</div>
+                          <div className="col-span-5 pl-5">{t("value")}</div>
+                          <div className="col-span-5 pl-3">
+                            {t("display_text")}
+                          </div>
+                          <div className="col-span-1 text-right">
+                            {t("actions")}
+                          </div>
+                        </div>
+                      </>
                     )}
                     {question.repeats ? (
                       annotatedAnswerOptions.map((opt, idx) => (
                         <AnimatedWrapper key={opt._id} keyValue={opt._id}>
                           <div
                             className={cn(
-                              "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-2",
+                              "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-4",
                               opt.initialSelected &&
                                 "bg-gray-100 border border-gray-400",
                             )}
                           >
-                            <div className="col-span-1 flex justify-start pt-8">
+                            <div className="col-span-1 flex justify-start pt-2">
                               <Checkbox
                                 checked={opt.initialSelected}
                                 onCheckedChange={(checked) => {
@@ -2454,9 +2463,6 @@ function QuestionEditor({
                               />
                             </div>
                             <div className="col-span-5">
-                              <Label className="mb-2 block">
-                                {idx + 1} {" . "} {t("value")}
-                              </Label>
                               <Input
                                 value={opt.value}
                                 onChange={(e) => {
@@ -2473,9 +2479,6 @@ function QuestionEditor({
                               />
                             </div>
                             <div className="col-span-5">
-                              <Label className="mb-2 block">
-                                {t("display_text")}
-                              </Label>
                               <Input
                                 value={opt.display || ""}
                                 onChange={(e) => {
@@ -2491,7 +2494,7 @@ function QuestionEditor({
                                 placeholder={t("display_text_placeholder")}
                               />
                             </div>
-                            <div className="col-span-1 flex justify-end pt-8">
+                            <div className="col-span-1 flex justify-end">
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <Button
@@ -2729,12 +2732,12 @@ function QuestionEditor({
                           <AnimatedWrapper key={opt._id} keyValue={opt._id}>
                             <div
                               className={cn(
-                                "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-2",
+                                "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-4",
                                 opt.initialSelected &&
                                   "bg-gray-100 border border-gray-400",
                               )}
                             >
-                              <div className="col-span-1 flex justify-start pt-8">
+                              <div className="col-span-1 flex justify-start pt-2">
                                 <RadioGroupItem
                                   value={opt.value}
                                   id={`default-choice-${question.id}-${idx}`}
@@ -2742,9 +2745,6 @@ function QuestionEditor({
                                 />
                               </div>
                               <div className="col-span-5">
-                                <Label className="mb-2 block">
-                                  {idx + 1} {" . "} {t("value")}
-                                </Label>
                                 <Input
                                   value={opt.value}
                                   onChange={(e) => {
@@ -2761,9 +2761,6 @@ function QuestionEditor({
                                 />
                               </div>
                               <div className="col-span-5">
-                                <Label className="mb-2 block">
-                                  {t("display_text")}
-                                </Label>
                                 <Input
                                   value={opt.display || ""}
                                   onChange={(e) => {
@@ -2779,7 +2776,7 @@ function QuestionEditor({
                                   placeholder={t("display_text_placeholder")}
                                 />
                               </div>
-                              <div className="col-span-1 flex justify-end pt-8">
+                              <div className="col-span-1 flex justify-end">
                                 <Popover>
                                   <PopoverTrigger asChild>
                                     <Button

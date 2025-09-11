@@ -24,7 +24,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import PaginationComponent from "@/components/Common/Pagination";
 import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
-import { EncounterAccordionLayout } from "@/components/Patient/EncounterAccordionLayout";
 
 import { RESULTS_PER_PAGE_LIMIT } from "@/common/constants";
 
@@ -42,6 +41,8 @@ interface Props {
   isPrintPreview?: boolean;
   onlyUnstructured?: boolean;
   canAccess?: boolean;
+  questionnaireId?: string;
+  renderItem?: (response: QuestionnaireResponse) => React.ReactNode;
 }
 
 export function formatValue(
@@ -431,14 +432,14 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
 
       <div className="flex items-center justify-between border-t border-gray-200 mt-8 pt-4 text-sm text-gray-500">
         <div>
-          <span className="text-gray-600">filed by</span>{" "}
+          <span className="text-gray-600">{t("filed_by")}</span>{" "}
           <span className="font-medium text-gray-700">
             {formatName(item.created_by)}
             {item.created_by?.user_type && ` (${item.created_by.user_type})`}
           </span>
         </div>
         <div>
-          <span className="text-gray-600">at</span>{" "}
+          <span className="text-gray-600">{t("at")}</span>{" "}
           <span className="font-medium text-gray-700">
             {formatDateTime(item.created_date)}
           </span>
@@ -448,12 +449,14 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
   );
 }
 
-function ResponseCard({
+export function ResponseCard({
   item,
   isPrintPreview,
+  onTitleClick,
 }: {
   item: QuestionnaireResponse;
   isPrintPreview?: boolean;
+  onTitleClick?: (questionnaireId: string) => void;
 }) {
   const isStructured = !item.questionnaire;
   const structuredType = Object.keys(item.structured_responses || {})[0];
@@ -464,20 +467,41 @@ function ResponseCard({
 
   return isPrintPreview ? (
     <Card className="shadow-none rounded-xl border border-gray-200">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-medium">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle
+          className="text-xl font-medium cursor-pointer hover:bg-gray-100 rounded px-2 -mx-1 transition-colors duration-200 p-2 pr-5"
+          onClick={() => {
+            if (item.questionnaire?.id && onTitleClick) {
+              onTitleClick(item.questionnaire.id);
+            }
+          }}
+        >
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ResponseCardContent item={item} />
       </CardContent>
     </Card>
   ) : (
-    <EncounterAccordionLayout
-      title={isStructured && structuredType ? structuredType : title}
-      actionButton={<PrintButton item={item} />}
-    >
-      <ResponseCardContent item={item} />
-    </EncounterAccordionLayout>
+    <Card className="shadow-none border rounded-lg">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle
+          className="text-lg font-medium cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1 transition-colors duration-200 p-2 pr-5"
+          onClick={() => {
+            if (item.questionnaire?.id && onTitleClick) {
+              onTitleClick(item.questionnaire.id);
+            }
+          }}
+        >
+          {title}
+        </CardTitle>
+        <PrintButton item={item} />
+      </CardHeader>
+      <CardContent>
+        <ResponseCardContent item={item} />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -487,12 +511,14 @@ export default function QuestionnaireResponsesList({
   isPrintPreview = false,
   onlyUnstructured,
   canAccess = true,
+  questionnaireId,
+  renderItem,
 }: Props) {
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{ page?: number }>();
 
   const { data: questionnarieResponses, isLoading } = useQuery({
-    queryKey: ["questionnaireResponses", patientId, qParams],
+    queryKey: ["questionnaireResponses", patientId, qParams, questionnaireId],
     queryFn: query.paginated(patientApi.getQuestionnaireResponses, {
       pathParams: { patientId },
       queryParams: {
@@ -503,6 +529,7 @@ export default function QuestionnaireResponsesList({
         encounter: encounter?.id,
         only_unstructured: onlyUnstructured,
         subject_type: encounter ? "encounter" : "patient",
+        ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
       },
       maxPages: isPrintPreview ? undefined : 1,
       pageSize: isPrintPreview ? 100 : RESULTS_PER_PAGE_LIMIT,
@@ -534,11 +561,15 @@ export default function QuestionnaireResponsesList({
                 {questionnarieResponses?.results?.map(
                   (item: QuestionnaireResponse) => (
                     <li key={item.id}>
-                      <ResponseCard
-                        key={item.id}
-                        item={item}
-                        isPrintPreview={isPrintPreview}
-                      />
+                      {renderItem ? (
+                        renderItem(item)
+                      ) : (
+                        <ResponseCard
+                          key={item.id}
+                          item={item}
+                          isPrintPreview={isPrintPreview}
+                        />
+                      )}
                     </li>
                   ),
                 )}

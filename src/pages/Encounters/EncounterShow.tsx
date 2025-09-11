@@ -29,6 +29,7 @@ import { EncounterMedicinesTab } from "@/pages/Encounters/tabs/medicines";
 import { EncounterObservationsTab } from "@/pages/Encounters/tabs/observations";
 import { EncounterOverviewTab } from "@/pages/Encounters/tabs/overview";
 import { EncounterPlotsTab } from "@/pages/Encounters/tabs/plots";
+import { EncounterResponsesTab } from "@/pages/Encounters/tabs/responses";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { EncounterRead } from "@/types/emr/encounter/encounter";
 import { PatientRead } from "@/types/emr/patient/patient";
@@ -135,6 +136,10 @@ export const EncounterShow = (props: Props) => {
       label: t(`ENCOUNTER_TAB__medicines`),
       component: <EncounterMedicinesTab />,
     },
+    responses: {
+      label: t(`ENCOUNTER_TAB__responses`),
+      component: <EncounterResponsesTab />,
+    },
     files: {
       label: t(`ENCOUNTER_TAB__files`),
       component: <EncounterFilesTab />,
@@ -230,7 +235,7 @@ export const EncounterShow = (props: Props) => {
         <NavTabs
           showMoreAfterIndex={showMoreAfterIndex}
           className="@container w-full"
-          tabContentClassName="flex-none overflow-x-auto overflow-y-hidden lg:overflow-y-auto lg:h-[calc(100vh-12rem)]"
+          tabContentClassName="flex-none overflow-x-auto overflow-y-hidden"
           tabs={tabs}
           currentTab={props.tab}
           tabTriggerClassName="max-w-36"

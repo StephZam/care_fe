@@ -79,8 +79,8 @@ export const EncounterResponsesTab = () => {
   }, [selectedResponseId]);
 
   return (
-    <div className="flex gap-3 h-screen overflow-hidden">
-      <div className="w-1/5 flex flex-col gap-3 pt-1 h-full">
+    <div className="flex gap-3 h-full">
+      <div className="w-1/5 flex flex-col gap-3 pt-1 sticky top-0 self-start h-screen">
         <div className="relative flex-shrink-0">
           <QuestionnaireSearch
             placeholder={
@@ -108,7 +108,7 @@ export const EncounterResponsesTab = () => {
             </Button>
           )}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 overflow-hidden">
           <QuestionnaireResponsesList
             encounter={encounter}
             patientId={patientId}
@@ -127,7 +127,7 @@ export const EncounterResponsesTab = () => {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto h-screen">
         <div className="space-y-4 p-3 pt-13">
           <QuestionnaireResponsesList
             encounter={encounter}

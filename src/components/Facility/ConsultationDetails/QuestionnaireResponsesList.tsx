@@ -451,7 +451,6 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
 
 export function ResponseCard({
   item,
-  isPrintPreview,
   onTitleClick,
 }: {
   item: QuestionnaireResponse;
@@ -465,25 +464,7 @@ export function ResponseCard({
       ? properCase(structuredType.replace(/_/g, " "))
       : item.questionnaire?.title || "";
 
-  return isPrintPreview ? (
-    <Card className="shadow-none rounded-xl border border-gray-200">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle
-          className="text-xl font-medium cursor-pointer hover:bg-gray-100 rounded px-2 -mx-1 transition-colors duration-200 p-2 pr-5"
-          onClick={() => {
-            if (item.questionnaire?.id && onTitleClick) {
-              onTitleClick(item.questionnaire.id);
-            }
-          }}
-        >
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponseCardContent item={item} />
-      </CardContent>
-    </Card>
-  ) : (
+  return (
     <Card className="shadow-none border rounded-lg">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle

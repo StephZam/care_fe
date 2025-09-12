@@ -4,6 +4,7 @@ import QuestionnaireResponsesList, {
 import { QuestionnaireSearch } from "@/components/Questionnaire/QuestionnaireSearch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
@@ -127,7 +128,7 @@ export const EncounterResponsesTab = () => {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto h-screen">
+      <ScrollArea className="flex-1 h-screen">
         <div className="space-y-4 p-3 pt-13">
           <QuestionnaireResponsesList
             encounter={encounter}
@@ -170,7 +171,7 @@ export const EncounterResponsesTab = () => {
             }}
           />
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };

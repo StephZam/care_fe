@@ -81,8 +81,8 @@ export const EncounterResponsesTab = () => {
   }, [selectedResponseId]);
 
   return (
-    <div className="flex gap-3 h-full">
-      <div className="w-1/5 flex flex-col gap-3 pt-1 sticky top-0 self-start h-screen">
+    <div className="flex flex-col md:flex-row gap-3 h-auto md:h-screen">
+      <div className="w-full md:w-1/5 flex flex-col gap-3 pt-1 md:sticky md:top-0 md:self-start md:h-screen">
         <div className="relative w-full">
           <QuestionnaireSearch
             placeholder={
@@ -129,7 +129,7 @@ export const EncounterResponsesTab = () => {
             }
           />
         </div>
-        <div className="flex-1 overflow-hidden">
+        <div className="hidden md:flex-1 md:overflow-hidden md:block">
           <QuestionnaireResponsesList
             encounter={encounter}
             patientId={patientId}
@@ -148,50 +148,52 @@ export const EncounterResponsesTab = () => {
           />
         </div>
       </div>
-      <ScrollArea className="flex-1 h-screen">
-        <div className="space-y-4 p-3 pt-13">
-          <QuestionnaireResponsesList
-            encounter={encounter}
-            patientId={patientId}
-            canAccess={canAccess}
-            questionnaireId={selectedQuestionnaire?.id}
-            renderItem={(response: QuestionnaireResponse) => {
-              return (
-                <div
-                  key={response.id}
-                  ref={(el) => {
-                    responseRefs.current[response.id] = el;
-                  }}
-                >
-                  <Card
-                    className={cn(
-                      "shadow-sm border rounded-lg",
-                      selectedResponseId === response.id &&
-                        "ring-2 ring-primary-500",
-                    )}
+      <div className="flex-1 h-auto md:h-screen md:overflow-hidden">
+        <ScrollArea className="h-auto md:h-full">
+          <div className="space-y-4 p-3">
+            <QuestionnaireResponsesList
+              encounter={encounter}
+              patientId={patientId}
+              canAccess={canAccess}
+              questionnaireId={selectedQuestionnaire?.id}
+              renderItem={(response: QuestionnaireResponse) => {
+                return (
+                  <div
+                    key={response.id}
+                    ref={(el) => {
+                      responseRefs.current[response.id] = el;
+                    }}
                   >
-                    <ResponseCard
-                      item={response}
-                      onTitleClick={(questionnaireId) => {
-                        setSelectedQuestionnaire({
-                          id: questionnaireId,
-                          slug: "",
-                          questions: [],
-                          title: response.questionnaire?.title || "",
-                          status: "active",
-                          subject_type: "encounter",
-                          tags: [],
-                        });
-                        setSelectedResponseId(null);
-                      }}
-                    />
-                  </Card>
-                </div>
-              );
-            }}
-          />
-        </div>
-      </ScrollArea>
+                    <Card
+                      className={cn(
+                        "shadow-sm border rounded-lg",
+                        selectedResponseId === response.id &&
+                          "ring-2 ring-primary-500",
+                      )}
+                    >
+                      <ResponseCard
+                        item={response}
+                        onTitleClick={(questionnaireId) => {
+                          setSelectedQuestionnaire({
+                            id: questionnaireId,
+                            slug: "",
+                            questions: [],
+                            title: response.questionnaire?.title || "",
+                            status: "active",
+                            subject_type: "encounter",
+                            tags: [],
+                          });
+                          setSelectedResponseId(null);
+                        }}
+                      />
+                    </Card>
+                  </div>
+                );
+              }}
+            />
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };

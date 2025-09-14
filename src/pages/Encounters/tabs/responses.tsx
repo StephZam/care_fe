@@ -9,9 +9,9 @@ import { cn } from "@/lib/utils";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
 import { formatDateTime, formatName } from "@/Utils/utils";
-import { t } from "i18next";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { QuestionnaireDetail } from "./../../../types/questionnaire/questionnaire";
 
 interface ResponsesCardProps {
@@ -20,13 +20,13 @@ interface ResponsesCardProps {
   onClick: () => void;
   showTitle?: boolean;
 }
-
 function ResponsesCard({
   response,
   isActive,
   onClick,
   showTitle = true,
 }: ResponsesCardProps) {
+  const { t } = useTranslation();
   return (
     <Card
       onClick={onClick}
@@ -52,7 +52,7 @@ function ResponsesCard({
             </span>
           </div>
         </div>
-        {isActive && <ArrowRight className="ml-2 shrink-5 text-gray-500" />}
+        {isActive && <ArrowRight className="size-4 text-gray-500" />}
       </div>
     </Card>
   );
@@ -64,6 +64,7 @@ export const EncounterResponsesTab = () => {
     patientId,
     canReadSelectedEncounter: canAccess,
   } = useEncounter();
+  const { t } = useTranslation();
   const [selectedQuestionnaire, setSelectedQuestionnaire] =
     useState<QuestionnaireDetail | null>(null);
   const [selectedResponseId, setSelectedResponseId] = useState<string | null>(
@@ -82,7 +83,7 @@ export const EncounterResponsesTab = () => {
   return (
     <div className="flex gap-3 h-full">
       <div className="w-1/5 flex flex-col gap-3 pt-1 sticky top-0 self-start h-screen">
-        <div className="relative flex-shrink-0">
+        <div className="relative w-full">
           <QuestionnaireSearch
             placeholder={
               selectedQuestionnaire
@@ -94,20 +95,39 @@ export const EncounterResponsesTab = () => {
               setSelectedQuestionnaire(q);
               setSelectedResponseId(null);
             }}
+            trigger={
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
+              >
+                <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
+                  <Plus className="size-4 flex-shrink-0" />
+                  <span className="text-left whitespace-normal break-words">
+                    {selectedQuestionnaire
+                      ? selectedQuestionnaire.title
+                      : t("select_questionnaire")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                  {selectedQuestionnaire && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedQuestionnaire(null);
+                        setSelectedResponseId(null);
+                      }}
+                      className="h-5 w-5 p-0 hover:bg-gray-100"
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  )}
+                </div>
+              </Button>
+            }
           />
-          {selectedQuestionnaire && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSelectedQuestionnaire(null);
-                setSelectedResponseId(null);
-              }}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100 rounded"
-            >
-              <X className="size-4" />
-            </Button>
-          )}
         </div>
         <div className="flex-1 overflow-hidden">
           <QuestionnaireResponsesList

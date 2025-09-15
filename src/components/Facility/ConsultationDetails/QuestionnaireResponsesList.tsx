@@ -158,14 +158,14 @@ function QuestionGroup({
     if (!hasAnyValue) return null;
 
     return (
-      <TableRow key={question.id}>
-        <TableCell className="py-1 pl-0 align-top">
+      <TableRow key={question.id} className="flex flex-col md:table-row">
+        <TableCell className="py-1 pl-0 align-top md:w-1/2">
           <div className="text-sm text-gray-600 break-words whitespace-normal">
             {question.text}
           </div>
         </TableCell>
         <TableCell
-          className="py-1 pr-0 align-top"
+          className="py-1 pr-0 align-top md:w-1/2"
           colSpan={response.note ? 1 : 2}
         >
           <div className="text-sm font-medium break-words whitespace-pre-wrap">
@@ -186,7 +186,7 @@ function QuestionGroup({
           </div>
         </TableCell>
         {response.note && (
-          <TableCell className="py-1 pr-0 align-top">
+          <TableCell className="py-1 pr-0 align-top text-right md:table-cell">
             <div className="flex justify-end">
               <Popover>
                 <PopoverTrigger asChild>
@@ -198,7 +198,7 @@ function QuestionGroup({
                     {t("see_note")}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-52 p-4">
+                <PopoverContent className="max-w-[90vw] p-4">
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">
                     {response.note}
                   </p>
@@ -326,14 +326,17 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
                     if (!hasAnyValue) return null;
 
                     return (
-                      <TableRow key={question.id}>
-                        <TableCell className="py-1 pl-0 align-top">
+                      <TableRow
+                        key={question.id}
+                        className="flex flex-col md:table-row"
+                      >
+                        <TableCell className="py-1 pl-0 align-top md:w-1/2">
                           <div className="text-sm text-gray-600 break-words whitespace-normal">
                             {question.text}
                           </div>
                         </TableCell>
                         <TableCell
-                          className="py-1 pr-0 align-top"
+                          className="py-1 pr-0 align-top md:w-1/2"
                           colSpan={response.note ? 1 : 2}
                         >
                           <div className="text-sm font-medium break-words whitespace-pre-wrap">
@@ -357,7 +360,7 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
                           </div>
                         </TableCell>
                         {response.note && (
-                          <TableCell className="py-1 pr-0 align-top text-right">
+                          <TableCell className="py-1 pr-0 align-top text-right md:table-cell">
                             <div className="flex justify-end">
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -369,7 +372,7 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
                                     {t("see_note")}
                                   </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-52 p-4">
+                                <PopoverContent className="max-w-[90vw] p-4">
                                   <p className="text-sm text-gray-700 whitespace-pre-wrap">
                                     {response.note}
                                   </p>
@@ -430,7 +433,7 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
         )}
       </div>
 
-      <div className="flex items-center justify-between border-t border-gray-200 mt-8 pt-4 text-sm text-gray-500">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-t border-gray-200 mt-8 pt-4 text-sm text-gray-500 gap-2">
         <div>
           <span className="text-gray-600">{t("filed_by")}</span>{" "}
           <span className="font-medium text-gray-700">

@@ -92,7 +92,6 @@ import { HTTPError } from "@/Utils/request/types";
 import { swapElements } from "@/Utils/request/utils";
 import organizationApi from "@/types/organization/organizationApi";
 import {
-  AnswerOption,
   EnableWhen,
   Question,
   QuestionType,
@@ -1593,7 +1592,6 @@ function QuestionEditor({
       answer_option?.map((option: any) => ({
         ...option,
         _id: option._id || crypto.randomUUID(),
-        initialSelected: option.initial_selected || false,
       })) || []
     );
   }, [answer_option]);
@@ -1612,23 +1610,7 @@ function QuestionEditor({
     value: Question[K],
     additionalFields?: Partial<Question>,
   ) => {
-    let transformedValue = value;
-
-    if (field === "answer_option" && Array.isArray(value)) {
-      const answerOptions = value as AnswerOption[];
-      transformedValue = answerOptions.map((opt) => {
-        if ("initialSelected" in opt) {
-          const { initialSelected, ...rest } = opt;
-          return {
-            ...rest,
-            initial_selected: initialSelected ?? false,
-          };
-        }
-        return opt;
-      }) as Question[K];
-    }
-
-    onChange({ ...question, [field]: transformedValue, ...additionalFields });
+    onChange({ ...question, [field]: value, ...additionalFields });
   };
 
   const toggleSubQuestionExpanded = (
@@ -2380,7 +2362,7 @@ function QuestionEditor({
                             <span>
                               {
                                 annotatedAnswerOptions.filter(
-                                  (opt) => opt.initialSelected,
+                                  (opt) => opt.initial_selected,
                                 ).length
                               }{" "}
                               {question.repeats
@@ -2388,7 +2370,7 @@ function QuestionEditor({
                                 : t("default_selected")}
                             </span>
                             {annotatedAnswerOptions.some(
-                              (opt) => opt.initialSelected,
+                              (opt) => opt.initial_selected,
                             ) && (
                               <Button
                                 variant="outline"
@@ -2397,7 +2379,7 @@ function QuestionEditor({
                                   const cleared = annotatedAnswerOptions.map(
                                     (o) => ({
                                       ...o,
-                                      initialSelected: false,
+                                      initial_selected: false,
                                     }),
                                   );
                                   updateField("answer_option", cleared);
@@ -2444,18 +2426,18 @@ function QuestionEditor({
                           <div
                             className={cn(
                               "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-4",
-                              opt.initialSelected &&
+                              opt.initial_selected &&
                                 "bg-gray-100 border border-gray-400",
                             )}
                           >
                             <div className="col-span-1 flex justify-start pt-2">
                               <Checkbox
-                                checked={opt.initialSelected}
+                                checked={opt.initial_selected}
                                 onCheckedChange={(checked) => {
                                   const newOptions = annotatedAnswerOptions.map(
                                     (o, i) =>
                                       i === idx
-                                        ? { ...o, initialSelected: !!checked }
+                                        ? { ...o, initial_selected: !!checked }
                                         : o,
                                   );
                                   updateField("answer_option", newOptions);
@@ -2715,14 +2697,14 @@ function QuestionEditor({
                     ) : (
                       <RadioGroup
                         value={
-                          annotatedAnswerOptions.find((o) => o.initialSelected)
+                          annotatedAnswerOptions.find((o) => o.initial_selected)
                             ?.value || ""
                         }
                         onValueChange={(selectedValue) => {
                           const newOptions = annotatedAnswerOptions.map(
                             (o) => ({
                               ...o,
-                              initialSelected: o.value === selectedValue,
+                              initial_selected: o.value === selectedValue,
                             }),
                           );
                           updateField("answer_option", newOptions);
@@ -2733,7 +2715,7 @@ function QuestionEditor({
                             <div
                               className={cn(
                                 "grid grid-cols-12 items-start gap-3 pb-4 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-4",
-                                opt.initialSelected &&
+                                opt.initial_selected &&
                                   "bg-gray-100 border border-gray-400",
                               )}
                             >

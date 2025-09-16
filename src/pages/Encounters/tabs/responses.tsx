@@ -72,14 +72,14 @@ export const EncounterResponsesTab = () => {
     responseId?: string;
   }>();
 
-  const { questionnaireId, questionnaireTitle, responseId } = qParams;
+  const { questionnaireId, responseId } = qParams;
 
   const selectedQuestionnaire = questionnaireId
     ? {
         id: questionnaireId,
         slug: "",
         questions: [],
-        title: questionnaireTitle || "",
+        title: "",
         status: "active",
         subject_type: "encounter",
         tags: [],
@@ -90,7 +90,6 @@ export const EncounterResponsesTab = () => {
     (questionnaire: QuestionnaireDetail) => {
       setQueryParams({
         questionnaireId: questionnaire.id,
-        questionnaireTitle: questionnaire.title,
       });
     },
     [setQueryParams],
@@ -112,10 +111,9 @@ export const EncounterResponsesTab = () => {
   );
 
   const handleTitleClick = useCallback(
-    (questionnaireId: string, title: string) => {
+    (questionnaireId: string) => {
       setQueryParams({
         questionnaireId,
-        questionnaireTitle: title,
       });
     },
     [setQueryParams],
@@ -209,10 +207,7 @@ export const EncounterResponsesTab = () => {
                       <ResponseCard
                         item={response}
                         onTitleClick={(questionnaireId) => {
-                          handleTitleClick(
-                            questionnaireId,
-                            response.questionnaire?.title || "",
-                          );
+                          handleTitleClick(questionnaireId);
                         }}
                       />
                     </Card>

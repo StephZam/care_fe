@@ -10,7 +10,8 @@ import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
 import { formatDateTime, formatName } from "@/Utils/utils";
 import { ArrowRight, Plus, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useQueryParams } from "raviger";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { QuestionnaireDetail } from "./../../../types/questionnaire/questionnaire";
 
@@ -65,20 +66,60 @@ export const EncounterResponsesTab = () => {
     canReadSelectedEncounter: canAccess,
   } = useEncounter();
   const { t } = useTranslation();
-  const [selectedQuestionnaire, setSelectedQuestionnaire] =
-    useState<QuestionnaireDetail | null>(null);
-  const [selectedResponseId, setSelectedResponseId] = useState<string | null>(
-    null,
-  );
-  const responseRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  useEffect(() => {
-    if (selectedResponseId && responseRefs.current[selectedResponseId]) {
-      responseRefs.current[selectedResponseId]?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+  const [qParams, setQueryParams] = useQueryParams<{
+    questionnaireId?: string;
+    questionnaireTitle?: string;
+    responseId?: string;
+  }>();
+
+  const { questionnaireId, questionnaireTitle, responseId } = qParams;
+
+  const selectedQuestionnaire = questionnaireId
+    ? {
+        id: questionnaireId,
+        slug: "",
+        questions: [],
+        title: questionnaireTitle || "",
+        status: "active",
+        subject_type: "encounter",
+        tags: [],
+      }
+    : null;
+
+  const handleQuestionnaireSelect = useCallback(
+    (questionnaire: QuestionnaireDetail) => {
+      setQueryParams({
+        questionnaireId: questionnaire.id,
+        questionnaireTitle: questionnaire.title,
       });
-    }
-  }, [selectedResponseId]);
+    },
+    [setQueryParams],
+  );
+
+  const handleQuestionnaireClear = useCallback(() => {
+    setQueryParams({});
+  }, [setQueryParams]);
+
+  const handleResponseSelect = useCallback(
+    (responseId: string) => {
+      setQueryParams({
+        ...qParams,
+        responseId,
+      });
+      window.location.hash = `response-${responseId}`;
+    },
+    [setQueryParams, qParams],
+  );
+
+  const handleTitleClick = useCallback(
+    (questionnaireId: string, title: string) => {
+      setQueryParams({
+        questionnaireId,
+        questionnaireTitle: title,
+      });
+    },
+    [setQueryParams],
+  );
 
   return (
     <div className="flex flex-col md:flex-row gap-3 h-auto md:h-screen">
@@ -91,10 +132,7 @@ export const EncounterResponsesTab = () => {
                 : t("select_questionnaire")
             }
             subjectType="encounter"
-            onSelect={(q) => {
-              setSelectedQuestionnaire(q);
-              setSelectedResponseId(null);
-            }}
+            onSelect={handleQuestionnaireSelect}
             trigger={
               <Button
                 variant="outline"
@@ -116,8 +154,7 @@ export const EncounterResponsesTab = () => {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedQuestionnaire(null);
-                        setSelectedResponseId(null);
+                        handleQuestionnaireClear();
                       }}
                       className="h-5 w-5 p-0 hover:bg-gray-100"
                     >
@@ -138,9 +175,9 @@ export const EncounterResponsesTab = () => {
             renderItem={(response: QuestionnaireResponse) => (
               <ResponsesCard
                 response={response}
-                isActive={selectedResponseId === response.id}
+                isActive={responseId === response.id}
                 onClick={() => {
-                  setSelectedResponseId(response.id);
+                  handleResponseSelect(response.id);
                 }}
                 showTitle={!selectedQuestionnaire}
               />
@@ -149,7 +186,7 @@ export const EncounterResponsesTab = () => {
         </div>
       </div>
       <div className="flex-1 h-auto md:h-screen md:overflow-hidden">
-        <ScrollArea className="h-auto md:h-full">
+        <ScrollArea className="h-auto md:h-full [overflow-anchor:auto]">
           <div className="space-y-4 p-3">
             <QuestionnaireResponsesList
               encounter={encounter}
@@ -160,30 +197,22 @@ export const EncounterResponsesTab = () => {
                 return (
                   <div
                     key={response.id}
-                    ref={(el) => {
-                      responseRefs.current[response.id] = el;
-                    }}
+                    id={`response-${response.id}`}
+                    className="scroll-mt-24 [overflow-anchor:auto]"
                   >
                     <Card
                       className={cn(
                         "shadow-sm border rounded-lg",
-                        selectedResponseId === response.id &&
-                          "ring-2 ring-primary-500",
+                        responseId === response.id && "ring-2 ring-primary-500",
                       )}
                     >
                       <ResponseCard
                         item={response}
                         onTitleClick={(questionnaireId) => {
-                          setSelectedQuestionnaire({
-                            id: questionnaireId,
-                            slug: "",
-                            questions: [],
-                            title: response.questionnaire?.title || "",
-                            status: "active",
-                            subject_type: "encounter",
-                            tags: [],
-                          });
-                          setSelectedResponseId(null);
+                          handleTitleClick(
+                            questionnaireId,
+                            response.questionnaire?.title || "",
+                          );
                         }}
                       />
                     </Card>

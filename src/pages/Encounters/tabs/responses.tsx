@@ -11,9 +11,7 @@ import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireRespon
 import { formatDateTime, formatName } from "@/Utils/utils";
 import { ArrowRight, Plus, X } from "lucide-react";
 import { useQueryParams } from "raviger";
-import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { QuestionnaireDetail } from "./../../../types/questionnaire/questionnaire";
 
 interface ResponsesCardProps {
   response: QuestionnaireResponse;
@@ -68,7 +66,6 @@ export const EncounterResponsesTab = () => {
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{
     questionnaireId?: string;
-    questionnaireTitle?: string;
     responseId?: string;
   }>();
 
@@ -86,39 +83,6 @@ export const EncounterResponsesTab = () => {
       }
     : null;
 
-  const handleQuestionnaireSelect = useCallback(
-    (questionnaire: QuestionnaireDetail) => {
-      setQueryParams({
-        questionnaireId: questionnaire.id,
-      });
-    },
-    [setQueryParams],
-  );
-
-  const handleQuestionnaireClear = useCallback(() => {
-    setQueryParams({});
-  }, [setQueryParams]);
-
-  const handleResponseSelect = useCallback(
-    (responseId: string) => {
-      setQueryParams({
-        ...qParams,
-        responseId,
-      });
-      window.location.hash = `response-${responseId}`;
-    },
-    [setQueryParams, qParams],
-  );
-
-  const handleTitleClick = useCallback(
-    (questionnaireId: string) => {
-      setQueryParams({
-        questionnaireId,
-      });
-    },
-    [setQueryParams],
-  );
-
   return (
     <div className="flex flex-col md:flex-row gap-3 h-auto md:h-screen">
       <div className="w-full md:w-1/5 flex flex-col gap-3 pt-1 md:sticky md:top-0 md:self-start md:h-screen">
@@ -130,7 +94,7 @@ export const EncounterResponsesTab = () => {
                 : t("select_questionnaire")
             }
             subjectType="encounter"
-            onSelect={handleQuestionnaireSelect}
+            onSelect={(q) => setQueryParams({ questionnaireId: q.id })}
             trigger={
               <Button
                 variant="outline"
@@ -152,7 +116,7 @@ export const EncounterResponsesTab = () => {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleQuestionnaireClear();
+                        setQueryParams({});
                       }}
                       className="h-5 w-5 p-0 hover:bg-gray-100"
                     >
@@ -175,7 +139,8 @@ export const EncounterResponsesTab = () => {
                 response={response}
                 isActive={responseId === response.id}
                 onClick={() => {
-                  handleResponseSelect(response.id);
+                  setQueryParams({ ...qParams, responseId: response.id });
+                  window.location.hash = `response-${response.id}`;
                 }}
                 showTitle={!selectedQuestionnaire}
               />
@@ -206,8 +171,8 @@ export const EncounterResponsesTab = () => {
                     >
                       <ResponseCard
                         item={response}
-                        onTitleClick={(questionnaireId) => {
-                          handleTitleClick(questionnaireId);
+                        onTitleClick={(qid) => {
+                          setQueryParams({ questionnaireId: qid });
                         }}
                       />
                     </Card>

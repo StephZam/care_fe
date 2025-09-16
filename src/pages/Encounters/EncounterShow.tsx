@@ -137,7 +137,7 @@ export const EncounterShow = (props: Props) => {
       component: <EncounterMedicinesTab />,
     },
     responses: {
-      label: t(`ENCOUNTER_TAB__responses`),
+      label: t(`ENCOUNTER_TAB__qnr_responses`),
       component: <EncounterResponsesTab />,
     },
     files: {

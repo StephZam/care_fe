@@ -78,7 +78,7 @@
   "ENCOUNTER_TAB__observations": "Observations",
   "ENCOUNTER_TAB__plots": "Plots",
   "ENCOUNTER_TAB__pressure_sore": "Pressure Sore",
-  "ENCOUNTER_TAB__responses": "Qnr.Responses",
+  "ENCOUNTER_TAB__qnr_responses": "Qnr.Responses",
   "ENCOUNTER_TAB__service_requests": "Service Requests",
   "ENCOUNTER_TAB__summary": "Vitals",
   "ENCOUNTER_TAB__updates": "Overview",

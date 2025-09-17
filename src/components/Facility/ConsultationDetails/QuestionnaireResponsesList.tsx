@@ -502,7 +502,7 @@ export default function QuestionnaireResponsesList({
   const [qParams, setQueryParams] = useQueryParams<{ page?: number }>();
 
   const { data: questionnarieResponses, isLoading } = useQuery({
-    queryKey: ["questionnaireResponses", patientId, qParams, questionnaireId],
+    queryKey: ["questionnaireResponses", patientId, questionnaireId],
     queryFn: query.paginated(patientApi.getQuestionnaireResponses, {
       pathParams: { patientId },
       queryParams: {

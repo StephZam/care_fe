@@ -25,8 +25,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import PaginationComponent from "@/components/Common/Pagination";
 import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
 
-import { RESULTS_PER_PAGE_LIMIT } from "@/common/constants";
-
 import query from "@/Utils/request/query";
 import { formatDateTime, formatName, properCase } from "@/Utils/utils";
 import { EncounterRead } from "@/types/emr/encounter/encounter";
@@ -488,6 +486,7 @@ export function ResponseCard({
     </Card>
   );
 }
+const RESULTS_PER_PAGE_LIMIT = 100;
 
 export default function QuestionnaireResponsesList({
   encounter,

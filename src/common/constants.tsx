@@ -9,7 +9,7 @@ import {
 
 import { EncounterClass } from "@/types/emr/encounter/encounter";
 
-export const RESULTS_PER_PAGE_LIMIT = 100;
+export const RESULTS_PER_PAGE_LIMIT = 14;
 
 /**
  * Contains local storage keys that are potentially used in multiple places.

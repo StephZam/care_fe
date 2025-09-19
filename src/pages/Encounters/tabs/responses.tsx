@@ -4,12 +4,14 @@ import QuestionnaireResponsesList, {
 import { QuestionnaireSearch } from "@/components/Questionnaire/QuestionnaireSearch";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import useBreakpoints from "@/hooks/useBreakpoints";
 import { cn } from "@/lib/utils";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
 import { formatDateTime, formatName } from "@/Utils/utils";
-import { ArrowRight, ChevronDown, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useQueryParams } from "raviger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -86,80 +88,110 @@ export const EncounterResponsesTab = () => {
 
   const [selectedQuestionnaireTitle, setSelectedQuestionnaireTitle] =
     useState<string>("");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const isMobile = useBreakpoints({ default: true, md: false });
 
+  const handleResponseClick = (response: QuestionnaireResponse) => {
+    if (isMobile) {
+      setIsDrawerOpen(false);
+    }
+    setQueryParams({ ...qParams, responseId: response.id });
+    setTimeout(() => {
+      window.location.hash = `#response-${response.id}`;
+    }, 1000);
+  };
+
+  const leftPanel = (
+    <>
+      <div className="relative w-full">
+        <QuestionnaireSearch
+          placeholder={
+            selectedQuestionnaire
+              ? selectedQuestionnaireTitle || selectedQuestionnaire.title
+              : t("select_questionnaire")
+          }
+          subjectType="encounter"
+          onSelect={(q) => {
+            setQueryParams({ questionnaireId: q.id });
+            setSelectedQuestionnaireTitle(q.title);
+          }}
+          trigger={
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
+            >
+              <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
+                <ChevronDown className="size-4 flex-shrink-0" />
+                <span className="text-left whitespace-normal break-words">
+                  {selectedQuestionnaire
+                    ? selectedQuestionnaireTitle || selectedQuestionnaire.title
+                    : t("select_questionnaire")}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                {selectedQuestionnaire && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQueryParams({});
+                      setSelectedQuestionnaireTitle("");
+                    }}
+                    className="h-5 w-5 p-0 hover:bg-gray-100"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                )}
+              </div>
+            </Button>
+          }
+        />
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <QuestionnaireResponsesList
+          encounter={encounter}
+          patientId={patientId}
+          canAccess={canAccess}
+          questionnaireId={selectedQuestionnaire?.id}
+          renderItem={(response: QuestionnaireResponse) => (
+            <ResponsesCard
+              response={response}
+              isActive={responseId === response.id}
+              onClick={() => handleResponseClick(response)}
+              showTitle={!selectedQuestionnaire}
+            />
+          )}
+        />
+      </div>
+    </>
+  );
   return (
     <div className="flex flex-col md:flex-row h-full">
-      <div className="w-full md:w-1/5 flex flex-col gap-3 pt-1 md:h-full md:overflow-y-auto">
-        <div className="relative w-full">
-          <QuestionnaireSearch
-            placeholder={
-              selectedQuestionnaire
-                ? selectedQuestionnaireTitle || selectedQuestionnaire.title
-                : t("select_questionnaire")
-            }
-            subjectType="encounter"
-            onSelect={(q) => {
-              setQueryParams({ questionnaireId: q.id });
-              setSelectedQuestionnaireTitle(q.title);
-            }}
-            trigger={
-              <Button
-                variant="outline"
-                role="combobox"
-                className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
-              >
-                <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
-                  <ChevronDown className="size-4 flex-shrink-0" />
-                  <span className="text-left whitespace-normal break-words">
-                    {selectedQuestionnaire
-                      ? selectedQuestionnaireTitle ||
-                        selectedQuestionnaire.title
-                      : t("select_questionnaire")}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                  {selectedQuestionnaire && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setQueryParams({});
-                        setSelectedQuestionnaireTitle("");
-                      }}
-                      className="h-5 w-5 p-0 hover:bg-gray-100"
-                    >
-                      <X className="size-4" />
-                    </Button>
-                  )}
-                </div>
-              </Button>
-            }
-          />
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          <QuestionnaireResponsesList
-            encounter={encounter}
-            patientId={patientId}
-            canAccess={canAccess}
-            questionnaireId={selectedQuestionnaire?.id}
-            renderItem={(response: QuestionnaireResponse) => (
-              <ResponsesCard
-                response={response}
-                isActive={responseId === response.id}
-                onClick={() => {
-                  setQueryParams({ ...qParams, responseId: response.id });
-                  window.location.hash = `response-${response.id}`;
-                }}
-                showTitle={!selectedQuestionnaire}
-              />
-            )}
-          />
-        </div>
+      <div className="hidden md:flex md:w-1/5 flex flex-col gap-3 pt-1 md:h-full md:overflow-y-auto">
+        {leftPanel}
       </div>
+      {isMobile && (
+        <div className="p-3 border-b md:hidden flex justify-center">
+          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full">
+                <Menu className="h-4 w-4 mr-2" />
+                {t("view_responses")}
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="h-[85vh]">
+              <ScrollArea className="h-full">
+                <div className="p-3 h-full">{leftPanel}</div>
+              </ScrollArea>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      )}
       <div className="flex-1 h-full overflow-y-auto">
         <ScrollArea className="h-full">
-          <div className="space-y-4 p-3">
+          <div className="space-y-4 p-3 overflow-anchor-auto">
             <QuestionnaireResponsesList
               encounter={encounter}
               patientId={patientId}

@@ -60,6 +60,101 @@ function ResponsesCard({
   );
 }
 
+interface LeftPanelProps {
+  encounter: any;
+  patientId: string;
+  canAccess: boolean;
+  responseId?: string;
+  selectedQuestionnaireTitle: string;
+  selectedQuestionnaire: any | null;
+  setSelectedQuestionnaireTitle: (title: string) => void;
+  setQueryParams: (params: any) => void;
+  onResponseClick: (response: QuestionnaireResponse) => void;
+}
+
+function LeftPanel({
+  encounter,
+  patientId,
+  canAccess,
+  responseId,
+  selectedQuestionnaireTitle,
+  selectedQuestionnaire,
+  setSelectedQuestionnaireTitle,
+  setQueryParams,
+  onResponseClick,
+}: LeftPanelProps) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <div className="relative w-full pb-2">
+        <QuestionnaireSearch
+          placeholder={
+            selectedQuestionnaire
+              ? selectedQuestionnaireTitle || selectedQuestionnaire.title
+              : t("select_questionnaire")
+          }
+          subjectType="encounter"
+          onSelect={(q) => {
+            setQueryParams({ questionnaireId: q.id });
+            setSelectedQuestionnaireTitle(q.title);
+          }}
+          trigger={
+            <Button
+              variant="outline"
+              role="combobox"
+              className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
+            >
+              <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
+                <span className="text-left whitespace-normal break-words">
+                  {selectedQuestionnaire
+                    ? selectedQuestionnaireTitle || selectedQuestionnaire.title
+                    : t("select_questionnaire")}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                {selectedQuestionnaire && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setQueryParams({});
+                      setSelectedQuestionnaireTitle("");
+                    }}
+                    className="h-5 w-5 p-0 hover:bg-gray-100"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                )}
+                {!selectedQuestionnaire && (
+                  <ChevronDown className="size-4 flex-shrink-0" />
+                )}
+              </div>
+            </Button>
+          }
+        />
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <QuestionnaireResponsesList
+          encounter={encounter}
+          patientId={patientId}
+          canAccess={canAccess}
+          questionnaireId={selectedQuestionnaire?.id}
+          renderItem={(response: QuestionnaireResponse) => (
+            <ResponsesCard
+              response={response}
+              isActive={responseId === response.id}
+              onClick={() => onResponseClick(response)}
+              showTitle={!selectedQuestionnaire}
+            />
+          )}
+        />
+      </div>
+    </>
+  );
+}
+
 export const EncounterResponsesTab = () => {
   const {
     selectedEncounter: encounter,
@@ -100,71 +195,17 @@ export const EncounterResponsesTab = () => {
   return (
     <div className="flex flex-col md:flex-row h-full">
       <div className="hidden md:flex md:w-1/5 flex flex-col gap-3 pt-1 md:h-full md:overflow-y-auto">
-        <div className="relative w-full">
-          <QuestionnaireSearch
-            placeholder={
-              selectedQuestionnaire
-                ? selectedQuestionnaireTitle || selectedQuestionnaire.title
-                : t("select_questionnaire")
-            }
-            subjectType="encounter"
-            onSelect={(q) => {
-              setQueryParams({ questionnaireId: q.id });
-              setSelectedQuestionnaireTitle(q.title);
-            }}
-            trigger={
-              <Button
-                variant="outline"
-                role="combobox"
-                className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
-              >
-                <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
-                  <span className="text-left whitespace-normal break-words">
-                    {selectedQuestionnaire
-                      ? selectedQuestionnaireTitle ||
-                        selectedQuestionnaire.title
-                      : t("select_questionnaire")}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                  {selectedQuestionnaire && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setQueryParams({});
-                        setSelectedQuestionnaireTitle("");
-                      }}
-                      className="h-5 w-5 p-0 hover:bg-gray-100"
-                    >
-                      <X className="size-4" />
-                    </Button>
-                  )}
-                  {!selectedQuestionnaire && (
-                    <ChevronDown className="size-4 flex-shrink-0" />
-                  )}
-                </div>
-              </Button>
-            }
-          />
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          <QuestionnaireResponsesList
-            encounter={encounter}
-            patientId={patientId}
-            canAccess={canAccess}
-            questionnaireId={selectedQuestionnaire?.id}
-            renderItem={(response: QuestionnaireResponse) => (
-              <ResponsesCard
-                response={response}
-                isActive={responseId === response.id}
-                onClick={() => handleResponseClick(response)}
-                showTitle={!selectedQuestionnaire}
-              />
-            )}
-          />
-        </div>
+        <LeftPanel
+          encounter={encounter}
+          patientId={patientId}
+          canAccess={canAccess}
+          responseId={responseId}
+          selectedQuestionnaire={selectedQuestionnaire}
+          selectedQuestionnaireTitle={selectedQuestionnaireTitle}
+          setSelectedQuestionnaireTitle={setSelectedQuestionnaireTitle}
+          setQueryParams={setQueryParams}
+          onResponseClick={handleResponseClick}
+        />
       </div>
       {isMobile && (
         <div className="p-3 border-b md:hidden flex justify-center">
@@ -181,72 +222,19 @@ export const EncounterResponsesTab = () => {
             >
               <ScrollArea className="h-full">
                 <div className="p-3 h-full">
-                  <div className="relative w-full pb-4">
-                    <QuestionnaireSearch
-                      placeholder={
-                        selectedQuestionnaire
-                          ? selectedQuestionnaireTitle ||
-                            selectedQuestionnaire.title
-                          : t("select_questionnaire")
-                      }
-                      subjectType="encounter"
-                      onSelect={(q) => {
-                        setQueryParams({ questionnaireId: q.id });
-                        setSelectedQuestionnaireTitle(q.title);
-                      }}
-                      trigger={
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className="w-full border border-primary-600 justify-between h-auto min-h-[2.5rem] py-2"
-                        >
-                          <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
-                            <span className="text-left whitespace-normal break-words">
-                              {selectedQuestionnaire
-                                ? selectedQuestionnaireTitle ||
-                                  selectedQuestionnaire.title
-                                : t("select_questionnaire")}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                            {selectedQuestionnaire && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setQueryParams({});
-                                  setSelectedQuestionnaireTitle("");
-                                }}
-                                className="h-5 w-5 p-0 hover:bg-gray-100"
-                              >
-                                <X className="size-4" />
-                              </Button>
-                            )}
-                            {!selectedQuestionnaire && (
-                              <ChevronDown className="size-4 flex-shrink-0" />
-                            )}
-                          </div>
-                        </Button>
-                      }
-                    />
-                  </div>
-                  <div className="flex-1 overflow-y-auto">
-                    <QuestionnaireResponsesList
-                      encounter={encounter}
-                      patientId={patientId}
-                      canAccess={canAccess}
-                      questionnaireId={selectedQuestionnaire?.id}
-                      renderItem={(response: QuestionnaireResponse) => (
-                        <ResponsesCard
-                          response={response}
-                          isActive={responseId === response.id}
-                          onClick={() => handleResponseClick(response)}
-                          showTitle={!selectedQuestionnaire}
-                        />
-                      )}
-                    />
-                  </div>
+                  <LeftPanel
+                    encounter={encounter}
+                    patientId={patientId}
+                    canAccess={canAccess}
+                    responseId={responseId}
+                    selectedQuestionnaire={selectedQuestionnaire}
+                    selectedQuestionnaireTitle={selectedQuestionnaireTitle}
+                    setSelectedQuestionnaireTitle={
+                      setSelectedQuestionnaireTitle
+                    }
+                    setQueryParams={setQueryParams}
+                    onResponseClick={handleResponseClick}
+                  />
                 </div>
               </ScrollArea>
             </DrawerContent>

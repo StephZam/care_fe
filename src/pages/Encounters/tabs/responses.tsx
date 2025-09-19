@@ -92,13 +92,9 @@ export const EncounterResponsesTab = () => {
   const isMobile = useBreakpoints({ default: true, md: false });
 
   const handleResponseClick = (response: QuestionnaireResponse) => {
-    if (isMobile) {
-      setIsDrawerOpen(false);
-    }
     setQueryParams({ ...qParams, responseId: response.id });
-    setTimeout(() => {
-      window.location.hash = `#response-${response.id}`;
-    }, 1000);
+    window.location.hash = `#response-${response.id}`;
+    if (isMobile) setIsDrawerOpen(false);
   };
 
   const leftPanel = (
@@ -181,7 +177,10 @@ export const EncounterResponsesTab = () => {
                 {t("view_responses")}
               </Button>
             </DrawerTrigger>
-            <DrawerContent className="h-[85vh]">
+            <DrawerContent
+              className="h-[85vh]"
+              onCloseAutoFocus={(e) => e.preventDefault()}
+            >
               <ScrollArea className="h-full">
                 <div className="p-3 h-full">{leftPanel}</div>
               </ScrollArea>

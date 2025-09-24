@@ -8,7 +8,6 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useBreakpoints from "@/hooks/useBreakpoints";
 import { cn } from "@/lib/utils";
-import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
 import { formatDateTime, formatName } from "@/Utils/utils";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
@@ -61,7 +60,7 @@ function ResponsesCard({
 }
 
 interface LeftPanelProps {
-  encounter: any;
+  encounterId?: string;
   patientId: string;
   canAccess: boolean;
   responseId?: string;
@@ -73,7 +72,7 @@ interface LeftPanelProps {
 }
 
 function LeftPanel({
-  encounter,
+  encounterId,
   patientId,
   canAccess,
   responseId,
@@ -94,7 +93,7 @@ function LeftPanel({
               ? selectedQuestionnaireTitle || selectedQuestionnaire.title
               : t("select_questionnaire")
           }
-          subjectType="encounter"
+          subjectType={encounterId ? "encounter" : "patient"}
           onSelect={(q) => {
             setQueryParams({ questionnaireId: q.id });
             setSelectedQuestionnaireTitle(q.title);
@@ -137,7 +136,7 @@ function LeftPanel({
       </div>
       <div className="flex-1 overflow-y-auto">
         <QuestionnaireResponsesList
-          encounter={encounter}
+          encounterId={encounterId}
           patientId={patientId}
           canAccess={canAccess}
           questionnaireId={selectedQuestionnaire?.id}
@@ -155,12 +154,17 @@ function LeftPanel({
   );
 }
 
-export const EncounterResponsesTab = () => {
-  const {
-    selectedEncounter: encounter,
-    patientId,
-    canReadSelectedEncounter: canAccess,
-  } = useEncounter();
+interface EncounterResponsesTabProps {
+  patientId: string;
+  encounterId?: string;
+  canAccess?: boolean;
+}
+
+export const EncounterResponsesTab = ({
+  patientId,
+  encounterId,
+  canAccess = true,
+}: EncounterResponsesTabProps) => {
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{
     questionnaireId?: string;
@@ -176,7 +180,7 @@ export const EncounterResponsesTab = () => {
         questions: [],
         title: "",
         status: "active",
-        subject_type: "encounter",
+        subject_type: encounterId ? "encounter" : "patient",
         tags: [],
       }
     : null;
@@ -196,7 +200,7 @@ export const EncounterResponsesTab = () => {
     <div className="flex flex-col md:flex-row h-full">
       <div className="hidden md:flex md:w-1/5 flex flex-col gap-3 pt-1 md:h-full md:overflow-y-auto">
         <LeftPanel
-          encounter={encounter}
+          encounterId={encounterId}
           patientId={patientId}
           canAccess={canAccess}
           responseId={responseId}
@@ -223,7 +227,7 @@ export const EncounterResponsesTab = () => {
               <ScrollArea className="h-full">
                 <div className="p-3 h-full">
                   <LeftPanel
-                    encounter={encounter}
+                    encounterId={encounterId}
                     patientId={patientId}
                     canAccess={canAccess}
                     responseId={responseId}
@@ -245,7 +249,7 @@ export const EncounterResponsesTab = () => {
         <ScrollArea className="h-full">
           <div className="space-y-4 p-3 overflow-anchor-auto">
             <QuestionnaireResponsesList
-              encounter={encounter}
+              encounterId={encounterId}
               patientId={patientId}
               canAccess={canAccess}
               questionnaireId={selectedQuestionnaire?.id}

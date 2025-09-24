@@ -27,14 +27,13 @@ import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
 
 import query from "@/Utils/request/query";
 import { formatDateTime, formatName, properCase } from "@/Utils/utils";
-import { EncounterRead } from "@/types/emr/encounter/encounter";
 import patientApi from "@/types/emr/patient/patientApi";
 import { ResponseValue } from "@/types/questionnaire/form";
 import { Question } from "@/types/questionnaire/question";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
 
 interface Props {
-  encounter?: EncounterRead;
+  encounterId?: string;
   patientId: string;
   isPrintPreview?: boolean;
   onlyUnstructured?: boolean;
@@ -489,7 +488,7 @@ export function ResponseCard({
 const RESULTS_PER_PAGE_LIMIT = 100;
 
 export default function QuestionnaireResponsesList({
-  encounter,
+  encounterId,
   patientId,
   isPrintPreview = false,
   onlyUnstructured,
@@ -515,9 +514,9 @@ export default function QuestionnaireResponsesList({
           limit: RESULTS_PER_PAGE_LIMIT,
           offset: ((qParams.page ?? 1) - 1) * RESULTS_PER_PAGE_LIMIT,
         }),
-        encounter: encounter?.id,
+        encounter: encounterId,
         only_unstructured: onlyUnstructured,
-        subject_type: encounter ? "encounter" : "patient",
+        subject_type: encounterId ? "encounter" : "patient",
         ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
       },
       maxPages: isPrintPreview ? undefined : 1,

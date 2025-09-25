@@ -1,11 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { PaginatedResponse } from "@/Utils/request/types";
+import { cn } from "@/lib/utils";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { t } from "i18next";
 import { Printer } from "lucide-react";
-import { Link, useQueryParams } from "raviger";
-import React from "react";
+import { Link } from "raviger";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-
-import { cn } from "@/lib/utils";
+import { useInView } from "react-intersection-observer";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +23,6 @@ import {
 } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import PaginationComponent from "@/components/Common/Pagination";
 import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
 
 import query from "@/Utils/request/query";
@@ -485,7 +485,7 @@ export function ResponseCard({
     </Card>
   );
 }
-const RESULTS_PER_PAGE_LIMIT = 100;
+const RESULTS_PER_PAGE_LIMIT = 10;
 
 export default function QuestionnaireResponsesList({
   encounterId,
@@ -497,33 +497,47 @@ export default function QuestionnaireResponsesList({
   renderItem,
 }: Props) {
   const { t } = useTranslation();
-  const [qParams, setQueryParams] = useQueryParams<{ page?: number }>();
+  const { ref, inView } = useInView();
 
-  const { data: questionnarieResponses, isLoading } = useQuery({
-    queryKey: [
-      "questionnaireResponses",
-      patientId,
-      encounter?.id,
-      qParams.page,
-      questionnaireId,
-    ],
-    queryFn: query.paginated(patientApi.getQuestionnaireResponses, {
-      pathParams: { patientId },
-      queryParams: {
-        ...(!isPrintPreview && {
-          limit: RESULTS_PER_PAGE_LIMIT,
-          offset: ((qParams.page ?? 1) - 1) * RESULTS_PER_PAGE_LIMIT,
-        }),
-        encounter: encounterId,
-        only_unstructured: onlyUnstructured,
-        subject_type: encounterId ? "encounter" : "patient",
-        ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
+      queryKey: [
+        "questionnaireResponses",
+        patientId,
+        questionnaireId,
+        encounterId,
+      ],
+      queryFn: async ({ pageParam = 0, signal }) => {
+        const response = await query(patientApi.getQuestionnaireResponses, {
+          pathParams: { patientId },
+          queryParams: {
+            ...(!isPrintPreview && {
+              limit: String(RESULTS_PER_PAGE_LIMIT),
+              offset: String(pageParam),
+            }),
+            encounter: encounterId,
+            only_unstructured: onlyUnstructured,
+            subject_type: encounterId ? "encounter" : "patient",
+            ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
+          },
+        })({ signal });
+
+        return response as PaginatedResponse<QuestionnaireResponse>;
       },
-      maxPages: isPrintPreview ? undefined : 1,
-      pageSize: isPrintPreview ? 200 : RESULTS_PER_PAGE_LIMIT,
-    }),
-    enabled: canAccess,
-  });
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, allPages) => {
+        const currentOffset = allPages.length * RESULTS_PER_PAGE_LIMIT;
+        return currentOffset < lastPage.count ? currentOffset : null;
+      },
+      select: (data) => data?.pages.flatMap((p) => p.results) || [],
+      enabled: canAccess,
+    });
+
+  const responses = data ?? [];
+  useEffect(() => {
+    if (inView && hasNextPage) fetchNextPage();
+  }, [inView, hasNextPage, fetchNextPage]);
+
   return (
     <div className="gap-4">
       <div className="max-w-full">
@@ -531,61 +545,42 @@ export default function QuestionnaireResponsesList({
           <div className="grid gap-5">
             <CardListSkeleton count={RESULTS_PER_PAGE_LIMIT} />
           </div>
-        ) : (
-          <div>
-            {questionnarieResponses?.results?.length === 0 ? (
-              <Card
-                className={cn(
-                  "p-6",
-                  isPrintPreview && "shadow-none border-gray-200",
-                )}
-              >
-                <div className="text-lg font-medium text-gray-500">
-                  {t("no_questionnaire_responses")}
-                </div>
-              </Card>
-            ) : (
-              <ul className="grid gap-4">
-                {questionnarieResponses?.results?.map(
-                  (item: QuestionnaireResponse) => (
-                    <li key={item.id}>
-                      {renderItem ? (
-                        renderItem(item)
-                      ) : (
-                        <ResponseCard
-                          key={item.id}
-                          item={item}
-                          isPrintPreview={isPrintPreview}
-                        />
-                      )}
-                    </li>
-                  ),
-                )}
-                {!isPrintPreview && (
-                  <div className="flex w-full items-center justify-center mt-4">
-                    <div
-                      className={cn(
-                        "flex w-full justify-center",
-                        (questionnarieResponses?.count ?? 0) >
-                          RESULTS_PER_PAGE_LIMIT
-                          ? "visible"
-                          : "invisible",
-                      )}
-                    >
-                      <PaginationComponent
-                        cPage={qParams.page ?? 1}
-                        defaultPerPage={RESULTS_PER_PAGE_LIMIT}
-                        data={{
-                          totalCount: questionnarieResponses?.count ?? 0,
-                        }}
-                        onChange={(page) => setQueryParams({ page })}
-                      />
-                    </div>
-                  </div>
-                )}
-              </ul>
+        ) : responses.length === 0 ? (
+          <Card
+            className={cn(
+              "p-6",
+              isPrintPreview && "shadow-none border-gray-200",
             )}
-          </div>
+          >
+            <div className="text-lg font-medium text-gray-500">
+              {t("no_questionnaire_responses")}
+            </div>
+          </Card>
+        ) : (
+          <ul className="grid gap-4">
+            {responses.map((item: QuestionnaireResponse) => (
+              <li key={item.id}>
+                {renderItem ? (
+                  renderItem(item)
+                ) : (
+                  <ResponseCard
+                    key={item.id}
+                    item={item}
+                    isPrintPreview={isPrintPreview}
+                  />
+                )}
+              </li>
+            ))}
+
+            {/* Infinite scroll sentinel */}
+            {!isPrintPreview && hasNextPage && (
+              <li ref={ref} className="flex justify-center py-4">
+                {isFetchingNextPage && (
+                  <CardListSkeleton count={RESULTS_PER_PAGE_LIMIT} />
+                )}
+              </li>
+            )}
+          </ul>
         )}
       </div>
     </div>

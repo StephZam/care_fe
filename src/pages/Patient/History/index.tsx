@@ -17,7 +17,7 @@ import patientApi from "@/types/emr/patient/patientApi";
 
 import { AllergyHistory } from "./AllergyHistory";
 import { DiagnosesHistory } from "./DiagnosesHistory";
-import { ResponsesHistory } from "./QnrResponses";
+import { ResponsesHistory } from "./ResponsesHistory";
 import { SymptomsHistory } from "./SymptomsHistory";
 
 export function ClinicalHistoryPage({

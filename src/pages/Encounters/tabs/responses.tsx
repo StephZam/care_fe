@@ -15,18 +15,18 @@ import { useQueryParams } from "raviger";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-interface ResponsesCardProps {
+interface LeftCardProps {
   response: QuestionnaireResponse;
   isActive: boolean;
   onClick: () => void;
   showTitle?: boolean;
 }
-function ResponsesCard({
+function LeftCard({
   response,
   isActive,
   onClick,
   showTitle = true,
-}: ResponsesCardProps) {
+}: LeftCardProps) {
   const { t } = useTranslation();
   return (
     <Card
@@ -141,7 +141,7 @@ function LeftPanel({
           canAccess={canAccess}
           questionnaireId={selectedQuestionnaire?.id}
           renderItem={(response: QuestionnaireResponse) => (
-            <ResponsesCard
+            <LeftCard
               response={response}
               isActive={responseId === response.id}
               onClick={() => onResponseClick(response)}
@@ -246,7 +246,7 @@ export const EncounterResponsesTab = ({
         </div>
       )}
       <div className="flex-1 h-full overflow-y-auto">
-        <ScrollArea className="h-full">
+        <ScrollArea key={selectedQuestionnaire?.id} className="h-full">
           <div className="space-y-4 p-3 overflow-anchor-auto">
             <QuestionnaireResponsesList
               encounterId={encounterId}

@@ -453,10 +453,12 @@ function ResponseCardContent({ item }: { item: QuestionnaireResponse }) {
 export function ResponseCard({
   item,
   onTitleClick,
+  showTitle = true,
 }: {
   item: QuestionnaireResponse;
   isPrintPreview?: boolean;
   onTitleClick?: (questionnaireId: string) => void;
+  showTitle?: boolean;
 }) {
   const isStructured = !item.questionnaire;
   const structuredType = Object.keys(item.structured_responses || {})[0];
@@ -467,18 +469,22 @@ export function ResponseCard({
 
   return (
     <Card className="shadow-none border rounded-lg">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle
-          className="text-lg font-medium cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1 transition-colors duration-200 p-2 pr-5"
-          onClick={() => {
-            if (item.questionnaire?.id && onTitleClick) {
-              onTitleClick(item.questionnaire.id);
-            }
-          }}
-        >
-          {title}
-        </CardTitle>
-        <PrintButton item={item} />
+      <CardHeader className="flex flex-row items-center pb-2">
+        {showTitle && (
+          <CardTitle
+            className="text-lg font-medium cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1 transition-colors duration-200 p-2 pr-5"
+            onClick={() => {
+              if (item.questionnaire?.id && onTitleClick) {
+                onTitleClick(item.questionnaire.id);
+              }
+            }}
+          >
+            {title}
+          </CardTitle>
+        )}
+        <div className="ml-auto">
+          <PrintButton item={item} />
+        </div>
       </CardHeader>
       <CardContent>
         <ResponseCardContent item={item} />

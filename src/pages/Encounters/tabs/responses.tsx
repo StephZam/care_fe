@@ -204,7 +204,7 @@ export const EncounterResponsesTab = ({
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <DrawerTrigger asChild>
               <Button variant="outline" size="sm" className="w-full">
-                <Menu className="h-4 w-4 mr-2" />
+                <Menu className="size-4 mr-2" />
                 {t("view_responses")}
               </Button>
             </DrawerTrigger>
@@ -256,6 +256,7 @@ export const EncounterResponsesTab = ({
                     >
                       <ResponseCard
                         item={response}
+                        showTitle={!questionnaireId}
                         onTitleClick={(qid) => {
                           setQueryParams({ questionnaireId: qid });
                           setSelectedQuestionnaireTitle(

@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 
 import { cn } from "@/lib/utils";
 
@@ -9,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import query from "@/Utils/request/query";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
 import facilityOrganizationApi from "@/types/facilityOrganization/facilityOrganizationApi";
+import { useEffect } from "react";
 
 interface OrganizationTreeNodeProps {
   organization: FacilityOrganizationRead;
@@ -123,6 +125,8 @@ interface FacilityOrganizationNavbarProps {
   onOrganizationSelect: (organization: FacilityOrganizationRead) => void;
 }
 
+const LIMIT = 20;
+
 export default function FacilityOrganizationNavbar({
   facilityId,
   selectedOrganizationId,
@@ -130,31 +134,46 @@ export default function FacilityOrganizationNavbar({
   onToggleExpand,
   onOrganizationSelect,
 }: FacilityOrganizationNavbarProps) {
-  const { data: allOrganizations, isLoading: isLoadingOrganizations } =
-    useQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteQuery({
       queryKey: ["facilityOrganization", "list", facilityId],
-      queryFn: query(facilityOrganizationApi.list, {
-        pathParams: { facilityId },
-        queryParams: {
-          parent: "",
-        },
-      }),
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      queryFn: async ({ pageParam = 0, signal }) => {
+        const response = query(facilityOrganizationApi.list, {
+          pathParams: { facilityId },
+          queryParams: {
+            parent: "",
+            limit: LIMIT,
+            offset: pageParam,
+          },
+        });
+        const result = await response({ signal });
+        return result;
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage, allPages) => {
+        const offset = allPages.flatMap((page) => page.results).length;
+        return offset < lastPage.count ? offset : undefined;
+      },
     });
+  const organizations = data?.pages.flatMap((p) => p.results) || [];
+  const { ref, inView } = useInView();
 
-  const topLevelOrganizations = allOrganizations?.results || [];
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="w-full h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
       <div className="flex-1 overflow-x-auto overflow-y-auto pl-4 pt-4 pr-4">
         <div className="inline-block min-w-max">
-          {isLoadingOrganizations ? (
+          {isLoading ? (
             <div className="p-4">
               <Skeleton className="h-8 w-full" />
             </div>
           ) : (
-            topLevelOrganizations.map((organization) => (
+            organizations.map((organization) => (
               <OrganizationTreeNode
                 key={organization.id}
                 organization={organization}
@@ -166,6 +185,9 @@ export default function FacilityOrganizationNavbar({
               />
             ))
           )}
+          <div ref={ref} className="p-4">
+            {isFetchingNextPage && <Skeleton className="h-8 w-full" />}
+          </div>
         </div>
       </div>
     </div>

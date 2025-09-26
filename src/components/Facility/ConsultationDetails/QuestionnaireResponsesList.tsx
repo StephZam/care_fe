@@ -40,7 +40,7 @@ interface Props {
   canAccess?: boolean;
   questionnaireId?: string;
   renderItem?: (response: QuestionnaireResponse) => React.ReactNode;
-  SubjectType?: string;
+  subjectType?: string;
 }
 
 export function formatValue(
@@ -502,7 +502,7 @@ export default function QuestionnaireResponsesList({
   canAccess = true,
   questionnaireId,
   renderItem,
-  SubjectType = "encounter",
+  subjectType = "encounter",
 }: Props) {
   const { t } = useTranslation();
   const { ref, inView } = useInView();
@@ -525,7 +525,7 @@ export default function QuestionnaireResponsesList({
             }),
             encounter: encounterId,
             only_unstructured: onlyUnstructured,
-            subject_type: SubjectType,
+            subject_type: subjectType,
             ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
           },
         })({ signal });

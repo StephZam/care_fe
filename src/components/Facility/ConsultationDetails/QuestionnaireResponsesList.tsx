@@ -40,6 +40,7 @@ interface Props {
   canAccess?: boolean;
   questionnaireId?: string;
   renderItem?: (response: QuestionnaireResponse) => React.ReactNode;
+  SubjectType?: string;
 }
 
 export function formatValue(
@@ -495,6 +496,7 @@ export default function QuestionnaireResponsesList({
   canAccess = true,
   questionnaireId,
   renderItem,
+  SubjectType = "encounter",
 }: Props) {
   const { t } = useTranslation();
   const { ref, inView } = useInView();
@@ -517,7 +519,7 @@ export default function QuestionnaireResponsesList({
             }),
             encounter: encounterId,
             only_unstructured: onlyUnstructured,
-            subject_type: encounterId ? "encounter" : "patient",
+            subject_type: SubjectType,
             ...(questionnaireId ? { questionnaire: questionnaireId } : {}),
           },
         })({ signal });
@@ -572,7 +574,6 @@ export default function QuestionnaireResponsesList({
               </li>
             ))}
 
-            {/* Infinite scroll sentinel */}
             {!isPrintPreview && hasNextPage && (
               <li ref={ref} className="flex justify-center py-4">
                 {isFetchingNextPage && (

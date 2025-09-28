@@ -50,7 +50,7 @@ function OrganizationTreeNode({
     <div className="space-y-1">
       <div
         className={cn(
-          "flex items-center py-1 px-2 rounded-md cursor-pointer",
+          "flex items-center py-1 rounded-md cursor-pointer transition-colors min-w-max",
           isSelected ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
         )}
         style={{ paddingLeft: `${level}rem` }}
@@ -167,7 +167,7 @@ export default function FacilityOrganizationNavbar({
   return (
     <div className="w-full h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
       <div className="flex-1 overflow-x-auto overflow-y-auto pl-4 pt-4 pr-4">
-        <div className="inline-block min-w-max">
+        <div className="inline-block min-w-full">
           {isLoading ? (
             <div className="p-4">
               <Skeleton className="h-8 w-full" />

@@ -189,8 +189,8 @@ export default function FacilityOrganizationList({
                 <div className="flex flex-col h-full w-full">
                   <div className="flex-1 w-full h-full rounded-lg md:shadow-lg md:bg-white overflow-y-auto">
                     {organizationId && (
-                      <div className="md:pt-2 flex items-center">
-                        <Breadcrumb className="md:px-1">
+                      <div className="md:pt-4 flex items-center mx-auto max-w-4xl">
+                        <Breadcrumb className="md:px-5 md:pt-5">
                           <BreadcrumbList>
                             <BreadcrumbItem>
                               <BreadcrumbLink
@@ -238,11 +238,11 @@ export default function FacilityOrganizationList({
                     <Page
                       hideTitleOnPage
                       title={org?.name || ""}
-                      className="flex flex-col flex-1"
+                      className="mx-auto max-w-4xl"
                     >
                       {organizationId && org && (
                         <>
-                          <div className="flex items-center">
+                          <div className="mt-2 flex items-center">
                             <h2 className="text-xl font-semibold">
                               {org.name}
                             </h2>

@@ -2627,12 +2627,11 @@ function QuestionEditor({
                         <AnimatedWrapper key={opt._id} keyValue={opt._id}>
                           <div
                             className={cn(
-                              "grid grid-cols-12 items-start gap-3 pb-2 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-3",
-                              opt.initial_selected &&
-                                "bg-gray-100 border border-gray-400",
+                              "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
+                              opt.initial_selected && "bg-gray-100",
                             )}
                           >
-                            <div className="col-span-1 flex justify-start pt-2">
+                            <div className="col-span-1 flex items-center justify-start">
                               <Checkbox
                                 checked={opt.initial_selected}
                                 onCheckedChange={(checked) => {
@@ -2675,12 +2674,11 @@ function QuestionEditor({
                           <AnimatedWrapper key={opt._id} keyValue={opt._id}>
                             <div
                               className={cn(
-                                "grid grid-cols-12 items-start gap-3 pb-2 border-b border-gray-300 last:border-0 last:pb-0 rounded-md p-3",
-                                opt.initial_selected &&
-                                  "bg-gray-100 border border-gray-400",
+                                "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
+                                opt.initial_selected && "bg-gray-100",
                               )}
                             >
-                              <div className="col-span-1 flex justify-start pt-2">
+                              <div className="col-span-1 flex items-center justify-start">
                                 <RadioGroupItem
                                   value={opt.value}
                                   id={`default-choice-${question.id}-${idx}`}

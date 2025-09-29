@@ -93,7 +93,7 @@ function LeftPanel({
               ? selectedQuestionnaireTitle
               : t("select_questionnaire")
           }
-          subjectType={encounterId ? "encounter" : "patient"}
+          subjectType="encounter"
           onSelect={(q) => {
             setQueryParams({ questionnaireId: q.id });
             setSelectedQuestionnaireTitle(q.title);

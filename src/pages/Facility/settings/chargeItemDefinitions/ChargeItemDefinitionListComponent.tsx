@@ -199,7 +199,7 @@ export function ChargeItemList({
           pathParams: { facilityId },
           queryParams: {
             title: qParams.search,
-            ...(qParams.status ? { status: qParams.status } : {}),
+            status: qParams.status,
             category: categorySlug,
             limit: resultsPerPage,
             offset: ((qParams.page ?? 1) - 1) * resultsPerPage,

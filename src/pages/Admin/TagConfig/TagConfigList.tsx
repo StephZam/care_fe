@@ -50,7 +50,7 @@ export default function TagConfigList({ facilityId }: TagConfigListProps) {
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         display: qParams.display,
-        ...(qParams.status ? { status: qParams.status } : {}),
+        status: qParams.status,
         category: qParams.category,
         resource: qParams.resource,
         parent_is_null: true,

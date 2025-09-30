@@ -101,7 +101,7 @@ export default function ProductList({ facilityId }: { facilityId: string }) {
       queryParams: {
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
-        ...(qParams.status ? { status: qParams.status } : {}),
+        status: qParams.status,
         name: qParams.search,
         ordering: "-created_date",
       },

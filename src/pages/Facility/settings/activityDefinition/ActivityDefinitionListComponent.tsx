@@ -213,7 +213,7 @@ export function ActivityDefinitionList({
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         title: qParams.search,
-        ...(qParams.status ? { status: qParams.status } : {}),
+        status: qParams.status,
         classification: qParams.classification,
         category: categorySlug,
         ordering: "-created_date",

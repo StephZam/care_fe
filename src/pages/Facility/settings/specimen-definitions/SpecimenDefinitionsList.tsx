@@ -97,7 +97,7 @@ export function SpecimenDefinitionsList({
       pathParams: { facilityId },
       queryParams: {
         title: qParams.search,
-        ...(qParams.status ? { status: qParams.status } : {}),
+        status: qParams.status,
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         ordering: "-created_date",

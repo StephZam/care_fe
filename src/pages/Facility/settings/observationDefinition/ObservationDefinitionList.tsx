@@ -107,7 +107,7 @@ export default function ObservationDefinitionList({
           limit: resultsPerPage,
           offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
           title: qParams.search,
-          ...(qParams.status ? { status: qParams.status } : {}),
+          status: qParams.status,
           category: qParams.category,
           ordering: "-created_date",
         },

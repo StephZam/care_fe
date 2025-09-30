@@ -214,7 +214,7 @@ export function ProductKnowledgeList({
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         name: qParams.search,
         product_type: qParams.product_type,
-        ...(qParams.status ? { status: qParams.status } : {}),
+        status: qParams.status,
         ordering: "-created_date",
       },
     }),

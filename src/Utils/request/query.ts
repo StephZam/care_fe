@@ -15,11 +15,16 @@ export async function callApi<Route extends ApiRoute<unknown, unknown>>(
   { baseUrl, path, method, noAuth, defaultQueryParams }: Route,
   options?: ApiCallOptions<Route>,
 ): Promise<Route["TRes"]> {
+  const filteredQueryParams = Object.fromEntries(
+    Object.entries(options?.queryParams || {}).filter(
+      ([_, v]) => v != undefined,
+    ),
+  );
   const url = `${baseUrl ?? careConfig.apiUrl}${makeUrl(
     path,
     {
       ...(defaultQueryParams ?? {}),
-      ...options?.queryParams,
+      ...filteredQueryParams,
     },
     options?.pathParams,
   )}`;

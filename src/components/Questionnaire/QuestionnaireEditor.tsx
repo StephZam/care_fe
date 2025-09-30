@@ -2573,8 +2573,8 @@ function QuestionEditor({
                     {annotatedAnswerOptions.length !== 0 && (
                       <>
                         <div className="grid grid-cols-12 items-center border-b pb-2">
-                          <div className="col-span-12 flex items-center justify-end gap-4 text-sm text-gray-600">
-                            <span>
+                          <div className="col-span-12 flex flex-wrap items-center justify-end gap-2 sm:gap-4 text-sm text-gray-600">
+                            <span className="whitespace-nowrap">
                               {
                                 annotatedAnswerOptions.filter(
                                   (opt) => opt.initial_selected,
@@ -2623,108 +2623,137 @@ function QuestionEditor({
                             </Button>
                           </div>
                         </div>
-                        <div className="grid grid-cols-12 items-center border-b pb-2 font-medium text-sm text-gray-700">
-                          <div className="col-span-1">{t("default")}</div>
-                          <div className="col-span-5 pl-5">{t("value")}</div>
-                          <div className="col-span-5 pl-3">
-                            {t("display_text")}
-                          </div>
-                          <div className="col-span-1 text-right">
-                            {t("actions")}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {question.repeats ? (
-                      annotatedAnswerOptions.map((opt, idx) => (
-                        <AnimatedWrapper key={opt._id} keyValue={opt._id}>
-                          <div
-                            className={cn(
-                              "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
-                              opt.initial_selected && "bg-gray-100",
-                            )}
-                          >
-                            <div className="col-span-1 flex items-center justify-start">
-                              <Checkbox
-                                checked={opt.initial_selected}
-                                onCheckedChange={(checked) => {
+                        <div className="w-full overflow-x-auto">
+                          <div className="min-w-[470px]">
+                            <div className="grid grid-cols-12 items-center border-b pb-2 font-medium text-sm text-gray-700">
+                              <div className="col-span-1 whitespace-nowrap">
+                                {t("default")}
+                              </div>
+                              <div className="col-span-5 pl-5">
+                                {t("value")}
+                              </div>
+                              <div className="col-span-5 pl-3">
+                                {t("display_text")}
+                              </div>
+                              <div className="col-span-1 text-right whitespace-nowrap">
+                                {t("actions")}
+                              </div>
+                            </div>
+
+                            {question.repeats ? (
+                              annotatedAnswerOptions.map((opt, idx) => (
+                                <AnimatedWrapper
+                                  key={opt._id}
+                                  keyValue={opt._id}
+                                >
+                                  <div
+                                    className={cn(
+                                      "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
+                                      opt.initial_selected && "bg-gray-100",
+                                    )}
+                                  >
+                                    <div className="col-span-1 flex items-center justify-start">
+                                      <Checkbox
+                                        checked={opt.initial_selected}
+                                        onCheckedChange={(checked) => {
+                                          const newOptions =
+                                            annotatedAnswerOptions.map(
+                                              (o, i) =>
+                                                i === idx
+                                                  ? {
+                                                      ...o,
+                                                      initial_selected:
+                                                        !!checked,
+                                                    }
+                                                  : o,
+                                            );
+                                          updateField(
+                                            "answer_option",
+                                            newOptions,
+                                          );
+                                        }}
+                                      />
+                                    </div>
+                                    <OptionFields
+                                      opt={opt}
+                                      idx={idx}
+                                      annotatedAnswerOptions={
+                                        annotatedAnswerOptions
+                                      }
+                                      updateField={updateField}
+                                    />
+                                  </div>
+                                </AnimatedWrapper>
+                              ))
+                            ) : (
+                              <RadioGroup
+                                value={
+                                  annotatedAnswerOptions.find(
+                                    (o) => o.initial_selected,
+                                  )?.value || ""
+                                }
+                                onValueChange={(selectedValue) => {
                                   const newOptions = annotatedAnswerOptions.map(
-                                    (o, i) =>
-                                      i === idx
-                                        ? { ...o, initial_selected: !!checked }
-                                        : o,
+                                    (o) => ({
+                                      ...o,
+                                      initial_selected:
+                                        o.value === selectedValue,
+                                    }),
                                   );
                                   updateField("answer_option", newOptions);
                                 }}
-                              />
-                            </div>
-                            <OptionFields
-                              opt={opt}
-                              idx={idx}
-                              annotatedAnswerOptions={annotatedAnswerOptions}
-                              updateField={updateField}
-                            />
+                              >
+                                {annotatedAnswerOptions.map((opt, idx) => (
+                                  <AnimatedWrapper
+                                    key={opt._id}
+                                    keyValue={opt._id}
+                                  >
+                                    <div
+                                      className={cn(
+                                        "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
+                                        opt.initial_selected && "bg-gray-100",
+                                      )}
+                                    >
+                                      <div className="col-span-1 flex items-center justify-start">
+                                        <RadioGroupItem
+                                          value={opt.value}
+                                          id={`default-choice-${question.id}-${idx}`}
+                                          className="mt-1"
+                                        />
+                                      </div>
+                                      <OptionFields
+                                        opt={opt}
+                                        idx={idx}
+                                        annotatedAnswerOptions={
+                                          annotatedAnswerOptions
+                                        }
+                                        updateField={updateField}
+                                      />
+                                    </div>
+                                  </AnimatedWrapper>
+                                ))}
+                              </RadioGroup>
+                            )}
                           </div>
-                        </AnimatedWrapper>
-                      ))
-                    ) : (
-                      <RadioGroup
-                        value={
-                          annotatedAnswerOptions.find((o) => o.initial_selected)
-                            ?.value || ""
-                        }
-                        onValueChange={(selectedValue) => {
-                          const newOptions = annotatedAnswerOptions.map(
-                            (o) => ({
-                              ...o,
-                              initial_selected: o.value === selectedValue,
-                            }),
-                          );
-                          updateField("answer_option", newOptions);
-                        }}
-                      >
-                        {annotatedAnswerOptions.map((opt, idx) => (
-                          <AnimatedWrapper key={opt._id} keyValue={opt._id}>
-                            <div
-                              className={cn(
-                                "grid grid-cols-12 items-center gap-3 rounded-md p-3 mb-2",
-                                opt.initial_selected && "bg-gray-100",
-                              )}
-                            >
-                              <div className="col-span-1 flex items-center justify-start">
-                                <RadioGroupItem
-                                  value={opt.value}
-                                  id={`default-choice-${question.id}-${idx}`}
-                                  className="mt-1"
-                                />
-                              </div>
-                              <OptionFields
-                                opt={opt}
-                                idx={idx}
-                                annotatedAnswerOptions={annotatedAnswerOptions}
-                                updateField={updateField}
-                              />
-                            </div>
-                          </AnimatedWrapper>
-                        ))}
-                      </RadioGroup>
-                    )}
+                        </div>
 
-                    <Button
-                      variant="outline"
-                      type="button"
-                      size="sm"
-                      onClick={() => {
-                        const newOption = { value: "" };
-                        const newOptions = annotatedAnswerOptions
-                          ? [...annotatedAnswerOptions, newOption]
-                          : [newOption];
-                        updateField("answer_option", newOptions);
-                      }}
-                    >
-                      <CareIcon icon="l-plus" className="size-4" />
-                      {t("add_option")}
-                    </Button>
+                        <Button
+                          variant="outline"
+                          type="button"
+                          size="sm"
+                          onClick={() => {
+                            const newOption = { value: "" };
+                            const newOptions = annotatedAnswerOptions
+                              ? [...annotatedAnswerOptions, newOption]
+                              : [newOption];
+                            updateField("answer_option", newOptions);
+                          }}
+                        >
+                          <CareIcon icon="l-plus" className="size-4" />
+                          {t("add_option")}
+                        </Button>
+                      </>
+                    )}
                   </CardContent>
                 ) : (
                   <CardContent className="space-y-4">

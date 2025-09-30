@@ -165,8 +165,8 @@ export default function FacilityOrganizationNavbar({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="w-full h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
-      <div className="flex-1 overflow-x-auto overflow-y-auto pl-4 pt-4 pr-4">
+    <div className="w-full min-h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto p-4">
         <div className="inline-block min-w-full">
           {isLoading ? (
             <div className="p-4">

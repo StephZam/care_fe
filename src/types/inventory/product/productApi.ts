@@ -11,6 +11,9 @@ export default {
     path: "/api/v1/facility/{facilityId}/product/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<ProductRead>>(),
+    defaultQueryParams: {
+      status: "active",
+    },
   },
   retrieveProduct: {
     path: "/api/v1/facility/{facilityId}/product/{productId}/",

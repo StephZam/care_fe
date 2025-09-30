@@ -189,13 +189,6 @@ export function ChargeItemList({
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
-  // TODO: Remove this once we have a default status (robo's PR)
-  useEffect(() => {
-    if (!qParams.status) {
-      updateQuery({ status: "active" });
-    }
-  }, [qParams.status, updateQuery]);
-
   // Fetch charge items for current category
   const { data: chargeItemsResponse, isLoading: isLoadingChargeItems } =
     useQuery({
@@ -206,7 +199,7 @@ export function ChargeItemList({
           pathParams: { facilityId },
           queryParams: {
             title: qParams.search,
-            status: qParams.status,
+            ...(qParams.status ? { status: qParams.status } : {}),
             category: categorySlug,
             limit: resultsPerPage,
             offset: ((qParams.page ?? 1) - 1) * resultsPerPage,

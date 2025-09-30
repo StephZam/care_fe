@@ -203,13 +203,6 @@ export function ProductKnowledgeList({
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
-  // TODO: Remove this once we have a default status (robo's PR)
-  useEffect(() => {
-    if (!qParams.status) {
-      updateQuery({ status: "active" });
-    }
-  }, [qParams.status, updateQuery]);
-
   // Fetch product knowledge for current category
   const { data: productsResponse, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["productKnowledge", facilityId, categorySlug, qParams],
@@ -221,7 +214,7 @@ export function ProductKnowledgeList({
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         name: qParams.search,
         product_type: qParams.product_type,
-        status: qParams.status,
+        ...(qParams.status ? { status: qParams.status } : {}),
         ordering: "-created_date",
       },
     }),

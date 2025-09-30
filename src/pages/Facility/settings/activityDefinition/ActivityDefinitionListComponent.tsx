@@ -201,13 +201,6 @@ export function ActivityDefinitionList({
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
-  // TODO: Remove this once we have a default status (robo's PR)
-  useEffect(() => {
-    if (!qParams.status) {
-      updateQuery({ status: "active" });
-    }
-  }, [qParams.status, updateQuery]);
-
   // Fetch activity definitions for current category
   const {
     data: activityDefinitionsResponse,
@@ -220,7 +213,7 @@ export function ActivityDefinitionList({
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         title: qParams.search,
-        status: qParams.status,
+        ...(qParams.status ? { status: qParams.status } : {}),
         classification: qParams.classification,
         category: categorySlug,
         ordering: "-created_date",

@@ -13,6 +13,9 @@ export default {
     path: "/api/v1/facility/{facilityId}/charge_item_definition/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<ChargeItemDefinitionBase>>(),
+    defaultQueryParams: {
+      status: "active",
+    },
   },
   retrieveChargeItemDefinition: {
     path: "/api/v1/facility/{facilityId}/charge_item_definition/{slug}/",

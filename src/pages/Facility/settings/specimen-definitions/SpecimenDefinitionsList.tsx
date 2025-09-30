@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { navigate } from "raviger";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import CareIcon from "@/CAREUI/icons/CareIcon";
@@ -92,20 +91,13 @@ export function SpecimenDefinitionsList({
     disableCache: true,
   });
 
-  // TODO: Remove this once we have a default status (robo's PR)
-  useEffect(() => {
-    if (!qParams.status) {
-      updateQuery({ status: "active" });
-    }
-  }, []);
-
   const { data: response, isLoading } = useQuery({
     queryKey: ["specimenDefinitions", facilityId, qParams],
     queryFn: query.debounced(specimenDefinitionApi.listSpecimenDefinitions, {
       pathParams: { facilityId },
       queryParams: {
         title: qParams.search,
-        status: qParams.status,
+        ...(qParams.status ? { status: qParams.status } : {}),
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         ordering: "-created_date",

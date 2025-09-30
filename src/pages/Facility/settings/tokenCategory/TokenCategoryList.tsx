@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { navigate } from "raviger";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import CareIcon from "@/CAREUI/icons/CareIcon";
@@ -92,13 +91,6 @@ export default function TokenCategoryList({
     disableCache: true,
   });
 
-  // TODO: Remove this once we have a default status (robo's PR)
-  useEffect(() => {
-    if (!qParams.status) {
-      updateQuery({ status: "active" });
-    }
-  }, []);
-
   const { data: response, isLoading } = useQuery({
     queryKey: ["tokenCategories", qParams],
     queryFn: query.debounced(tokenCategoryApi.list, {
@@ -108,7 +100,7 @@ export default function TokenCategoryList({
       queryParams: {
         limit: resultsPerPage,
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
-        status: qParams.status,
+        ...(qParams.status ? { status: qParams.status } : {}),
         name: qParams.search,
         ordering: "-created_date",
       },

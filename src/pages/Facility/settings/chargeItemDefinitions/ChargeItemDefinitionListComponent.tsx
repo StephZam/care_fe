@@ -185,6 +185,9 @@ export function ChargeItemList({
   const { qParams, updateQuery, Pagination, resultsPerPage } = useFilters({
     limit: 15,
     disableCache: true,
+    defaultQueryParams: {
+      status: "active",
+    },
   });
 
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");

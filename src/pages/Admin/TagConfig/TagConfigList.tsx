@@ -39,6 +39,9 @@ export default function TagConfigList({ facilityId }: TagConfigListProps) {
   const { qParams, updateQuery, Pagination, resultsPerPage } = useFilters({
     limit: 15,
     disableCache: true,
+    defaultQueryParams: {
+      status: "active",
+    },
   });
 
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);

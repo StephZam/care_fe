@@ -103,13 +103,13 @@ export default function useFilters({
   }, []);
 
   useEffect(() => {
-    const entries = Object.entries(defaultQueryParams);
-    if (entries.length === 0) return;
-
-    const [[key, value]] = entries;
-
-    if (qParams[key] === undefined) {
-      updateQuery({ [key]: value });
+    const defaults = Object.fromEntries(
+      Object.entries(defaultQueryParams).filter(
+        ([key]) => qParams[key] === undefined,
+      ),
+    );
+    if (Object.keys(defaults).length > 0) {
+      updateQuery(defaults);
     }
   }, []);
 

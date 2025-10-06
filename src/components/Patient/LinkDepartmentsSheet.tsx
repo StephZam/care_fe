@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Building, Loader2, Trash2 } from "lucide-react";
+import { Blocks, Building, Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -292,7 +292,7 @@ export default function LinkDepartmentsSheet({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="!w-[50vw] !max-w-none min-h-[50vh]">
         <SheetHeader>
           <SheetTitle>
             {t("manage_organization", {
@@ -310,6 +310,62 @@ export default function LinkDepartmentsSheet({
         <div className="space-y-6 py-4">
           <div className="space-y-4">
             <div className="space-y-4">
+              <div className="space-y-3">
+                {currentOrganizations.length > 0 ? (
+                  <>
+                    <h3 className="text-sm font-medium">
+                      {t("current_organization", {
+                        count: entityType === "device" ? 1 : 0,
+                      })}
+                    </h3>
+                    <div className="space-y-2">
+                      {currentOrganizations.map((org) => (
+                        <div
+                          key={org.id}
+                          className="flex items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-4"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <div className="ml-2 flex flex-col">
+                              <span
+                                className="ml-2 font-medium text-s"
+                                data-cy="link-organisation-name"
+                              >
+                                {org.name}
+                              </span>
+                              {org.description && (
+                                <span className="text-xs text-gray-500">
+                                  {org.description}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <DeleteOrganizationButton
+                            organizationId={org.id}
+                            entityType={entityType}
+                            entityId={entityId}
+                            facilityId={facilityId}
+                            onSuccess={onUpdate}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-gray-100 p-6 rounded-md space-y-2 text-center">
+                    <Blocks className="size-4 mx-auto" />
+                    <p className="text-medium text-gray-900">
+                      {t("no_organization_added_yet", {
+                        count: entityType === "device" ? 1 : 0,
+                      })}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {t(
+                        "start_by_adding_organization_from_your_organizations",
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
               <FacilityOrganizationSelector
                 facilityId={facilityId}
                 value={selectedOrgs}
@@ -319,63 +375,16 @@ export default function LinkDepartmentsSheet({
               />
 
               <Button
-                className="w-full"
+                className="block ml-auto"
                 data-cy="add-organization"
                 onClick={handleAddOrganizations}
                 disabled={!selectedOrgs?.length || isAdding}
               >
                 {isAdding && <Loader2 className="mr-2 size-4 animate-spin" />}
-                {t("add_organization", {
+                {t("save_changes", {
                   count: entityType === "device" ? 1 : 0,
                 })}
               </Button>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">
-                {t("current_organization", {
-                  count: entityType === "device" ? 1 : 0,
-                })}
-              </h3>
-              <div className="space-y-2">
-                {currentOrganizations.map((org) => (
-                  <div
-                    key={org.id}
-                    className="flex items-center justify-between rounded-md border border-gray-200 p-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Building className="size-4 text-blue-400" />
-                      <div className="flex flex-col">
-                        <span
-                          className="font-medium"
-                          data-cy="link-organisation-name"
-                        >
-                          {org.name}
-                        </span>
-                        {org.description && (
-                          <span className="text-xs text-gray-500">
-                            {org.description}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <DeleteOrganizationButton
-                      organizationId={org.id}
-                      entityType={entityType}
-                      entityId={entityId}
-                      facilityId={facilityId}
-                      onSuccess={onUpdate}
-                    />
-                  </div>
-                ))}
-                {currentOrganizations.length === 0 && (
-                  <p className="text-sm text-gray-500">
-                    {t("no_organization_added_yet", {
-                      count: entityType === "device" ? 1 : 0,
-                    })}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         </div>

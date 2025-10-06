@@ -206,7 +206,6 @@ export function ChargeItemList({
             category: categorySlug,
             limit: resultsPerPage,
             offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
-            ordering: "-created_date",
           },
         },
       ),

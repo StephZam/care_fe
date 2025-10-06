@@ -12,6 +12,9 @@ export default {
     path: "/api/v1/facility/{facility_id}/token/category/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<TokenCategoryRead>>(),
+    defaultQueryParams: {
+      ordering: "-created_date",
+    },
   },
   get: {
     path: "/api/v1/facility/{facility_id}/token/category/{id}/",

@@ -219,7 +219,6 @@ export function ActivityDefinitionList({
         status: qParams.status,
         classification: qParams.classification,
         category: categorySlug,
-        ordering: "-created_date",
       },
     }),
   });

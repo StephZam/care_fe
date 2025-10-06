@@ -105,7 +105,6 @@ export default function TokenCategoryList({
         offset: ((qParams.page ?? 1) - 1) * resultsPerPage,
         status: qParams.status,
         name: qParams.search,
-        ordering: "-created_date",
       },
     }),
   });

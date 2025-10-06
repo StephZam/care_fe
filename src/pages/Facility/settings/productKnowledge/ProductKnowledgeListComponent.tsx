@@ -218,7 +218,6 @@ export function ProductKnowledgeList({
         name: qParams.search,
         product_type: qParams.product_type,
         status: qParams.status,
-        ordering: "-created_date",
       },
     }),
   });

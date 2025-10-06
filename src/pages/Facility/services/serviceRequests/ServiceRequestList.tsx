@@ -255,7 +255,6 @@ export default function ServiceRequestList({
         status: qParams.status,
         priority: qParams.priority,
         tags: qParams.tags,
-        ordering: "-created_date",
         patient: qParams.patient,
         tags_behavior: qParams.tags_behavior,
       },

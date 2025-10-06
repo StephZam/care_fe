@@ -11,6 +11,9 @@ export default {
     path: "/api/v1/facility/{facilityId}/organizations/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<FacilityOrganizationRead>>(),
+    defaultQueryParams: {
+      ordering: "name",
+    },
   },
   listMine: {
     path: "/api/v1/facility/{facilityId}/organizations/mine/",

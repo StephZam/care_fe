@@ -12,6 +12,9 @@ export default {
     path: "/api/v1/facility/{facilityId}/resource_category/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<ResourceCategoryRead>>(),
+    defaultQueryParams: {
+      ordering: "title",
+    },
   },
   get: {
     path: "/api/v1/facility/{facilityId}/resource_category/{slug}/",

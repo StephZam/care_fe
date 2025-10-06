@@ -112,7 +112,6 @@ export default function ObservationDefinitionList({
           title: qParams.search,
           status: qParams.status,
           category: qParams.category,
-          ordering: "-created_date",
         },
       },
     ),

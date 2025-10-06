@@ -12,9 +12,6 @@ export default {
     path: "/api/v1/patient_identifier_config/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<PatientIdentifierConfig>>(),
-    defaultQueryParams: {
-      ordering: "-created_date",
-    },
   },
   retrievePatientIdentifierConfig: {
     path: "/api/v1/patient_identifier_config/{external_id}/",

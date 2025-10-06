@@ -8,9 +8,6 @@ export default {
     path: "/api/v1/role/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<RoleRead>>(),
-    defaultQueryParams: {
-      ordering: "name",
-    },
   },
   createRole: {
     path: "/api/v1/role/",

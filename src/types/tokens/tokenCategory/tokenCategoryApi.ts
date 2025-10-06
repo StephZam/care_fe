@@ -12,9 +12,6 @@ export default {
     path: "/api/v1/facility/{facility_id}/token/category/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<TokenCategoryRead>>(),
-    defaultQueryParams: {
-      status: "active",
-    },
   },
   get: {
     path: "/api/v1/facility/{facility_id}/token/category/{id}/",

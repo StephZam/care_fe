@@ -12,9 +12,6 @@ export default {
     path: "/api/v1/observation_definition/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<ObservationDefinitionReadSpec>>(),
-    defaultQueryParams: {
-      status: "active",
-    },
   },
   retrieveObservationDefinition: {
     path: "/api/v1/observation_definition/{observationSlug}/",

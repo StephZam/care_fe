@@ -11,9 +11,6 @@ export default {
     path: "/api/v1/product_knowledge/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<ProductKnowledgeBase>>(),
-    defaultQueryParams: {
-      status: "active",
-    },
   },
   retrieveProductKnowledge: {
     path: "/api/v1/product_knowledge/{slug}/",

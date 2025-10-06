@@ -21,9 +21,6 @@ export default {
     path: "/api/v1/tag_config/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<TagConfig>>(),
-    defaultQueryParams: {
-      status: "active",
-    },
   },
 
   create: {

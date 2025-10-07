@@ -226,7 +226,7 @@ export default function FacilityOrganizationSelector(
             >
               {org.name}
             </button>
-            <ArrowRight className="h-3 w-3 text-gray-400 flex-shrink-0" />
+            <ArrowRight className="size-3 text-gray-950 flex-shrink-0" />
           </div>
         ))}
       </div>
@@ -269,9 +269,9 @@ export default function FacilityOrganizationSelector(
                     value={org.name}
                     onSelect={() => handleSelect(org)}
                     className={cn(
-                      "flex items-center justify-between px-4 py-4",
+                      "flex items-center justify-between px-4 py-4 mb-1",
                       isSelected && "bg-gray-100",
-                      "border-b border-gray-200",
+                      "border-b border-gray-100",
                     )}
                   >
                     <div className="flex items-center gap-2 text-gray-950">
@@ -285,43 +285,43 @@ export default function FacilityOrganizationSelector(
                   </CommandItem>
                 );
               })}
+            {currentSelection && (
+              <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md">
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-700 mb-0.5">
+                    {t("selected")}
+                  </span>
+                  {navigationLevels.length > 0 && (
+                    <div className="items-center py-1">
+                      {renderNavigationPath()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-2 underline"
+                    onClick={() => setCurrentSelection(null)}
+                  >
+                    <span>{t("cancel")}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1 border-primary-600 text-primary-700"
+                    onClick={() => handleConfirmSelection(currentSelection)}
+                    disabled={isDisabled}
+                    data-cy="confirm-organization"
+                  >
+                    <CareIcon icon="l-check" className="size-4" />
+                    <span>{t("confirm")}</span>
+                  </Button>
+                </div>
+              </div>
+            )}
           </CommandGroup>
         </CommandList>
-        {currentSelection && (
-          <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md mx-1 mb-1">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-700 mb-0.5">
-                {t("selected")}
-              </span>
-              {navigationLevels.length > 0 && (
-                <div className="items-center py-1 border-b">
-                  {renderNavigationPath()}
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-2 underline"
-                onClick={() => setCurrentSelection(null)}
-              >
-                <span>{t("cancel")}</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1 border-primary-600 text-primary-700"
-                onClick={() => handleConfirmSelection(currentSelection)}
-                disabled={isDisabled}
-                data-cy="confirm-organization"
-              >
-                <CareIcon icon="l-check" className="size-4" />
-                <span>{t("confirm")}</span>
-              </Button>
-            </div>
-          </div>
-        )}
       </Command>
     );
   };
@@ -373,7 +373,7 @@ export default function FacilityOrganizationSelector(
                         type="button" // Prevents unintended form submission
                       >
                         {open || navigationLevels.length > 0 ? (
-                          <div className="items-center py-1 border-b">
+                          <div className="items-center py-1">
                             {renderNavigationPath()}
                           </div>
                         ) : (
@@ -398,7 +398,7 @@ export default function FacilityOrganizationSelector(
                       data-cy="facility-organization"
                     >
                       {open || navigationLevels.length > 0 ? (
-                        <div className="items-center py-1 border-b">
+                        <div className="items-center py-1">
                           {renderNavigationPath()}
                         </div>
                       ) : (

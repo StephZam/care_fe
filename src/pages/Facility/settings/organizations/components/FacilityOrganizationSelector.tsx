@@ -59,7 +59,7 @@ export default function FacilityOrganizationSelector(
   } = props;
 
   const [selectedOrganizations, setSelectedOrganizations] = useState<
-    FacilityOrganizationRead[]
+    (FacilityOrganizationRead & { fullPath: string[] })[]
   >([]);
   const [currentSelection, setCurrentSelection] =
     useState<FacilityOrganizationRead | null>(null);
@@ -122,8 +122,13 @@ export default function FacilityOrganizationSelector(
 
   const handleConfirmSelection = useCallback(
     (org: FacilityOrganizationRead) => {
-      if (!selectedOrganizations.includes(org)) {
-        const newSelection = [...selectedOrganizations, org];
+      if (!selectedOrganizations.some((o) => o.id === org.id)) {
+        const orgWithPath = {
+          ...org,
+          fullPath: [...navigationLevels.map((o) => o.name), org.name],
+        };
+
+        const newSelection = [...selectedOrganizations, orgWithPath];
         setSelectedOrganizations(newSelection);
         onChange(newSelection.map((org) => org.id));
         setAlreadySelected(true);
@@ -132,7 +137,7 @@ export default function FacilityOrganizationSelector(
       setNavigationLevels([]);
       setOpen(false);
     },
-    [selectedOrganizations, onChange],
+    [selectedOrganizations, onChange, navigationLevels],
   );
 
   const handleRemoveOrganization = (index: number) => {
@@ -217,7 +222,7 @@ export default function FacilityOrganizationSelector(
                 setNavigationLevels(navigationLevels.slice(0, index + 1));
                 setFacilityOrgSearch("");
               }}
-              className="text-sm font-medium text-gray-700 hover:text-primary-600 cursor-pointer"
+              className="text-sm font-medium text-gray-950 hover:text-sky-600 cursor-pointer"
             >
               {org.name}
             </button>
@@ -231,10 +236,10 @@ export default function FacilityOrganizationSelector(
   const renderOrganizationCommand = (className?: string) => {
     return (
       <Command className={className}>
-        <div className="flex items-center px-3 py-2 border-b">
+        <div className="flex items-center px-3 py-3 border-b">
           <Search className="size-3 mr-2 text-gray-700" />
           <span className="font-medium text-sm text-gray-700">
-            {t("select_department")}
+            {t("search_department")}
           </span>
         </div>
         <CommandList onWheel={(e) => e.stopPropagation()}>
@@ -269,7 +274,7 @@ export default function FacilityOrganizationSelector(
                       "border-b border-gray-200",
                     )}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-gray-950">
                       <span>{org.name}</span>
                     </div>
                     {org.has_children ? (
@@ -283,9 +288,9 @@ export default function FacilityOrganizationSelector(
           </CommandGroup>
         </CommandList>
         {currentSelection && (
-          <div className="md:m-0 m-3 flex items-center justify-between px-3 py-1  bg-sky-100 border-sky-200 rounded-md ">
+          <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md mx-1 mb-1">
             <div className="flex flex-col">
-              <span className="text-xs text-gray-500 mb-0.5">
+              <span className="text-xs text-gray-700 mb-0.5">
                 {t("selected")}
               </span>
               {navigationLevels.length > 0 && (
@@ -338,11 +343,10 @@ export default function FacilityOrganizationSelector(
         }}
         currentTab={showAllOrgs ? "all" : "mine"}
         onTabChange={handleOrganizationViewChange}
-        tabTriggerClassName=""
         tabContentClassName="hidden"
       />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label>
             {t("select_department")}
             {!props.optional && <span className="text-red-500 ml-0.5">*</span>}
@@ -368,9 +372,13 @@ export default function FacilityOrganizationSelector(
                         onClick={() => setOpen(true)}
                         type="button" // Prevents unintended form submission
                       >
-                        <span className="truncate text-gray-500">
-                          {currentSelection && currentSelection.name}
-                        </span>
+                        {open || navigationLevels.length > 0 ? (
+                          <div className="items-center py-1 border-b">
+                            {renderNavigationPath()}
+                          </div>
+                        ) : (
+                          <span>{t("select_department")}</span>
+                        )}
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </DrawerTrigger>
@@ -389,9 +397,13 @@ export default function FacilityOrganizationSelector(
                       className="w-full justify-between border-gray-300"
                       data-cy="facility-organization"
                     >
-                      <span className="truncate text-gray-500">
-                        {currentSelection && currentSelection.name}
-                      </span>
+                      {open || navigationLevels.length > 0 ? (
+                        <div className="items-center py-1 border-b">
+                          {renderNavigationPath()}
+                        </div>
+                      ) : (
+                        <span>{t("select_department")}</span>
+                      )}
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -404,32 +416,60 @@ export default function FacilityOrganizationSelector(
                   </PopoverContent>
                 </Popover>
               ))}
-            {selectedOrganizations.map((org, index) => (
+            {selectedOrganizations.length > 0 && (
               <>
                 <span className="font-semibold text-sm text-gray-950 mt-3">
                   {t("newly_added_organizations")}
                 </span>
-                <div
-                  key={index}
-                  className="flex-1 flex items-center gap-3 rounded-md border border-sky-300 bg-sky-50/100"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate ml-3">
-                      {org.name}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="size-8 p-0 text-gray-500 hover:text-gray-900"
-                    onClick={() => handleRemoveOrganization(index)}
+                {selectedOrganizations.map((org, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 flex items-center gap-3 rounded-md border border-sky-300 bg-sky-50/100"
                   >
-                    <X className="size-4" />
-                    <span className="sr-only">{t("remove_organization")}</span>
-                  </Button>
-                </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 flex-wrap ml-3">
+                        {org.fullPath && org.fullPath.length > 0 ? (
+                          org.fullPath.map((name, idx) => (
+                            <span
+                              key={idx}
+                              className="flex items-center text-sm text-gray-900"
+                            >
+                              <span
+                                className={
+                                  idx === org.fullPath.length - 1
+                                    ? "font-semibold"
+                                    : "text-gray-700"
+                                }
+                              >
+                                {name}
+                              </span>
+                              {idx < org.fullPath.length - 1 && (
+                                <ArrowRight className="mx-1 h-3.5 w-3.5 text-gray-500" />
+                              )}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="font-medium text-sm text-gray-900">
+                            {org.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="size-8 p-0 text-gray-500 hover:text-gray-900"
+                      onClick={() => handleRemoveOrganization(index)}
+                    >
+                      <X className="size-4" />
+                      <span className="sr-only">
+                        {t("remove_organization")}
+                      </span>
+                    </Button>
+                  </div>
+                ))}
               </>
-            ))}
+            )}
           </div>
         </div>
       </div>

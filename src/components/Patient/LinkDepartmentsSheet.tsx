@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Blocks, Building, Loader2, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowRight, Blocks, Building, Loader2, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
@@ -195,6 +195,19 @@ export default function LinkDepartmentsSheet({
   const [selectedOrgs, setSelectedOrgs] = useState<string[] | null>(null);
   const queryClient = useQueryClient();
 
+  const getOrganizationPath = useCallback(
+    (org: FacilityOrganizationRead): string[] => {
+      const path: string[] = [org.name];
+      let currentParent = org.parent;
+      while (currentParent) {
+        path.unshift(currentParent.name);
+        currentParent = currentParent.parent;
+      }
+      return path;
+    },
+    [],
+  );
+
   useEffect(() => {
     if (props.open != null) {
       _setOpen(props.open);
@@ -309,11 +322,11 @@ export default function LinkDepartmentsSheet({
 
         <div className="space-y-6 py-4">
           <div className="space-y-4">
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="space-y-3">
                 {currentOrganizations.length > 0 ? (
                   <>
-                    <h3 className="text-sm font-medium">
+                    <h3 className="text-sm font-semibold text-gray-950">
                       {t("current_organization", {
                         count: entityType === "device" ? 1 : 0,
                       })}
@@ -326,17 +339,32 @@ export default function LinkDepartmentsSheet({
                         >
                           <div className="flex items-center space-x-2">
                             <div className="ml-2 flex flex-col">
-                              <span
-                                className="ml-2 font-medium text-s"
+                              <div
+                                className="ml-1 flex items-center text-sm text-gray-900 font-medium"
                                 data-cy="link-organisation-name"
                               >
-                                {org.name}
-                              </span>
-                              {org.description && (
-                                <span className="text-xs text-gray-500">
-                                  {org.description}
-                                </span>
-                              )}
+                                {getOrganizationPath(org).map(
+                                  (name, idx, arr) => (
+                                    <span
+                                      key={idx}
+                                      className="flex items-center"
+                                    >
+                                      <span
+                                        className={
+                                          idx === arr.length - 1
+                                            ? "font-semibold"
+                                            : "text-gray-700"
+                                        }
+                                      >
+                                        {name}
+                                      </span>
+                                      {idx < arr.length - 1 && idx !== 0 && (
+                                        <ArrowRight className="mx-1 size-3 text-gray-700" />
+                                      )}
+                                    </span>
+                                  ),
+                                )}
+                              </div>
                             </div>
                           </div>
                           <DeleteOrganizationButton
@@ -352,13 +380,13 @@ export default function LinkDepartmentsSheet({
                   </>
                 ) : (
                   <div className="bg-gray-100 p-6 rounded-md space-y-2 text-center">
-                    <Blocks className="size-4 mx-auto" />
-                    <p className="text-medium text-gray-900">
+                    <Blocks className="size-6 mx-auto" />
+                    <p className="text-medium text-gray-950">
                       {t("no_organization_added_yet", {
                         count: entityType === "device" ? 1 : 0,
                       })}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-600">
                       {t(
                         "start_by_adding_organization_from_your_organizations",
                       )}

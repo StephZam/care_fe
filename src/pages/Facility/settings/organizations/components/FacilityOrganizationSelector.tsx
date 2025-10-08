@@ -124,7 +124,13 @@ export default function FacilityOrganizationSelector(
       if (!selectedOrganizations.some((o) => o.id === org.id)) {
         const orgWithPath = {
           ...org,
-          fullPath: [...navigationLevels.map((o) => o.name), org.name],
+          fullPath: [
+            ...navigationLevels.map((o) => o.name),
+            ...(navigationLevels.length &&
+            navigationLevels[navigationLevels.length - 1].id === org.id
+              ? []
+              : [org.name]),
+          ],
         };
 
         const newSelection = [...selectedOrganizations, orgWithPath];
@@ -313,7 +319,7 @@ export default function FacilityOrganizationSelector(
                     disabled={isDisabled}
                     data-cy="confirm-organization"
                   >
-                    <CareIcon icon="l-check" className="size-4" />
+                    <CareIcon icon="l-check" className="size-4 text-gray-950" />
                     <span>{t("confirm")}</span>
                   </Button>
                 </div>
@@ -421,36 +427,34 @@ export default function FacilityOrganizationSelector(
                 {selectedOrganizations.map((org, index) => (
                   <div
                     key={index}
-                    className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 rounded-md border border-sky-300 bg-sky-50/100 p-2"
+                    className="relative flex flex-wrap justify-start sm:justify-center rounded-md border border-sky-300 bg-sky-50/100 p-2"
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 flex-wrap ml-2">
-                        {org.fullPath && org.fullPath.length > 0 ? (
-                          org.fullPath.map((name, idx) => (
+                    <div className="flex-1 min-w-0 ml-2 flex flex-wrap gap-1">
+                      {org.fullPath && org.fullPath.length > 0 ? (
+                        org.fullPath.map((name, idx) => (
+                          <span
+                            key={idx}
+                            className="flex items-center text-sm text-gray-900"
+                          >
                             <span
-                              key={idx}
-                              className="flex items-center text-sm text-gray-900"
+                              className={
+                                idx === org.fullPath.length - 1
+                                  ? "font-semibold"
+                                  : "text-gray-950"
+                              }
                             >
-                              <span
-                                className={
-                                  idx === org.fullPath.length - 1
-                                    ? "font-semibold"
-                                    : "text-gray-950"
-                                }
-                              >
-                                {name}
-                              </span>
-                              {idx < org.fullPath.length - 1 && (
-                                <ArrowRight className="mx-1 size-3 text-gray-500" />
-                              )}
+                              {name}
                             </span>
-                          ))
-                        ) : (
-                          <span className="font-medium text-sm text-gray-900">
-                            {org.name}
+                            {idx < org.fullPath.length - 1 && (
+                              <ArrowRight className="mx-1 size-3 text-gray-500" />
+                            )}
                           </span>
-                        )}
-                      </div>
+                        ))
+                      ) : (
+                        <span className="font-medium text-sm text-gray-900">
+                          {org.name}
+                        </span>
+                      )}
                     </div>
                     <Button
                       variant="ghost"

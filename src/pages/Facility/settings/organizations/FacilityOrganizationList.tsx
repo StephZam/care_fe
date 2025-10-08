@@ -147,24 +147,24 @@ export default function FacilityOrganizationList({
       <Page
         title={t("departments_or_teams")}
         hideTitleOnPage
-        className="p-0 flex flex-col"
+        className="p-0 flex flex-col h-full min-h-0"
       >
         <div className="shrink-0 container mx-auto">
           <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-4">
             <h3>{t("departments_or_teams")}</h3>
           </div>
         </div>
-        <div className="flex-1 flex">
-          <div className="container mx-auto flex-1 flex min-h-0">
+        <div className="flex-1 justify-center">
+          <div className="container mx-auto flex h-[calc(100vh-14rem)]">
             <ResizablePanelGroup
               direction="horizontal"
-              className="flex-1 rounded-lg h-full min-h-0"
+              className="flex-1 rounded-lg h-[calc(100vh-14rem)] min-h-0"
             >
               <ResizablePanel
                 defaultSize={20}
                 minSize={15}
                 maxSize={30}
-                className="hidden md:flex flex-col overflow-hidden"
+                className="hidden md:flex flex-col overflow-hidden h-full"
               >
                 <div className="flex-1">
                   <div className="h-full w-full">
@@ -184,7 +184,7 @@ export default function FacilityOrganizationList({
               />
               <ResizablePanel
                 defaultSize={80}
-                className="pl-0 md:pl-4 overflow-hidden"
+                className="pl-0 md:pl-4 overflow-hidden h-full"
               >
                 <div className="flex flex-col h-full w-full">
                   <div className="flex-1 w-full h-full rounded-lg md:shadow-lg md:bg-white overflow-y-auto">

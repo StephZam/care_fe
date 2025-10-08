@@ -29,7 +29,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import useBreakpoints from "@/hooks/useBreakpoints";
 
@@ -367,19 +366,17 @@ export default function FacilityOrganizationSelector(
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full justify-between border-gray-100"
+                        className="w-full flex flex-row sm:flex-row sm:items-center justify-between border-gray-100 text-left px-3 py-2 gap-2 sm:gap-3"
                         data-cy="facility-organization"
                         onClick={() => setOpen(true)}
                         type="button" // Prevents unintended form submission
                       >
-                        {open || navigationLevels.length > 0 ? (
-                          <div className="items-center py-1">
-                            {renderNavigationPath()}
-                          </div>
-                        ) : (
-                          <span>{t("select_department")}</span>
-                        )}
-                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        <span className="flex-1 break-words whitespace-normal">
+                          {open || navigationLevels.length > 0
+                            ? renderNavigationPath()
+                            : t("select_department")}
+                        </span>
+                        <ChevronDown className="size-4 shrink-0 opacity-50 self-center" />
                       </Button>
                     </DrawerTrigger>
                     <DrawerContent className="min-h-[50vh] max-h-[85vh]">
@@ -424,10 +421,10 @@ export default function FacilityOrganizationSelector(
                 {selectedOrganizations.map((org, index) => (
                   <div
                     key={index}
-                    className="flex-1 flex items-center gap-3 rounded-md border border-sky-300 bg-sky-50/100"
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 rounded-md border border-sky-300 bg-sky-50/100 p-2"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 flex-wrap ml-3">
+                      <div className="flex items-center gap-1 flex-wrap ml-2">
                         {org.fullPath && org.fullPath.length > 0 ? (
                           org.fullPath.map((name, idx) => (
                             <span
@@ -438,13 +435,13 @@ export default function FacilityOrganizationSelector(
                                 className={
                                   idx === org.fullPath.length - 1
                                     ? "font-semibold"
-                                    : "text-gray-700"
+                                    : "text-gray-950"
                                 }
                               >
                                 {name}
                               </span>
                               {idx < org.fullPath.length - 1 && (
-                                <ArrowRight className="mx-1 h-3.5 w-3.5 text-gray-500" />
+                                <ArrowRight className="mx-1 size-3 text-gray-500" />
                               )}
                             </span>
                           ))

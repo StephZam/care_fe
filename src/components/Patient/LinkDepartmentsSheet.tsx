@@ -335,12 +335,12 @@ export default function LinkDepartmentsSheet({
                       {currentOrganizations.map((org) => (
                         <div
                           key={org.id}
-                          className="flex items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-4"
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 sm:gap-4 p-3 sm:p-2"
                         >
                           <div className="flex items-center space-x-2">
                             <div className="ml-2 flex flex-col">
                               <div
-                                className="ml-1 flex items-center text-sm text-gray-900 font-medium"
+                                className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words"
                                 data-cy="link-organisation-name"
                               >
                                 {getOrganizationPath(org).map(
@@ -367,13 +367,15 @@ export default function LinkDepartmentsSheet({
                               </div>
                             </div>
                           </div>
-                          <DeleteOrganizationButton
-                            organizationId={org.id}
-                            entityType={entityType}
-                            entityId={entityId}
-                            facilityId={facilityId}
-                            onSuccess={onUpdate}
-                          />
+                          <div className="flex-shrink-0 flex items-center justify-center">
+                            <DeleteOrganizationButton
+                              organizationId={org.id}
+                              entityType={entityType}
+                              entityId={entityId}
+                              facilityId={facilityId}
+                              onSuccess={onUpdate}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>

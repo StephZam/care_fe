@@ -33,7 +33,7 @@ import {
 import useBreakpoints from "@/hooks/useBreakpoints";
 
 import query from "@/Utils/request/query";
-import { NavTabs } from "@/components/ui/nav-tabs";
+import { FilterTabs } from "@/components/ui/filter-tabs";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
 import facilityOrganizationApi from "@/types/facilityOrganization/facilityOrganizationApi";
 
@@ -68,7 +68,6 @@ export default function FacilityOrganizationSelector(
   const [facilityOrgSearch, setFacilityOrgSearch] = useState("");
   const [showAllOrgs, setShowAllOrgs] = useState(false);
   const [open, setOpen] = useState(false);
-  const [, setAlreadySelected] = useState(false);
   const isMobile = useBreakpoints({ default: true, sm: false });
   const { data: rootOrganizations, isLoading: isLoadingRoot } = useQuery({
     queryKey: ["facilityOrganization", facilityOrgSearch, showAllOrgs],
@@ -105,7 +104,6 @@ export default function FacilityOrganizationSelector(
       (o) => o.id === org.id,
     );
     if (isAlreadySelected) {
-      setAlreadySelected(true);
       setCurrentSelection(org);
       setFacilityOrgSearch("");
       return;
@@ -136,7 +134,6 @@ export default function FacilityOrganizationSelector(
         const newSelection = [...selectedOrganizations, orgWithPath];
         setSelectedOrganizations(newSelection);
         onChange(newSelection.map((org) => org.id));
-        setAlreadySelected(true);
       }
       setCurrentSelection(null);
       setNavigationLevels([]);
@@ -341,14 +338,17 @@ export default function FacilityOrganizationSelector(
 
   return (
     <div className="space-y-4">
-      <NavTabs
-        tabs={{
-          mine: { label: t("my_organizations"), component: <></> },
-          all: { label: t("all_organizations"), component: <></> },
+      <FilterTabs
+        value={showAllOrgs ? t("all_organizations") : t("my_organizations")}
+        onValueChange={(value: string) => {
+          handleOrganizationViewChange(
+            value === t("all_organizations") ? "all" : "mine",
+          );
         }}
-        currentTab={showAllOrgs ? "all" : "mine"}
-        onTabChange={handleOrganizationViewChange}
-        tabContentClassName="hidden"
+        options={[t("my_organizations"), t("all_organizations")]}
+        variant="underline"
+        showAllOption={false}
+        className="w-auto overflow-x-auto"
       />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">

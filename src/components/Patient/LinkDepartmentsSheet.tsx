@@ -335,36 +335,31 @@ export default function LinkDepartmentsSheet({
                       {currentOrganizations.map((org) => (
                         <div
                           key={org.id}
-                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 sm:gap-4 p-3 sm:p-2"
+                          className="flex flex-wrap items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 sm:gap-4 p-3 sm:p-2"
                         >
-                          <div className="flex items-center space-x-2">
-                            <div className="ml-2 flex flex-col">
-                              <div
-                                className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words"
-                                data-cy="link-organisation-name"
-                              >
-                                {getOrganizationPath(org).map(
-                                  (name, idx, arr) => (
+                          <div className="flex-1 min-w-0 flex flex-wrap ml-1 items-center">
+                            <div
+                              className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words"
+                              data-cy="link-organisation-name"
+                            >
+                              {getOrganizationPath(org).map(
+                                (name, idx, arr) => (
+                                  <span key={idx} className="flex items-center">
                                     <span
-                                      key={idx}
-                                      className="flex items-center"
+                                      className={
+                                        idx === arr.length - 1
+                                          ? "font-semibold"
+                                          : "text-gray-700"
+                                      }
                                     >
-                                      <span
-                                        className={
-                                          idx === arr.length - 1
-                                            ? "font-semibold"
-                                            : "text-gray-700"
-                                        }
-                                      >
-                                        {name}
-                                      </span>
-                                      {idx < arr.length - 1 && idx !== 0 && (
-                                        <ArrowRight className="mx-1 size-3 text-gray-700" />
-                                      )}
+                                      {name}
                                     </span>
-                                  ),
-                                )}
-                              </div>
+                                    {idx < arr.length - 1 && idx !== 0 && (
+                                      <ArrowRight className="mx-1 size-3 text-gray-700" />
+                                    )}
+                                  </span>
+                                ),
+                              )}
                             </div>
                           </div>
                           <div className="flex-shrink-0 flex items-center justify-center">

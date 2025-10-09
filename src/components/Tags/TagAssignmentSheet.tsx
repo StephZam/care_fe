@@ -11,6 +11,7 @@ import serviceRequestApi from "@/types/emr/serviceRequest/serviceRequestApi";
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
 import scheduleApis from "@/types/scheduling/scheduleApi";
 
+import requestOrderApi from "@/types/inventory/requestOrder/requestOrderApi";
 import { MultiFilterStyleTagSelector } from "./MultiFilterStyleTagSelector";
 
 // Export the new component for backward compatibility
@@ -22,7 +23,8 @@ export type TagEntityType =
   | "encounter"
   | "appointment"
   | "prescription"
-  | "service_request";
+  | "service_request"
+  | "request_order";
 
 // Mapping from entity types to tag resources
 const ENTITY_TO_RESOURCE_MAP = {
@@ -31,6 +33,7 @@ const ENTITY_TO_RESOURCE_MAP = {
   appointment: TagResource.APPOINTMENT,
   prescription: TagResource.PRESCRIPTION,
   service_request: TagResource.SERVICE_REQUEST,
+  request_order: TagResource.REQUEST_ORDER,
 } as const;
 
 // Configuration for different entity types using their respective API files
@@ -60,6 +63,11 @@ const ENTITY_CONFIG = {
     setTagsApi: serviceRequestApi.setTags,
     removeTagsApi: serviceRequestApi.removeTags,
     displayName: "service_request",
+  },
+  request_order: {
+    setTagsApi: requestOrderApi.setTags,
+    removeTagsApi: requestOrderApi.removeTags,
+    displayName: "request_order",
   },
   // TODO: Add more entity configurations here
 

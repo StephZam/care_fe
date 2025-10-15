@@ -106,7 +106,12 @@ export default function RequestOrderTable({
                   currentTags={request.tags ?? []}
                   onUpdate={() => {
                     queryClient.invalidateQueries({
-                      queryKey: ["requestOrder", facilityId, locationId],
+                      queryKey: [
+                        "requestOrders",
+                        locationId,
+                        internal,
+                        isRequester,
+                      ],
                     });
                   }}
                   trigger={

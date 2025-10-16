@@ -185,6 +185,15 @@ export const PractitionerSelector = ({
     onSelect([]);
   };
 
+  const clearOrganizationUsers = (organizationUsers: {
+    users: UserReadMinimal[];
+  }) => {
+    const remainingSelected = selected.filter(
+      (s) => !organizationUsers.users.some((u) => u.id === s.id),
+    );
+    onSelect(remainingSelected);
+  };
+
   const handleUserSelect = (user: UserReadMinimal) => {
     if (selected && multiple) {
       onSelect([...selected, user]);
@@ -554,11 +563,17 @@ export const PractitionerSelector = ({
                                 >
                                   {t("select_all")}
                                 </Button>
-                                {selected.length > 1 && (
+                                {selected.filter((s) =>
+                                  organizationUsers.users.some(
+                                    (u) => u.id === s.id,
+                                  ),
+                                ).length > 1 && (
                                   <Button
                                     variant="outline"
                                     size="xs"
-                                    onClick={handleClearAll}
+                                    onClick={() =>
+                                      clearOrganizationUsers(organizationUsers)
+                                    }
                                   >
                                     {t("clear_all")}
                                   </Button>

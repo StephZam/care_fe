@@ -59,7 +59,7 @@ function OrganizationTreeNode({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 flex-shrink-0"
+            className="size-6 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               onToggleExpand(organization.id);

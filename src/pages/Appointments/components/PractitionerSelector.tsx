@@ -581,6 +581,7 @@ export const PractitionerSelector = ({
                       const isSelected = selected?.some(
                         (s) => s.id === user.id,
                       );
+
                       return (
                         <div
                           key={user.id}

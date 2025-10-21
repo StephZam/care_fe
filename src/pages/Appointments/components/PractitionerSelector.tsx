@@ -491,101 +491,96 @@ export const PractitionerSelector = ({
             </div>
           </div>
 
-                {/* Sidebar Content */}
-                <div className="flex-1 overflow-y-auto max-h-[400px]">
-                  {/* Show child organizations if current org has children */}
-                  {childOrganizations?.results?.length ? (
-                    <div className="p-2">
-                      <h3 className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        {t("departments")}
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto max-h-[400px]">
+            {/* Show child organizations if current org has children */}
+            {childOrganizations?.results?.length ? (
+              <div className="p-2">
+                <h3 className="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  {t("departments")}
+                </h3>
+                {childOrganizations.results.map((organization) => (
+                  <div
+                    key={organization.id}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleChildOrganizationClick(organization)}
+                  >
+                    <div className="flex-shrink-0">
+                      <div
+                        className={cn(
+                          "h-3 w-3 rounded-full flex-shrink-0 border",
+                          getColorForTag(organization.id),
+                        )}
+                      />
+                    </div>
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <span className="font-medium text-sm truncate">
+                        {organization.name}
+                      </span>
+                      {organization.description && (
+                        <span className="text-xs text-gray-500 truncate mt-0.5">
+                          {organization.description}
+                        </span>
+                      )}
+                    </div>
+                    {organization.has_children && (
+                      <ChevronRight className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Show users if current org has no children or is a leaf organization */
+              <div className="p-2">
+                {isLoadingOrganizationUsers ? (
+                  <div className="p-6 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <div className="space-y-1 flex-1">
+                        <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-3 w-1/2 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                ) : organizationUsers?.users?.length ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <h3 className="px-2 py-1 text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        {t("practitioners")}
                       </h3>
-                      {childOrganizations.results.map((organization) => (
-                        <div
-                          key={organization.id}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-                          onClick={() =>
-                            handleChildOrganizationClick(organization)
-                          }
-                        >
-                          <div className="flex-shrink-0">
-                            <div
-                              className={cn(
-                                "h-3 w-3 rounded-full flex-shrink-0 border",
-                                getColorForTag(organization.id),
-                              )}
-                            />
-                          </div>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="font-medium text-sm truncate">
-                              {organization.name}
-                            </span>
-                            {organization.description && (
-                              <span className="text-xs text-gray-500 truncate mt-0.5">
-                                {organization.description}
-                              </span>
-                            )}
-                          </div>
-                          {organization.has_children && (
-                            <ChevronRight className="h-4 w-4 text-gray-500" />
+                      {multiple && (
+                        <div className="max-h-[400px] overflow-y-auto space-x-1">
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            onClick={() => {
+                              handleSelectAll(
+                                organizationUsers.users as NonEmptyArray<UserReadMinimal>,
+                              );
+                            }}
+                          >
+                            {t("select_all")}
+                          </Button>
+                          {selected.filter((s) =>
+                            organizationUsers.users.some((u) => u.id === s.id),
+                          ).length > 1 && (
+                            <Button
+                              variant="outline"
+                              size="xs"
+                              onClick={() =>
+                                clearOrganizationUsers(organizationUsers)
+                              }
+                            >
+                              {t("clear_all")}
+                            </Button>
                           )}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  ) : (
-                    /* Show users if current org has no children or is a leaf organization */
-                    <div className="p-2">
-                      {isLoadingOrganizationUsers ? (
-                        <div className="p-6 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            <div className="space-y-1 flex-1">
-                              <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
-                              <div className="h-3 w-1/2 bg-gray-200 rounded animate-pulse" />
-                            </div>
-                          </div>
-                        </div>
-                      ) : organizationUsers?.users?.length ? (
-                        <>
-                          <div className="flex items-center justify-between">
-                            <h3 className="px-2 py-1 text-sm font-medium text-gray-500 uppercase tracking-wide">
-                              {t("practitioners")}
-                            </h3>
-                            {multiple && (
-                              <div className="max-h-[400px] overflow-y-auto space-x-1">
-                                <Button
-                                  variant="outline"
-                                  size="xs"
-                                  onClick={() => {
-                                    handleSelectAll(
-                                      organizationUsers.users as NonEmptyArray<UserReadMinimal>,
-                                    );
-                                  }}
-                                >
-                                  {t("select_all")}
-                                </Button>
-                                {selected.filter((s) =>
-                                  organizationUsers.users.some(
-                                    (u) => u.id === s.id,
-                                  ),
-                                ).length > 1 && (
-                                  <Button
-                                    variant="outline"
-                                    size="xs"
-                                    onClick={() =>
-                                      clearOrganizationUsers(organizationUsers)
-                                    }
-                                  >
-                                    {t("clear_all")}
-                                  </Button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          {organizationUsers.users.map((user) => {
-                            const isSelected = selected?.some(
-                              (s) => s.id === user.id,
-                            );
-
+                    {organizationUsers.users.map((user) => {
+                      const isSelected = selected?.some(
+                        (s) => s.id === user.id,
+                      );
                       return (
                         <div
                           key={user.id}

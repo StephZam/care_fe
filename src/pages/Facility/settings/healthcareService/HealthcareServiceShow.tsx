@@ -27,6 +27,7 @@ import { TableSkeleton } from "@/components/Common/SkeletonLoading";
 
 import ColoredIndicator from "@/CAREUI/display/ColoredIndicator";
 import BackButton from "@/components/Common/BackButton";
+import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
 import healthcareServiceApi from "@/types/healthcareService/healthcareServiceApi";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
@@ -42,7 +43,7 @@ export default function HealthcareServiceShow({
   healthcareServiceId: string;
 }) {
   const { t } = useTranslation();
-  const [isDeleted, setIsDeleted] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: healthcareService, isLoading } = useQuery({
     queryKey: ["healthcareService", healthcareServiceId],
@@ -52,7 +53,6 @@ export default function HealthcareServiceShow({
         healthcareServiceId,
       },
     }),
-    enabled: !isDeleted,
   });
 
   const { mutate: deleteHealthcareService } = useMutation({
@@ -63,11 +63,11 @@ export default function HealthcareServiceShow({
       },
     }),
     onSuccess: () => {
-      setIsDeleted(true);
       queryClient.removeQueries({
         queryKey: ["healthcareService", healthcareServiceId],
       });
       toast.success(t("healthcare_service_deleted_successfully"));
+      navigate(`/facility/${facilityId}/settings/healthcare_services`);
     },
   });
 
@@ -141,11 +141,19 @@ export default function HealthcareServiceShow({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => deleteHealthcareService()}>
+                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
                   {t("delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <ConfirmActionDialog
+              open={showDeleteDialog}
+              onOpenChange={setShowDeleteDialog}
+              title={t("are_you_sure")}
+              description={t("are_you_sure_want_to_delete_this_service")}
+              confirmText={t("confirm")}
+              onConfirm={() => deleteHealthcareService()}
+            />
           </div>
         </div>
 

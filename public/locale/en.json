@@ -2371,6 +2371,7 @@
   "header_error": "There are errors in the Header tab. Please fix the errors before saving.",
   "healthcare_service": "Healthcare Service",
   "healthcare_service_created_successfully": "Healthcare service created successfully",
+  "healthcare_service_deleted_successfully": "Healthcare service deleted successfully",
   "healthcare_service_details": "Healthcare Service Details",
   "healthcare_service_not_found": "Healthcare service not found",
   "healthcare_service_updated_successfully": "Healthcare service updated successfully",

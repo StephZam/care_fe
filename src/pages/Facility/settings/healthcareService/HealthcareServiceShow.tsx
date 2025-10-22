@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, navigate } from "raviger";
-import { useTranslation } from "react-i18next";
-
 import CareIcon from "@/CAREUI/icons/CareIcon";
 import duoToneIcons from "@/CAREUI/icons/DuoTonePaths.json";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link, navigate } from "raviger";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,14 +14,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 
 import Page from "@/components/Common/Page";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
 
 import ColoredIndicator from "@/CAREUI/display/ColoredIndicator";
-import query from "@/Utils/request/query";
 import BackButton from "@/components/Common/BackButton";
 import healthcareServiceApi from "@/types/healthcareService/healthcareServiceApi";
+import mutate from "@/Utils/request/mutate";
+import query from "@/Utils/request/query";
+import queryClient from "@/Utils/request/queryClient";
 
 type DuoToneIconName = keyof typeof duoToneIcons;
 
@@ -32,6 +42,7 @@ export default function HealthcareServiceShow({
   healthcareServiceId: string;
 }) {
   const { t } = useTranslation();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const { data: healthcareService, isLoading } = useQuery({
     queryKey: ["healthcareService", healthcareServiceId],
@@ -41,6 +52,23 @@ export default function HealthcareServiceShow({
         healthcareServiceId,
       },
     }),
+    enabled: !isDeleted,
+  });
+
+  const { mutate: deleteHealthcareService } = useMutation({
+    mutationFn: mutate(healthcareServiceApi.deleteHealthcareService, {
+      pathParams: {
+        facility_external_id: facilityId,
+        external_id: healthcareServiceId,
+      },
+    }),
+    onSuccess: () => {
+      setIsDeleted(true);
+      queryClient.removeQueries({
+        queryKey: ["healthcareService", healthcareServiceId],
+      });
+      toast.success(t("healthcare_service_deleted_successfully"));
+    },
   });
 
   const getIconName = (name: string): DuoToneIconName =>
@@ -106,6 +134,18 @@ export default function HealthcareServiceShow({
             >
               {t("edit")}
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="cursor-pointer">
+                  <MoreVertical className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => deleteHealthcareService()}>
+                  {t("delete")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

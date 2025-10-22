@@ -28,4 +28,10 @@ export default {
     method: HttpMethod.PUT,
     TRes: Type<HealthcareServiceUpdateSpec>(),
   },
+  deleteHealthcareService: {
+    path: "/api/v1/facility/{facility_external_id}/healthcare_service/{external_id}/",
+    method: HttpMethod.DELETE,
+    TRes: Type<void>(),
+    TBody: Type<void>(),
+  },
 } as const;

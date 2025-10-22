@@ -58,8 +58,8 @@ export default function HealthcareServiceShow({
   const { mutate: deleteHealthcareService } = useMutation({
     mutationFn: mutate(healthcareServiceApi.deleteHealthcareService, {
       pathParams: {
-        facility_external_id: facilityId,
-        external_id: healthcareServiceId,
+        facilityId,
+        healthcareServiceId,
       },
     }),
     onSuccess: () => {

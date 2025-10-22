@@ -1,3 +1,4 @@
+import { RotateCwIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -167,6 +168,16 @@ export default function UserSummaryTab({
             />
           </>
         )}
+        <div className="flex justify-start mt-3">
+          <Button
+            variant="ghost"
+            onClick={() => window.location.reload()}
+            className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
+          >
+            <RotateCwIcon className="text-2xl" />
+            <span className="ml-1">{t("refresh")}</span>
+          </Button>
+        </div>
         {canEditUser && (
           <Card className="border-red-500">
             <CardHeader className="px-4 sm:px-6">

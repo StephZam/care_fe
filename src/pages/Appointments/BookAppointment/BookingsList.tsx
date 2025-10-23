@@ -1,5 +1,5 @@
-import { differenceInMinutes, format } from "date-fns";
-import { CalendarDays } from "lucide-react";
+import { differenceInMinutes, format, subDays } from "date-fns";
+import { CalendarDays, CalendarOff } from "lucide-react";
 import { Link, navigate } from "raviger";
 import { useTranslation } from "react-i18next";
 
@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { dateQueryString } from "@/Utils/utils";
 import { Avatar } from "@/components/Common/Avatar";
 import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
 import { ScheduleResourceIcon } from "@/components/Schedule/ScheduleResourceIcon";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
@@ -41,7 +43,7 @@ interface BookingsListProps {
 
 export const BookingsList = ({ patientId, facilityId }: BookingsListProps) => {
   const { t } = useTranslation();
-
+  const today = new Date();
   return (
     <div className="mt-2">
       <Tabs defaultValue="upcoming">
@@ -66,24 +68,23 @@ export const BookingsList = ({ patientId, facilityId }: BookingsListProps) => {
               {t("cancelled")}
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="upcoming" className="space-y-4 overflow-x-scroll">
+          <TabsContent value="upcoming" className="space-y-4 overflow-x-auto">
             <BookingListContent
               patientId={patientId}
               facilityId={facilityId}
               statuses={UpcomingAppointmentStatuses}
+              date_after={today}
             />
           </TabsContent>
-          <TabsContent value="past" className="space-y-4 overflow-x-scroll">
+          <TabsContent value="past" className="space-y-4 overflow-x-auto">
             <BookingListContent
               patientId={patientId}
               facilityId={facilityId}
               statuses={PastAppointmentStatuses}
+              date_before={subDays(today, 1)}
             />
           </TabsContent>
-          <TabsContent
-            value="cancelled"
-            className="space-y-4 overflow-x-scroll"
-          >
+          <TabsContent value="cancelled" className="space-y-4 overflow-x-auto">
             <BookingListContent
               patientId={patientId}
               facilityId={facilityId}
@@ -99,11 +100,11 @@ export const BookingsList = ({ patientId, facilityId }: BookingsListProps) => {
 const AppointmentCard = ({
   appointment,
   patientId,
-  appointmentId,
+  showFacilityInfo,
 }: {
   appointment: Appointment;
   patientId: string;
-  appointmentId: string;
+  showFacilityInfo: boolean;
 }) => {
   const { t } = useTranslation();
 
@@ -135,15 +136,23 @@ const AppointmentCard = ({
           </div>
         </div>
         <div className="px-2 py-1 rounded-sm bg-gray-50">
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <ScheduleResourceIcon resource={appointment} />
+          <div className="flex flex-col gap-1">
+            <div className="flex flex-row gap-1">
+              <ScheduleResourceIcon resource={appointment} className="size-5" />
               <div className="flex items-center justify-center gap-2">
                 <span className="text-sm font-medium text-gray-950">
                   {formatScheduleResourceName(appointment)}
                 </span>
               </div>
             </div>
+            {showFacilityInfo && (
+              <div className="flex gap-1 items-center">
+                <Avatar name={appointment.facility.name} className="size-5" />
+                <span className="text-sm font-medium text-gray-950">
+                  {appointment.facility.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <Button
@@ -152,7 +161,7 @@ const AppointmentCard = ({
           asChild
         >
           <Link
-            href={`/facility/${appointment.facility.id}/patient/${patientId}/appointments/${appointmentId}`}
+            href={`/facility/${appointment.facility.id}/patient/${patientId}/appointments/${appointment.id}`}
           >
             {t("see_details")}
           </Link>
@@ -186,11 +195,6 @@ const AppointmentTable = ({
           <TableHead className="w-30 border-y bg-gray-100 text-gray-700 text-sm">
             {t("resource")}
           </TableHead>
-          {showFacilityInfo && (
-            <TableHead className="w-14 border-y bg-gray-100 text-gray-700 text-sm">
-              {t("facility")}
-            </TableHead>
-          )}
           <TableHead className="w-14 border-y bg-gray-100 text-gray-700 text-sm">
             {t("status")}
           </TableHead>
@@ -243,11 +247,11 @@ const AppointmentTable = ({
 
             <TableCell>
               <div className="px-2 py-1">
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-row gap-2">
+                <div className="flex flex-col gap-1">
+                  <div className="flex flex-row gap-1">
                     <ScheduleResourceIcon
                       resource={appointment}
-                      className="border border-white shadow-sm rounded-full"
+                      className="size-5"
                     />
                     <div className="flex items-center justify-center gap-2">
                       <span className="text-sm font-medium text-gray-950">
@@ -255,25 +259,23 @@ const AppointmentTable = ({
                       </span>
                     </div>
                   </div>
+
+                  {showFacilityInfo && (
+                    <div className="flex gap-1 items-center">
+                      <Avatar
+                        name={appointment.facility.name}
+                        className="size-5"
+                      />
+                      <span className="text-sm font-medium text-gray-950">
+                        {appointment.facility.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </TableCell>
 
-            {showFacilityInfo && (
-              <TableCell>
-                <div className="flex gap-2 items-center">
-                  <Avatar
-                    name={appointment.facility.name}
-                    className="size-8 border border-white shadow-sm"
-                  />
-                  <span className="text-sm font-medium text-gray-950">
-                    {appointment.facility.name}
-                  </span>
-                </div>
-              </TableCell>
-            )}
-
-            <TableCell className="hidden xl:table-cell">
+            <TableCell>
               <div className="flex flex-row items-start justify-start">
                 <Badge variant={APPOINTMENT_STATUS_COLORS[appointment.status]}>
                   {t(appointment.status)}
@@ -291,10 +293,14 @@ export const BookingListContent = ({
   patientId,
   facilityId,
   statuses,
+  date_after,
+  date_before,
 }: {
   patientId: string;
   facilityId?: string;
   statuses?: readonly AppointmentStatus[];
+  date_after?: Date;
+  date_before?: Date;
 }) => {
   const { t } = useTranslation();
   const { ref, inView } = useInView();
@@ -307,6 +313,7 @@ export const BookingListContent = ({
     isLoading,
   } = useInfiniteQuery({
     queryKey: ["infinite-appointments", patientId, facilityId, statuses],
+
     queryFn: async ({ pageParam = 0, signal }) => {
       const response = await query(scheduleApi.appointments.getAppointments, {
         pathParams: { patientId },
@@ -314,6 +321,8 @@ export const BookingListContent = ({
           offset: pageParam,
           limit: 15,
           facility: facilityId,
+          ...(date_after && { date_after: dateQueryString(date_after) }),
+          ...(date_before && { date_before: dateQueryString(date_before) }),
           status: statuses?.join(","),
         },
       })({ signal });
@@ -341,12 +350,13 @@ export const BookingListContent = ({
 
   if (appointments.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">{t("no_appointments")}</p>
-      </div>
+      <EmptyState
+        title={t("no_appointments")}
+        icon={<CalendarOff className="size-5 text-primary m-1" />}
+        className="m-1"
+      />
     );
   }
-
   return (
     <div className="w-full">
       <div className="hidden sm:block">
@@ -362,7 +372,7 @@ export const BookingListContent = ({
             key={`card-${appointment.id}`}
             appointment={appointment}
             patientId={patientId}
-            appointmentId={appointment.id}
+            showFacilityInfo={!facilityId}
           />
         ))}
       </div>

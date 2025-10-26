@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import UpdatableApp, { checkForUpdate } from "@/components/Common/UpdatableApp";
 
 import { clearQueryPersistenceCache } from "@/Utils/request/queryClient";
+import { RotateCwIcon } from "lucide-react";
 
 export default function UserSoftwareUpdate() {
   const [updateStatus, setUpdateStatus] = useState({
@@ -70,12 +71,20 @@ export default function UserSoftwareUpdate() {
         </UpdatableApp>
       ) : (
         // Default state to check for updates
-        <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6">
+        <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6 space-x-2">
           <Button variant="primary" onClick={checkUpdates}>
             <div className="flex items-center gap-4">
               <CareIcon icon="l-sync" className="text-xl" />
               {t("check_for_update")}
             </div>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => window.location.reload()}
+            className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
+          >
+            <RotateCwIcon className="text-2xl" />
+            <span className="ml-1">{t("clear_cache")}</span>
           </Button>
         </div>
       )}

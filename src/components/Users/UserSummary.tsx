@@ -160,7 +160,7 @@ export default function UserSummaryTab({
               childProps={userColumnsData}
             />
             <UserColumns
-              heading={t("software_update")}
+              heading={t("software_update_cache")}
               note={t("check_for_available_update")}
               Child={UserSoftwareUpdate}
               childProps={userColumnsData}

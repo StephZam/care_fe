@@ -78,15 +78,8 @@ export default function UserSoftwareUpdate() {
               {t("check_for_update")}
             </div>
           </Button>
-          <Button
-            variant="ghost"
-            onClick={() => window.location.reload()}
-            className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
-          >
-            <RotateCwIcon className="text-2xl" />
-            <span className="ml-1">{t("clear_cache")}</span>
-          </Button>
         </div>
+        
       )}
     </>
   );

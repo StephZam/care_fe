@@ -11,6 +11,34 @@ import UpdatableApp, { checkForUpdate } from "@/components/Common/UpdatableApp";
 import { clearQueryPersistenceCache } from "@/Utils/request/queryClient";
 import { RotateCwIcon } from "lucide-react";
 
+const ClearCacheButton = () => {
+  const { t } = useTranslation();
+  return (
+    <Button
+      variant="primary"
+      onClick={async () => {
+        if ("caches" in window) {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+        }
+        if ("serviceWorker" in navigator) {
+          const registrations =
+            await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((reg) => reg.unregister()));
+        }
+        if ((window as any).queryClient) {
+          (window as any).queryClient.clear();
+        }
+        window.location.reload();
+      }}
+      className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
+    >
+      <RotateCwIcon className="text-2xl" />
+      <span className="ml-1">{t("clear_cache")}</span>
+    </Button>
+  );
+};
+
 export default function UserSoftwareUpdate() {
   const [updateStatus, setUpdateStatus] = useState({
     isChecking: false,
@@ -40,35 +68,39 @@ export default function UserSoftwareUpdate() {
     <>
       {updateStatus.isChecking ? (
         // While checking for updates
-        <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6">
+        <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6 space-x-2">
           <Button variant="primary" disabled aria-busy="true">
             <div className="flex items-center gap-4">
               <CareIcon icon="l-sync" className="text-2xl animate-spin" />
               {t("checking_for_update")}
             </div>
           </Button>
+          <ClearCacheButton />
         </div>
       ) : updateStatus.isUpdateAvailable ? (
         // When an update is available
-        <UpdatableApp
-          silentlyAutoUpdate={false}
-          onDismissUpdateToast={() => {
-            setUpdateStatus({
-              isUpdateAvailable: false,
-              isChecking: false,
-            });
-          }}
-        >
-          <Button disabled>
-            <div className="flex items-center gap-4">
-              <CareIcon
-                icon="l-exclamation"
-                className="text-2xl text-warning"
-              />
-              {t("update_available")}
-            </div>
-          </Button>
-        </UpdatableApp>
+        <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6 space-x-2">
+          <UpdatableApp
+            silentlyAutoUpdate={false}
+            onDismissUpdateToast={() => {
+              setUpdateStatus({
+                isUpdateAvailable: false,
+                isChecking: false,
+              });
+            }}
+          >
+            <Button disabled>
+              <div className="flex items-center gap-4">
+                <CareIcon
+                  icon="l-exclamation"
+                  className="text-2xl text-warning"
+                />
+                {t("update_available")}
+              </div>
+            </Button>
+          </UpdatableApp>
+          <ClearCacheButton />
+        </div>
       ) : (
         // Default state to check for updates
         <div className="flex justify-center sm:justify-start overflow-hidden rounded-lg bg-white px-4 py-5 shadow-sm sm:rounded-lg sm:p-6 space-x-2">
@@ -78,8 +110,8 @@ export default function UserSoftwareUpdate() {
               {t("check_for_update")}
             </div>
           </Button>
+          <ClearCacheButton />
         </div>
-        
       )}
     </>
   );

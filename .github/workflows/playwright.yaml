@@ -9,7 +9,7 @@ name: Playwright Tests
 on:
   push:
     branches: [main, develop, production]
-  pull_request:
+  pull_request_target:
     branches: [develop, production]
     paths:
       - "src/**"
@@ -39,6 +39,9 @@ jobs:
       tests: ${{ steps.filter.outputs.tests }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - uses: dorny/paths-filter@v3
         id: filter
@@ -50,6 +53,17 @@ jobs:
               - 'package.json'
               - 'playwright.config.ts'
 
+  # Skip job if no relevant files changed (makes workflow pass)
+  skip:
+    if: github.repository == 'ohcnetwork/care_fe' && needs.changes.outputs.tests != 'true'
+    needs: changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: No relevant files changed, skipping tests
+        run: |
+          echo "No relevant files changed, skipping Playwright tests. Passing check."
+          exit 0
+
   # Build application once and cache for all test shards
   build:
     if: github.repository == 'ohcnetwork/care_fe' && needs.changes.outputs.tests == 'true'
@@ -60,6 +74,8 @@ jobs:
       - name: Checkout 📥
         uses: actions/checkout@v4
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -98,7 +114,9 @@ jobs:
     steps:
       - name: Checkout 📥
         uses: actions/checkout@v4
-        with:
+        with:  
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Set backend branch

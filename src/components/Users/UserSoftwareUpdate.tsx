@@ -9,26 +9,26 @@ import { Button } from "@/components/ui/button";
 import UpdatableApp, { checkForUpdate } from "@/components/Common/UpdatableApp";
 
 import { clearQueryPersistenceCache } from "@/Utils/request/queryClient";
+import { useQueryClient } from "@tanstack/react-query";
 import { RotateCwIcon } from "lucide-react";
 
 const ClearCacheButton = () => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   return (
     <Button
       variant="primary"
       onClick={async () => {
-        if ("caches" in window) {
-          const cacheKeys = await caches.keys();
-          await Promise.all(cacheKeys.map((key) => caches.delete(key)));
-        }
+        caches
+          .keys()
+          .then((names) => names.forEach((name) => caches.delete(name)));
         if ("serviceWorker" in navigator) {
           const registrations =
             await navigator.serviceWorker.getRegistrations();
           await Promise.all(registrations.map((reg) => reg.unregister()));
         }
-        if ((window as any).queryClient) {
-          (window as any).queryClient.clear();
-        }
+        queryClient.clear();
+        clearQueryPersistenceCache();
         window.location.reload();
       }}
       className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"

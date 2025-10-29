@@ -32,13 +32,13 @@ export default {
   setTags: {
     path: "/api/v1/facility/{facilityId}/order/request/{external_id}/set_tags/",
     method: HttpMethod.POST,
-    TRes: Type<unknown>(),
+    TRes: Type<RequestOrderRetrieve>(),
     TBody: Type<{ tags: string[] }>(),
   },
   removeTags: {
     path: "/api/v1/facility/{facilityId}/order/request/{external_id}/remove_tags/",
     method: HttpMethod.POST,
-    TRes: Type<unknown>(),
+    TRes: Type<RequestOrderRetrieve>(),
     TBody: Type<{ tags: string[] }>(),
   },
 } as const;

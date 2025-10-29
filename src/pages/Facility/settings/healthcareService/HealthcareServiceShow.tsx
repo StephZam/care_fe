@@ -14,13 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 
 import Page from "@/components/Common/Page";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
@@ -123,8 +116,16 @@ export default function HealthcareServiceShow({
           <h1 className="text-xl font-semibold text-gray-900">
             {t("healthcare_service_details")}
           </h1>
-          <div className="flex gap-2">
+          <div className="flex justify-end gap-2">
             <BackButton>{t("back_to_list")}</BackButton>
+            <Button
+              variant="outline"
+              className="cursor-pointer"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <CareIcon icon="l-trash" className="size-4" />
+              {t("delete")}
+            </Button>
             <Button
               onClick={() =>
                 navigate(
@@ -134,18 +135,6 @@ export default function HealthcareServiceShow({
             >
               {t("edit")}
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="cursor-pointer">
-                  <MoreVertical className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
-                  {t("delete")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <ConfirmActionDialog
               open={showDeleteDialog}
               onOpenChange={setShowDeleteDialog}

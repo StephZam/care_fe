@@ -119,7 +119,9 @@ export default function ScheduleChargeItemDefinitionSelector({
               </div>
 
               <div>
-                <Label>{t("re_visit_consultation_charge")}</Label>
+                <Label className={reVisitDays === 0 ? "text-gray-400" : ""}>
+                  {t("re_visit_consultation_charge")}
+                </Label>
                 <div className="mt-2 flex gap-2 flex-row">
                   <ChargeItemDefinitionPicker
                     facilityId={facilityId}
@@ -129,6 +131,7 @@ export default function ScheduleChargeItemDefinitionSelector({
                     placeholder={t("select_charge_item_definition")}
                     className="flex-1"
                     showCreateButton={true}
+                    disabled={reVisitDays === 0}
                   />
                 </div>
               </div>
@@ -145,7 +148,7 @@ export default function ScheduleChargeItemDefinitionSelector({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!selectedCSlug || !reVisitDays}
+              disabled={!selectedCSlug}
               className="w-full sm:w-auto"
             >
               {t("save")}

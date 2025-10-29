@@ -6,6 +6,11 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -13,6 +18,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { MoreVertical } from "lucide-react";
 
 import mutate from "@/Utils/request/mutate";
 import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
@@ -305,7 +311,7 @@ export default function LinkDepartmentsSheet({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="!w-[50vw] !max-w-none min-h-[50vh]">
+      <SheetContent className="!w-[50vw] !max-w-none min-h-[50vh] overflow-auto">
         <SheetHeader>
           <SheetTitle>
             {t("manage_organization", {
@@ -335,11 +341,11 @@ export default function LinkDepartmentsSheet({
                       {currentOrganizations.map((org) => (
                         <div
                           key={org.id}
-                          className="flex flex-wrap items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 sm:gap-4 p-3 sm:p-2"
+                          className="flex items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 p-3 sm:p-2"
                         >
-                          <div className="flex-1 min-w-0 flex flex-wrap ml-1 items-center">
+                          <div className="flex-1 min-w-0">
                             <div
-                              className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words"
+                              className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words gap-1"
                               data-cy="link-organisation-name"
                             >
                               {getOrganizationPath(org).map(
@@ -355,35 +361,49 @@ export default function LinkDepartmentsSheet({
                                       {name}
                                     </span>
                                     {idx < arr.length - 1 && idx !== 0 && (
-                                      <ArrowRight className="mx-1 size-3 text-gray-700" />
+                                      <ArrowRight className="mx-1 size-3 text-gray-700 flex-shrink-0" />
                                     )}
                                   </span>
                                 ),
                               )}
                             </div>
                           </div>
-                          <div className="flex-shrink-0 flex items-center justify-center">
-                            <DeleteOrganizationButton
-                              organizationId={org.id}
-                              entityType={entityType}
-                              entityId={entityId}
-                              facilityId={facilityId}
-                              onSuccess={onUpdate}
-                            />
+                          <div className="flex-shrink-0">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="w-auto min-w-0"
+                              >
+                                <div className="w-9">
+                                  <DeleteOrganizationButton
+                                    organizationId={org.id}
+                                    entityType={entityType}
+                                    entityId={entityId}
+                                    facilityId={facilityId}
+                                    onSuccess={onUpdate}
+                                  />
+                                </div>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <div className="bg-gray-100 p-6 rounded-md space-y-2 text-center">
-                    <Blocks className="size-6 mx-auto" />
-                    <p className="text-medium text-gray-950">
+                  <div className="bg-gray-100 p-4 sm:p-6 rounded-md space-y-2 sm:space-y-3 text-center">
+                    <Blocks className="size-5 sm:size-6 mx-auto" />
+                    <p className="text-sm sm:text-base text-gray-950">
                       {t("no_organization_added_yet", {
                         count: entityType === "device" ? 1 : 0,
                       })}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600">
                       {t(
                         "start_by_adding_organization_from_your_organizations",
                       )}

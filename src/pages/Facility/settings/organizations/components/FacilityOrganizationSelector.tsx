@@ -23,12 +23,18 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { MoreVertical } from "lucide-react";
 
 import useBreakpoints from "@/hooks/useBreakpoints";
 
@@ -213,22 +219,29 @@ export default function FacilityOrganizationSelector(
     props.optional,
   ]);
 
-  const renderNavigationPath = () => {
+  const renderNavigationPath = (linkStyle: boolean = false) => {
     return (
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
         {navigationLevels.map((org, index) => (
           <div key={org.id} className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setNavigationLevels(navigationLevels.slice(0, index + 1));
                 setFacilityOrgSearch("");
               }}
-              className="text-sm font-medium text-gray-950 hover:text-sky-600 cursor-pointer"
+              className={`text-sm font-medium cursor-pointer ${
+                linkStyle && index < navigationLevels.length - 1
+                  ? "text-sky-600 underline underline-offset-4 hover:text-sky-700"
+                  : "text-gray-950 hover:text-sky-600"
+              }`}
             >
               {org.name}
             </button>
-            <ArrowRight className="size-3 text-gray-950 flex-shrink-0" />
+            {index < navigationLevels.length - 1 && (
+              <ArrowRight className="!size-2 sm:!size-3 text-gray-950 flex-shrink-0" />
+            )}
           </div>
         ))}
       </div>
@@ -316,7 +329,10 @@ export default function FacilityOrganizationSelector(
                     disabled={isDisabled}
                     data-cy="confirm-organization"
                   >
-                    <CareIcon icon="l-check" className="size-4 text-gray-950" />
+                    <CareIcon
+                      icon="l-check"
+                      className="!size-4 text-gray-950"
+                    />
                     <span>{t("confirm")}</span>
                   </Button>
                 </div>
@@ -352,10 +368,7 @@ export default function FacilityOrganizationSelector(
       />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-2">
-          <Label>
-            {t("select_department")}
-            {!props.optional && <span className="text-red-500 ml-0.5">*</span>}
-          </Label>
+          <Label>{t("select_department")}</Label>
         </div>
       </div>
 
@@ -372,20 +385,20 @@ export default function FacilityOrganizationSelector(
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full flex flex-row sm:flex-row sm:items-center justify-between border-gray-100 text-left px-3 py-2 gap-2 sm:gap-3"
+                        className="w-full flex flex-row items-center justify-between border-gray-100 text-left px-3 py-5 gap-2 sm:gap-3"
                         data-cy="facility-organization"
                         onClick={() => setOpen(true)}
                         type="button" // Prevents unintended form submission
                       >
-                        <span className="flex-1 break-words whitespace-normal">
+                        <span className="flex-1 break-words whitespace-normal text-sm sm:text-base">
                           {open || navigationLevels.length > 0
-                            ? renderNavigationPath()
+                            ? renderNavigationPath(true)
                             : t("select_department")}
                         </span>
                         <ChevronDown className="size-4 shrink-0 opacity-50 self-center" />
                       </Button>
                     </DrawerTrigger>
-                    <DrawerContent className="min-h-[50vh] max-h-[85vh]">
+                    <DrawerContent className="min-h-[40vh] sm:min-h-[50vh] max-h-[75vh] sm:max-h-[85vh]">
                       {renderOrganizationCommand()}
                     </DrawerContent>
                   </Drawer>
@@ -402,7 +415,7 @@ export default function FacilityOrganizationSelector(
                     >
                       {open || navigationLevels.length > 0 ? (
                         <div className="items-center py-1">
-                          {renderNavigationPath()}
+                          {renderNavigationPath(true)}
                         </div>
                       ) : (
                         <span>{t("select_department")}</span>
@@ -446,7 +459,7 @@ export default function FacilityOrganizationSelector(
                               {name}
                             </span>
                             {idx < org.fullPath.length - 1 && (
-                              <ArrowRight className="mx-1 size-3 text-gray-500" />
+                              <ArrowRight className="mx-1 size-3 sm:size-3 text-gray-500 flex-shrink-0" />
                             )}
                           </span>
                         ))
@@ -456,17 +469,33 @@ export default function FacilityOrganizationSelector(
                         </span>
                       )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="size-8 p-0 text-gray-500 hover:text-gray-900"
-                      onClick={() => handleRemoveOrganization(index)}
-                    >
-                      <X className="size-4" />
-                      <span className="sr-only">
-                        {t("remove_organization")}
-                      </span>
-                    </Button>
+                    <div className="flex-shrink-0">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 sm:size-9 flex-shrink-0"
+                          >
+                            <MoreVertical className="size-3 sm:size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-auto min-w-0"
+                        >
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 w-full justify-start text-xs sm:text-sm"
+                            onClick={() => handleRemoveOrganization(index)}
+                          >
+                            <X className="size-4" />
+                            <span>{t("remove")}</span>
+                          </Button>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 ))}
               </>

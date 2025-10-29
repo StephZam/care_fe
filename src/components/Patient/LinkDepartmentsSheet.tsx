@@ -429,6 +429,7 @@ export default function LinkDepartmentsSheet({
                 onChange={setSelectedOrgs}
                 currentOrganizations={currentOrganizations}
                 singleSelection={entityType === "device"}
+                optional={true}
               />
 
               <Button

@@ -341,11 +341,11 @@ export default function LinkDepartmentsSheet({
                       {currentOrganizations.map((org) => (
                         <div
                           key={org.id}
-                          className="flex items-center justify-between rounded-md border bg-gray-100 border-gray-200 gap-2 p-3 sm:p-2"
+                          className="flex items-start sm:items-center justify-between rounded-md border border-gray-200 bg-gray-100 p-2"
                         >
                           <div className="flex-1 min-w-0">
                             <div
-                              className="flex flex-wrap items-center text-xs sm:text-sm text-gray-900 font-medium break-words gap-1"
+                              className="flex flex-wrap items-center gap-1 text-sm text-gray-900 break-words"
                               data-cy="link-organisation-name"
                             >
                               {getOrganizationPath(org).map(
@@ -355,13 +355,13 @@ export default function LinkDepartmentsSheet({
                                       className={
                                         idx === arr.length - 1
                                           ? "font-semibold"
-                                          : "text-gray-700"
+                                          : "text-gray-900"
                                       }
                                     >
                                       {name}
                                     </span>
                                     {idx < arr.length - 1 && idx !== 0 && (
-                                      <ArrowRight className="mx-1 size-3 text-gray-700 flex-shrink-0" />
+                                      <ArrowRight className="mx-1 size-3 text-gray-700" />
                                     )}
                                   </span>
                                 ),
@@ -371,8 +371,12 @@ export default function LinkDepartmentsSheet({
                           <div className="flex-shrink-0">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="size-8 sm:size-9 flex-shrink-0"
+                                >
+                                  <MoreVertical className="size-4 flex-shrink-0" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
@@ -410,6 +414,14 @@ export default function LinkDepartmentsSheet({
                     </p>
                   </div>
                 )}
+              </div>
+              <div className="space-y-1">
+                {[...Array(3)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full h-0.5 bg-[repeating-linear-gradient(to_right,_#D1D5DB_0_1px,_transparent_2px_5px)]"
+                  ></div>
+                ))}
               </div>
               <FacilityOrganizationSelector
                 facilityId={facilityId}

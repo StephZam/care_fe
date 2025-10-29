@@ -385,15 +385,13 @@ export default function FacilityOrganizationSelector(
                         variant="outline"
                         role="combobox"
                         aria-expanded={open}
-                        className="w-full flex flex-row items-center justify-between border-gray-100 text-left px-3 py-5 gap-2 sm:gap-3"
+                        className="w-full flex flex-row items-center justify-between border-gray-100 text-left px-2 py-5 gap-1 sm:gap-3"
                         data-cy="facility-organization"
                         onClick={() => setOpen(true)}
                         type="button" // Prevents unintended form submission
                       >
                         <span className="flex-1 break-words whitespace-normal text-sm sm:text-base">
-                          {open || navigationLevels.length > 0
-                            ? renderNavigationPath(true)
-                            : t("select_department")}
+                          {t("select_department")}
                         </span>
                         <ChevronDown className="size-4 shrink-0 opacity-50 self-center" />
                       </Button>
@@ -440,15 +438,12 @@ export default function FacilityOrganizationSelector(
                 {selectedOrganizations.map((org, index) => (
                   <div
                     key={index}
-                    className="relative flex flex-wrap justify-start sm:justify-center rounded-md border border-sky-300 bg-sky-50/100 p-2"
+                    className="relative flex justify-between rounded-md border border-sky-300 bg-sky-50/100 p-2"
                   >
-                    <div className="flex-1 min-w-0 ml-2 flex flex-wrap gap-1">
+                    <div className="flex flex-wrap items-center gap-1 text-sm text-gray-900 ml-1">
                       {org.fullPath && org.fullPath.length > 0 ? (
                         org.fullPath.map((name, idx) => (
-                          <span
-                            key={idx}
-                            className="flex items-center text-sm text-gray-900"
-                          >
+                          <span key={idx} className="flex items-center">
                             <span
                               className={
                                 idx === org.fullPath.length - 1
@@ -469,7 +464,7 @@ export default function FacilityOrganizationSelector(
                         </span>
                       )}
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="flex items-start flex-shrink-0 pr-1">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button

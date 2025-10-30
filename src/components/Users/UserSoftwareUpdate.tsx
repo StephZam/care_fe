@@ -12,32 +12,33 @@ import { clearQueryPersistenceCache } from "@/Utils/request/queryClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { RotateCwIcon } from "lucide-react";
 
-const ClearCacheButton = () => {
+function ClearCacheButton() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const [isClearing, setIsClearing] = useState(false);
+  const clearCache = async () => {
+    setIsClearing(true);
+    caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((reg) => reg.unregister()));
+    }
+    queryClient.clear();
+    clearQueryPersistenceCache();
+    window.location.reload();
+  };
+
   return (
     <Button
       variant="primary"
-      onClick={async () => {
-        caches
-          .keys()
-          .then((names) => names.forEach((name) => caches.delete(name)));
-        if ("serviceWorker" in navigator) {
-          const registrations =
-            await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registrations.map((reg) => reg.unregister()));
-        }
-        queryClient.clear();
-        clearQueryPersistenceCache();
-        window.location.reload();
-      }}
+      onClick={clearCache}
       className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
     >
-      <RotateCwIcon className="text-2xl" />
+      <RotateCwIcon className={`text-2xl ${isClearing && "animate-spin"}`} />
       <span className="ml-1">{t("clear_cache")}</span>
     </Button>
   );
-};
+}
 
 export default function UserSoftwareUpdate() {
   const [updateStatus, setUpdateStatus] = useState({

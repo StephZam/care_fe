@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { WalletMinimal } from "lucide-react";
@@ -65,6 +65,12 @@ export default function ScheduleChargeItemDefinitionSelector({
       setReVisitDays(scheduleTemplate.revisit_allowed_days);
     }
   };
+
+  useEffect(() => {
+    if (reVisitDays === 0) {
+      setReVisitCSlug("");
+    }
+  }, [reVisitDays]);
 
   return (
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>

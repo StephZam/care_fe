@@ -194,7 +194,7 @@ export default function RequestOrderForm({
         supplier: existingData.supplier?.id || undefined,
         origin: existingData.origin?.id || undefined,
         destination: existingData.destination.id,
-        tags: [],
+        tags: existingData.tags.map((tag) => tag.id),
       });
     }
   }, [isEditMode, existingData, form]);

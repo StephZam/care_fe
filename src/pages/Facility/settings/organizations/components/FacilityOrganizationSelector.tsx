@@ -4,7 +4,6 @@ import {
   ChevronDown,
   ChevronRight,
   Loader2,
-  Search,
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -19,6 +18,7 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -219,6 +219,12 @@ export default function FacilityOrganizationSelector(
     props.optional,
   ]);
 
+  useEffect(() => {
+    if (facilityOrgSearch.trim() === "" && navigationLevels.length === 0) {
+      setCurrentSelection(null);
+    }
+  }, [facilityOrgSearch, navigationLevels]);
+
   const renderNavigationPath = (linkStyle: boolean = false) => {
     return (
       <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
@@ -251,95 +257,96 @@ export default function FacilityOrganizationSelector(
   const renderOrganizationCommand = (className?: string) => {
     return (
       <Command className={className}>
-        <div className="flex items-center px-3 py-3 border-b">
-          <Search className="size-3 mr-2 text-gray-700" />
-          <span className="font-medium text-sm text-gray-700">
-            {t("search_department")}
-          </span>
+        <div className="flex items-center px-3 py-2 border-b">
+          <CommandInput
+            placeholder={t("search_department")}
+            onValueChange={setFacilityOrgSearch}
+            value={facilityOrgSearch}
+            className="border-none focus:ring-0 text-medium text-gray-800 sm:text-sm"
+          />
         </div>
-        <CommandList onWheel={(e) => e.stopPropagation()}>
-          <CommandEmpty>
-            {isLoadingRoot ||
-            organizationQueries[navigationLevels.length - 1]?.isLoading ? (
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                <span className="ml-2 text-sm text-gray-500">
-                  {t("loading_organizations")}
-                </span>
-              </div>
-            ) : (
-              t("no_organizations_found")
-            )}
-          </CommandEmpty>
-          <CommandGroup>
-            {!(
-              isLoadingRoot ||
-              organizationQueries[navigationLevels.length - 1]?.isLoading
-            ) &&
-              getCurrentLevelOrganizations().map((org) => {
-                const isSelected = currentSelection?.id === org.id;
-                return (
-                  <CommandItem
-                    key={org.id}
-                    value={org.name}
-                    onSelect={() => handleSelect(org)}
-                    className={cn(
-                      "flex items-center justify-between px-4 py-4 mb-1",
-                      isSelected && "bg-gray-100",
-                      "border-b border-gray-100",
-                    )}
-                  >
-                    <div className="flex items-center gap-2 text-gray-950">
-                      <span>{org.name}</span>
-                    </div>
-                    {org.has_children ? (
-                      <ChevronRight className="size-4 text-gray-500" />
-                    ) : (
-                      <span className="size-1 rounded-full bg-black mr-1"></span>
-                    )}
-                  </CommandItem>
-                );
-              })}
-            {currentSelection && (
-              <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md">
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-700 mb-0.5">
-                    {t("selected")}
+        <div className="max-h-[60vh] overflow-y-auto">
+          <CommandList onWheel={(e) => e.stopPropagation()}>
+            <CommandEmpty>
+              {isLoadingRoot ||
+              organizationQueries[navigationLevels.length - 1]?.isLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                  <span className="ml-2 text-sm text-gray-500">
+                    {t("loading_organizations")}
                   </span>
-                  {navigationLevels.length > 0 && (
-                    <div className="items-center py-1">
-                      {renderNavigationPath()}
-                    </div>
-                  )}
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 gap-2 underline"
-                    onClick={() => setCurrentSelection(null)}
-                  >
-                    <span>{t("cancel")}</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 gap-1 border-primary-600 text-primary-700"
-                    onClick={() => handleConfirmSelection(currentSelection)}
-                    disabled={isDisabled}
-                    data-cy="confirm-organization"
-                  >
-                    <CareIcon
-                      icon="l-check"
-                      className="!size-4 text-gray-950"
-                    />
-                    <span>{t("confirm")}</span>
-                  </Button>
+              ) : (
+                t("no_organizations_found")
+              )}
+            </CommandEmpty>
+            <CommandGroup>
+              {!(
+                isLoadingRoot ||
+                organizationQueries[navigationLevels.length - 1]?.isLoading
+              ) &&
+                getCurrentLevelOrganizations().map((org) => {
+                  const isSelected = currentSelection?.id === org.id;
+                  return (
+                    <CommandItem
+                      key={org.id}
+                      value={org.name}
+                      onSelect={() => handleSelect(org)}
+                      className={cn(
+                        "flex items-center justify-between px-4 py-4 mb-1",
+                        isSelected && "bg-gray-100",
+                        "border-b border-gray-100",
+                      )}
+                    >
+                      <div className="flex items-center gap-2 text-gray-950">
+                        <span>{org.name}</span>
+                      </div>
+                      {org.has_children ? (
+                        <ChevronRight className="size-4 text-gray-500" />
+                      ) : (
+                        <span className="size-1 rounded-full bg-black mr-1"></span>
+                      )}
+                    </CommandItem>
+                  );
+                })}
+            </CommandGroup>
+          </CommandList>
+        </div>
+        {currentSelection && (
+          <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md">
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-700 mb-0.5">
+                {t("selected")}
+              </span>
+              {navigationLevels.length > 0 && (
+                <div className="items-center py-1">
+                  {renderNavigationPath()}
                 </div>
-              </div>
-            )}
-          </CommandGroup>
-        </CommandList>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-2 underline"
+                onClick={() => setCurrentSelection(null)}
+              >
+                <span>{t("cancel")}</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 border-primary-600 text-primary-700"
+                onClick={() => handleConfirmSelection(currentSelection)}
+                disabled={isDisabled}
+                data-cy="confirm-organization"
+              >
+                <CareIcon icon="l-check" className="!size-4 text-gray-950" />
+                <span>{t("confirm")}</span>
+              </Button>
+            </div>
+          </div>
+        )}
       </Command>
     );
   };

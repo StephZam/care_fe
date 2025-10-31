@@ -49,13 +49,6 @@ import {
 } from "@/types/base/resourceCategory/resourceCategory";
 import resourceCategoryApi from "@/types/base/resourceCategory/resourceCategoryApi";
 
-const formSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  slug_value: z.string().min(5, "Slug should have atleast 5 characters"),
-  description: z.string().optional(),
-  resource_sub_type: z.nativeEnum(ResourceCategorySubType),
-});
-
 interface ResourceCategoryFormProps {
   facilityId: string;
   categorySlug?: string;
@@ -78,6 +71,16 @@ export function ResourceCategoryForm({
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const isEditing = !!categorySlug;
+
+  const formSchema = z.object({
+    title: z.string().min(1, t("field_required")),
+    slug_value: z
+      .string()
+      .min(5, t("character_count_validation", { min: 5, max: 25 }))
+      .max(25, t("character_count_validation", { min: 5, max: 25 })),
+    description: z.string().optional(),
+    resource_sub_type: z.nativeEnum(ResourceCategorySubType),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -116,7 +119,7 @@ export function ResourceCategoryForm({
 
     const subscription = form.watch((value, { name }) => {
       if (name === "title") {
-        form.setValue("slug_value", generateSlug(value.title || ""), {
+        form.setValue("slug_value", generateSlug(value.title || "", 25), {
           shouldValidate: true,
         });
       }
@@ -220,7 +223,7 @@ export function ResourceCategoryForm({
                         if (!isEditing) {
                           form.setValue(
                             "slug_value",
-                            generateSlug(e.target.value || ""),
+                            generateSlug(e.target.value || "", 25),
                             {
                               shouldValidate: true,
                             },

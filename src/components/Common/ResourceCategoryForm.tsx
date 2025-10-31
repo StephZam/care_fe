@@ -19,13 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -48,6 +42,7 @@ import {
   ResourceCategoryUpdate,
 } from "@/types/base/resourceCategory/resourceCategory";
 import resourceCategoryApi from "@/types/base/resourceCategory/resourceCategoryApi";
+import { ResourceSubTypePicker } from "./ResourceSubTypePicker";
 
 interface ResourceCategoryFormProps {
   facilityId: string;
@@ -112,6 +107,17 @@ export function ResourceCategoryForm({
       });
     }
   }, [categoryData, form]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      form.reset({
+        title: "",
+        slug_value: "",
+        description: "",
+        resource_sub_type: ResourceCategorySubType.other,
+      });
+    }
+  }, [isOpen, form]);
 
   // Auto-generate slug from name when creating new category
   useEffect(() => {
@@ -289,20 +295,11 @@ export function ResourceCategoryForm({
                 <FormItem>
                   <FormLabel>{t("resource_sub_type")}</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t("select_resource_sub_type")}
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.values(ResourceCategorySubType).map((subType) => (
-                        <SelectItem key={subType} value={subType}>
-                          {t(subType)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    <ResourceSubTypePicker
+                      resourceType={resourceType}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    />
                   </Select>
                   <FormDescription>
                     {t("resource_sub_type_help")}

@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -5,7 +6,6 @@ import { WalletMinimal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -16,9 +16,19 @@ import {
 } from "@/components/ui/sheet";
 
 import { ChargeItemDefinitionPicker } from "@/components/Common/ChargeItemDefinitionPicker";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 import { ResourceCategorySubType } from "@/types/base/resourceCategory/resourceCategory";
 import { ScheduleTemplate } from "@/types/scheduling/schedule";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 interface ScheduleChargeItemDefinitionSelectorProps {
   facilityId: string;
@@ -37,40 +47,62 @@ export default function ScheduleChargeItemDefinitionSelector({
 }: ScheduleChargeItemDefinitionSelectorProps) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedCSlug, setSelectedCSlug] = useState<string | undefined>(
-    scheduleTemplate.charge_item_definition?.slug,
-  );
-  const [reVisitDays, setReVisitDays] = useState(
-    scheduleTemplate.revisit_allowed_days,
-  );
-  const [reVisitCSlug, setReVisitCSlug] = useState<string | undefined>(
-    scheduleTemplate.revisit_charge_item_definition?.slug,
-  );
 
-  const handleSubmit = () => {
-    onChange({
-      charge_item_definition_slug: selectedCSlug!,
-      re_visit_allowed_days: reVisitDays,
-      re_visit_charge_item_definition_slug: reVisitCSlug || null,
+  const scheduleChargeItemSchema = z
+    .object({
+      charge_item_definition_slug: z
+        .string()
+        .min(1, "Consultation charge is required"),
+      re_visit_allowed_days: z
+        .number()
+        .min(0, "Re-visit allowed days cannot be negative"),
+      re_visit_charge_item_definition_slug: z.string().nullable(),
+    })
+    .refine((data) => {
+      if (data.re_visit_allowed_days === 0) {
+        return data.re_visit_charge_item_definition_slug === null;
+      }
+      return true;
     });
-    setIsOpen(false);
-  };
+
+  type FormValues = z.infer<typeof scheduleChargeItemSchema>;
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(scheduleChargeItemSchema),
+    defaultValues: {
+      charge_item_definition_slug:
+        scheduleTemplate.charge_item_definition?.slug || "",
+      re_visit_allowed_days: scheduleTemplate.revisit_allowed_days,
+      re_visit_charge_item_definition_slug:
+        scheduleTemplate.revisit_charge_item_definition?.slug || "",
+    },
+  });
+
+  const reVisitDays = form.watch("re_visit_allowed_days");
+
+  useEffect(() => {
+    if (reVisitDays === 0) {
+      form.setValue("re_visit_charge_item_definition_slug", null);
+    }
+  }, [reVisitDays, form]);
 
   const handleSheetOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      // Reset to original values when closing
-      setSelectedCSlug(scheduleTemplate.charge_item_definition?.slug);
-      setReVisitCSlug(scheduleTemplate.revisit_charge_item_definition?.slug);
-      setReVisitDays(scheduleTemplate.revisit_allowed_days);
+      form.reset({
+        charge_item_definition_slug:
+          scheduleTemplate.charge_item_definition?.slug || "",
+        re_visit_allowed_days: scheduleTemplate.revisit_allowed_days,
+        re_visit_charge_item_definition_slug:
+          scheduleTemplate.revisit_charge_item_definition?.slug || null,
+      });
     }
   };
 
-  useEffect(() => {
-    if (reVisitDays === 0) {
-      setReVisitCSlug("");
-    }
-  }, [reVisitDays]);
+  const onSubmit = (data: FormValues) => {
+    onChange(data);
+    setIsOpen(false);
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={handleSheetOpenChange}>
@@ -91,76 +123,95 @@ export default function ScheduleChargeItemDefinitionSelector({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 flex flex-col gap-6">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4">
-              <div>
-                <Label>{t("consulation charge")}</Label>
-                <div className="mt-2 flex gap-2 flex-row">
-                  <ChargeItemDefinitionPicker
-                    facilityId={facilityId}
-                    resourceSubType={ResourceCategorySubType.practitioner}
-                    value={selectedCSlug}
-                    onValueChange={setSelectedCSlug}
-                    placeholder={t("select_charge_item_definition")}
-                    className="flex-1"
-                    showCreateButton={true}
-                  />
-                </div>
-              </div>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="mt-6 flex flex-col gap-6"
+          >
+            <FormField
+              control={form.control}
+              name="charge_item_definition_slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("consulation charge")}</FormLabel>
+                  <FormControl>
+                    <ChargeItemDefinitionPicker
+                      facilityId={facilityId}
+                      resourceSubType={ResourceCategorySubType.practitioner}
+                      value={field.value}
+                      onValueChange={(value) => field.onChange(value || "")}
+                      placeholder={t("select_charge_item_definition")}
+                      className="flex-1"
+                      showCreateButton={true}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="re_visit_allowed_days"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("re_visit_allowed_days")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={field.value}
+                      onChange={(e) => {
+                        const value =
+                          e.target.value === "" ? 0 : parseInt(e.target.value);
+                        field.onChange(value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="re_visit_charge_item_definition_slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    className={reVisitDays === 0 ? "text-gray-400" : ""}
+                  >
+                    {t("re_visit_consultation_charge")}
+                  </FormLabel>
+                  <FormControl>
+                    <ChargeItemDefinitionPicker
+                      facilityId={facilityId}
+                      resourceSubType={ResourceCategorySubType.practitioner}
+                      value={field.value || ""}
+                      onValueChange={(value) => field.onChange(value || "")}
+                      placeholder={t("select_charge_item_definition")}
+                      className="flex-1"
+                      showCreateButton={true}
+                      disabled={reVisitDays === 0}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <div>
-                <Label>{t("re_visit_allowed_days")}</Label>
-                <div className="mt-2">
-                  <Input
-                    type="number"
-                    min={0}
-                    value={reVisitDays}
-                    onChange={(e) =>
-                      setReVisitDays(parseInt(e.target.value) || 0)
-                    }
-                    placeholder={t("enter_re_visit_allowed_days")}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label className={reVisitDays === 0 ? "text-gray-400" : ""}>
-                  {t("re_visit_consultation_charge")}
-                </Label>
-                <div className="mt-2 flex gap-2 flex-row">
-                  <ChargeItemDefinitionPicker
-                    facilityId={facilityId}
-                    resourceSubType={ResourceCategorySubType.practitioner}
-                    value={reVisitCSlug}
-                    onValueChange={setReVisitCSlug}
-                    placeholder={t("select_charge_item_definition")}
-                    className="flex-1"
-                    showCreateButton={true}
-                    disabled={reVisitDays === 0}
-                  />
-                </div>
-              </div>
+            <div className="flex justify-end gap-4 border-t pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                className="w-full sm:w-auto"
+              >
+                {t("cancel")}
+              </Button>
+              <Button type="submit" className="w-full sm:w-auto">
+                {t("save")}
+              </Button>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-4 border-t pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              className="w-full sm:w-auto"
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!selectedCSlug}
-              className="w-full sm:w-auto"
-            >
-              {t("save")}
-            </Button>
-          </div>
-        </div>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );

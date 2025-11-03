@@ -15,12 +15,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { getPermissions } from "@/common/Permissions";
 import Page from "@/components/Common/Page";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
 
 import ColoredIndicator from "@/CAREUI/display/ColoredIndicator";
 import BackButton from "@/components/Common/BackButton";
 import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
+import { usePermissions } from "@/context/PermissionContext";
 import healthcareServiceApi from "@/types/healthcareService/healthcareServiceApi";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
@@ -31,12 +33,19 @@ type DuoToneIconName = keyof typeof duoToneIcons;
 export default function HealthcareServiceShow({
   facilityId,
   healthcareServiceId,
+  permissions,
 }: {
   facilityId: string;
   healthcareServiceId: string;
+  permissions?: string[];
 }) {
   const { t } = useTranslation();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { hasPermission } = usePermissions();
+  const { canWriteHealthcareService } = getPermissions(
+    hasPermission,
+    permissions ?? [],
+  );
 
   const { data: healthcareService, isLoading } = useQuery({
     queryKey: ["healthcareService", healthcareServiceId],
@@ -118,14 +127,16 @@ export default function HealthcareServiceShow({
           </h1>
           <div className="flex justify-end gap-2">
             <BackButton>{t("back_to_list")}</BackButton>
-            <Button
-              variant="outline"
-              className="cursor-pointer"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <CareIcon icon="l-trash" className="size-4" />
-              {t("delete")}
-            </Button>
+            {canWriteHealthcareService && (
+              <Button
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <CareIcon icon="l-trash" className="size-4" />
+                {t("delete")}
+              </Button>
+            )}
             <Button
               onClick={() =>
                 navigate(

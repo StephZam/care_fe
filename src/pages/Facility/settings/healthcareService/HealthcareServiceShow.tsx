@@ -23,6 +23,7 @@ import ColoredIndicator from "@/CAREUI/display/ColoredIndicator";
 import BackButton from "@/components/Common/BackButton";
 import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
 import { usePermissions } from "@/context/PermissionContext";
+import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import healthcareServiceApi from "@/types/healthcareService/healthcareServiceApi";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
@@ -33,18 +34,17 @@ type DuoToneIconName = keyof typeof duoToneIcons;
 export default function HealthcareServiceShow({
   facilityId,
   healthcareServiceId,
-  permissions,
 }: {
   facilityId: string;
   healthcareServiceId: string;
-  permissions?: string[];
 }) {
   const { t } = useTranslation();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { facility } = useCurrentFacility();
   const { hasPermission } = usePermissions();
   const { canWriteHealthcareService } = getPermissions(
     hasPermission,
-    permissions ?? [],
+    facility?.permissions ?? [],
   );
 
   const { data: healthcareService, isLoading } = useQuery({

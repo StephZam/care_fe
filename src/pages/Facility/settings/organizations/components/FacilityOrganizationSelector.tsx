@@ -328,7 +328,7 @@ export default function FacilityOrganizationSelector(
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 gap-2 underline"
+                className="h-8 gap-2 underline hover:bg-transparent"
                 onClick={() => setCurrentSelection(null)}
               >
                 <span>{t("cancel")}</span>

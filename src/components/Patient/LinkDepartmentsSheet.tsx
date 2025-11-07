@@ -433,7 +433,7 @@ export default function LinkDepartmentsSheet({
               />
 
               <Button
-                className="block ml-auto"
+                className="flex ml-auto"
                 data-cy="add-organization"
                 onClick={handleAddOrganizations}
                 disabled={!selectedOrgs?.length || isAdding}

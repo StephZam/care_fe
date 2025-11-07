@@ -219,7 +219,6 @@ export interface Permissions {
   /** Permission slug: "can_list_token" */
   canListTokens: boolean;
 
-  //Healthcare Services Permissions
   /** Permission slug: "can_write_healthcare_service" */
   canWriteHealthcareService: boolean;
   /** Permission slug: "can_read_healthcare_service" */

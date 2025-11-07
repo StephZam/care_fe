@@ -86,7 +86,11 @@ test.describe("Organization Selector Management", () => {
       .first()
       .click();
 
-    const remove = page.getByRole("button").filter({ hasText: /^$/ });
+    const currentOrgsSection = page.locator("section, div").filter({
+      has: page.getByRole("heading", { name: "Current Organizations" }),
+    });
+
+    const remove = currentOrgsSection.locator('button[role="button"]').first();
     if ((await remove.count()) > 0 && (await remove.isVisible())) {
       await remove.click();
       await page.getByRole("button").click();

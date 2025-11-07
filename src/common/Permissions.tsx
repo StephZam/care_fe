@@ -89,7 +89,7 @@ export const PERMISSION_LIST_TOKEN_CATEGORIES = "can_list_token_category";
 export const PERMISSION_WRITE_TOKEN = "can_write_token";
 export const PERMISSION_LIST_TOKENS = "can_list_token";
 
-//Healthcare Permissions
+// Healthcare Permissions
 export const PERMISSION_WRITE_HEALTHCARE_SERVICE =
   "can_write_healthcare_service";
 export const PERMISSION_READ_HEALTHCARE_SERVICE = "can_read_healthcare_service";

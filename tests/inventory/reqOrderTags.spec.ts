@@ -3,140 +3,173 @@ import { expect, Page, test } from "@playwright/test";
 // Use authenticated session
 test.use({ storageState: "tests/.auth/user.json" });
 
-test.describe("Request Order Tag Management", () => {
-  test.beforeEach(async ({ page }) => {
+test.describe.serial("Request Order Tag Management", () => {
+  /**
+   * Navigates from home to the Outgoing Orders page
+   */
+  async function navigateToOutgoingOrders(page: Page) {
     await page.goto("/");
 
-    // Navigate to Facility with Patients → Services → Outgoing Orders
+    // Facility card → toggle sidebar → services → inventory → outgoing orders
     await page.locator('[data-slot="card"]').first().click();
     await page.getByRole("button", { name: /toggle sidebar/i }).click();
     await page.getByRole("link", { name: /^services$/i }).click();
 
-    // View first service details
+    // Open the first service
+    await page.locator('[data-slot="card"]').first().click();
     await page.locator('[data-slot="card"]').first().click();
 
     // Go to Inventory → Outgoing Orders
-    await page.locator('[data-slot="card"]').first().click();
     await page.getByRole("button", { name: /inventory/i }).click();
     await page.getByRole("link", { name: /outgoing orders/i }).click();
-  });
 
+    // Wait until Outgoing Orders heading appears
+    await expect(page.getByRole("heading", { name: /orders/i })).toBeVisible({
+      timeout: 10000,
+    });
+  }
+
+  /**
+   * Selects or deselects tags inside the "Add Tags" dialog
+   */
+  async function toggleTags(page: Page, tags: string[], select = true) {
+    for (const tag of tags) {
+      // Locate the tag’s container
+      const tagRow = page.locator(`div:has-text("${tag}")`).first();
+
+      // Locate the checkbox within that specific tag row
+      const checkbox = tagRow.locator('button[role="checkbox"]').first();
+
+      // Wait until it's visible
+      await expect(checkbox).toBeVisible({ timeout: 5000 });
+
+      // Determine if it needs to be toggled
+      const isChecked = await checkbox.getAttribute("aria-checked");
+      const shouldClick =
+        (select && isChecked === "false") || (!select && isChecked === "true");
+
+      if (shouldClick) {
+        await checkbox.click();
+        await page.waitForTimeout(200);
+      }
+    }
+  }
+
+  /**
+   * Creates an order with one or more tags
+   */
   async function createOrderWithTags(
     page: Page,
     orderName: string,
-    tagsToSelect: string[],
+    tags: string[],
   ) {
-    // Click "Create Order" button
     await page.getByRole("button", { name: /create order/i }).click();
 
-    // Fill order details
+    // Fill basic order details
     await page.getByRole("textbox", { name: /name/i }).fill(orderName);
+
     await page
       .getByRole("combobox")
       .filter({ hasText: "Select Location" })
       .click();
     await page.getByRole("option").first().click();
 
-    // Open tag selector
-    await page.getByRole("button", { name: /add tags/i }).click();
+    // Open Tag Selector
+    const addTagsButton = page.getByRole("button", { name: /add tags/i });
+    await expect(addTagsButton).toBeVisible();
+    await addTagsButton.click();
 
-    // Click the tags specified
+    // Select desired tags
+    await toggleTags(page, tags, true);
 
-    for (const tag of tagsToSelect) {
-      // Find the container element containing the tag text
-      const tagRow = page.locator("div", { hasText: tag });
+    // Close the tag dialog (Escape closes dropdown)
+    await page.locator("html").click();
 
-      // Locate its checkbox inside that row
-      const checkbox = tagRow.locator('button[role="checkbox"]').first();
-
-      // Only click if unchecked
-      const checked = await checkbox.getAttribute("aria-checked");
-      if (checked === "false") {
-        await checkbox.click();
-        await page.waitForTimeout(200); // allow UI update
-      }
-    }
-
-    await page.locator("html").click(); // close dropdown
-
-    // Create the order
+    // Submit order
     await page.getByRole("button", { name: /create/i }).click();
 
-    // Verify order appears in table
-    const tagsRow = page.locator("label").filter({ hasText: "Tags" });
-    await expect(tagsRow).toBeVisible();
+    await expect(page.locator("ol")).toContainText(
+      "Order created successfully",
+    );
 
-    // Verify tags appear in details
-    for (const tag of tagsToSelect) {
+    // Verify success label and tag presence
+    await expect(page.locator("label", { hasText: "Tags" })).toBeVisible({
+      timeout: 10000,
+    });
+
+    for (const tag of tags) {
       await expect(page.locator("#pages")).toContainText(tag);
     }
   }
 
-  // Example test using generic function
-  test("should create an order with any tags and see them in details", async ({
+  // --- 🧩 TESTS START HERE ---
+
+  test.beforeEach(async ({ page }) => {
+    await navigateToOutgoingOrders(page);
+  });
+
+  test("should create an order with selected tags and verify details", async ({
     page,
   }) => {
-    await createOrderWithTags(page, "order11", ["tag 1"]);
+    await createOrderWithTags(page, "AutoOrder1", ["tag 1"]);
   });
 
-  // --- ADD TAG TEST ---
-  test("should add a tag successfully", async ({ page }) => {
-    // Open the Add Tags dialog (works for 'Add Tags' or 'Tags' button)
-    await page
+  test("should add a new tag successfully", async ({ page }) => {
+    const addTagsBtn = page
       .getByRole("button", { name: /add tags|tags/i })
-      .first()
-      .click();
+      .first();
+    await expect(addTagsBtn).toBeVisible({ timeout: 10000 });
+    await addTagsBtn.click();
 
     const checkboxes = page.getByRole("checkbox");
+    const total = await checkboxes.count();
+    expect(total).toBeGreaterThan(0);
 
-    const count = await checkboxes.count();
-    expect(count).toBeGreaterThan(0);
-
-    for (let i = 0; i < count; i++) {
+    // Select first unchecked tag
+    for (let i = 0; i < total; i++) {
       const checkbox = checkboxes.nth(i);
-
-      // Only click if checkbox is NOT already checked
-      const isChecked = await checkbox.isChecked();
-      if (!isChecked) {
+      if (!(await checkbox.isChecked())) {
         await checkbox.click();
         break;
       }
     }
 
-    // Expect success toast
-    const toast = page.locator("ol");
-    await expect(toast).toContainText("Tags updated successfully");
+    // Confirm success toast
+    await expect(page.locator("ol")).toContainText("Tags updated successfully");
   });
 
-  // --- REMOVE TAG TEST ---
-  test("should remove a tag successfully", async ({ page }) => {
-    // Open the existing tags menu
-    await page
+  test("should remove an existing tag successfully", async ({ page }) => {
+    const tagsBtn = page
       .getByRole("button", { name: /add tags|tags/i })
-      .first()
-      .click();
+      .first();
+    await expect(tagsBtn).toBeVisible({ timeout: 10000 });
+    await tagsBtn.click();
 
     const checkboxes = page.getByRole("checkbox");
+    const total = await checkboxes.count();
+    expect(total).toBeGreaterThan(0);
 
-    const count = await checkboxes.count();
-    expect(count).toBeGreaterThan(0);
-
-    let removed = false;
-
-    for (let i = 0; i < count; i++) {
+    // Deselect one checked tag
+    let tagRemoved = false;
+    for (let i = 0; i < total; i++) {
       const checkbox = checkboxes.nth(i);
       if (await checkbox.isChecked()) {
-        // Click only a checked checkbox to remove the tag
         await checkbox.click();
-        removed = true;
+        tagRemoved = true;
         break;
       }
     }
 
-    // Expect success toast only if a tag was removed
-    if (removed) {
-      const toast = page.locator("ol");
-      await expect(toast).toContainText("Tags updated successfully");
+    // Verify result
+    if (tagRemoved) {
+      await expect(page.locator("ol")).toContainText(
+        "Tags updated successfully",
+      );
+    } else {
+      test.info().annotations.push({
+        type: "info",
+        description: "No tags were checked to remove.",
+      });
     }
   });
 });

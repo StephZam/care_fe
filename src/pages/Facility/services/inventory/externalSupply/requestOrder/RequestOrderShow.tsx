@@ -442,7 +442,7 @@ export function RequestOrderShow({
 
               <div>
                 <label className="text-sm font-medium text-gray-700">
-                  {t("tags")}
+                  {t("tags_other")}
                 </label>
                 <div className="flex flex-wrap gap-1">
                   {requestOrder.tags.map((tag) => (

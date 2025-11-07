@@ -144,165 +144,149 @@ export default function FacilityOrganizationList({
 
   return (
     <>
-      <Page
-        title={t("departments_or_teams")}
-        hideTitleOnPage
-        className="p-0 flex flex-col h-full min-h-0"
-      >
-        <div className="shrink-0 container mx-auto">
+      <Page title={t("departments_or_teams")} hideTitleOnPage className="p-4">
+        <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-4">
             <h3>{t("departments_or_teams")}</h3>
           </div>
         </div>
-        <div className="flex-1 justify-center">
-          <div className="container mx-auto flex h-[calc(100vh-14rem)]">
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="flex-1 rounded-lg h-[calc(100vh-14rem)] min-h-0"
+        <div className="flex rounded-lg w-full">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="flex w-full items-stretch"
+          >
+            <ResizablePanel
+              defaultSize={20}
+              minSize={15}
+              maxSize={30}
+              className="hidden md:flex flex-col h-[calc(100vh-rem)] overflow-hidden bg-white rounded-lg shadow-lg"
             >
-              <ResizablePanel
-                defaultSize={20}
-                minSize={15}
-                maxSize={30}
-                className="hidden md:flex flex-col overflow-hidden h-full"
-              >
-                <div className="flex-1">
-                  <div className="h-full w-full">
-                    <FacilityOrganizationNavbar
-                      facilityId={facilityId}
-                      selectedOrganizationId={organizationId || null}
-                      expandedOrganizations={expandedOrganizations}
-                      onToggleExpand={handleToggleExpand}
-                      onOrganizationSelect={handleOrganizationSelect}
-                    />
-                  </div>
-                </div>
-              </ResizablePanel>
-              <ResizableHandle
-                withHandle
-                className="hidden md:flex items-center justify-center"
-              />
-              <ResizablePanel
-                defaultSize={80}
-                className="pl-0 md:pl-4 overflow-hidden h-full"
-              >
-                <div className="flex flex-col h-full w-full">
-                  <div className="flex-1 w-full h-full rounded-lg md:shadow-lg md:bg-white overflow-y-auto">
-                    {organizationId && (
-                      <div className="md:pt-4 flex items-center mx-auto max-w-4xl">
-                        <Breadcrumb className="md:px-5 md:pt-5">
-                          <BreadcrumbList>
+              <div className="flex-1 overflow-y-auto">
+                <FacilityOrganizationNavbar
+                  facilityId={facilityId}
+                  selectedOrganizationId={organizationId || null}
+                  expandedOrganizations={expandedOrganizations}
+                  onToggleExpand={handleToggleExpand}
+                  onOrganizationSelect={handleOrganizationSelect}
+                />
+              </div>
+            </ResizablePanel>
+            <ResizableHandle
+              withHandle
+              className="hidden md:flex items-center justify-center mr-4"
+            />
+            <ResizablePanel
+              defaultSize={80}
+              className="flex flex-col flex-1 min-h-[calc(100vh-14rem)] bg-white rounded-lg shadow-lg"
+            >
+              <div className="space-y-3 sm:space-y-4 rounded-lg md:shadow-lg overflow-hidden flex-1">
+                {organizationId && (
+                  <div className="md:pt-4 flex items-center mx-auto max-w-4xl">
+                    <Breadcrumb className="md:px-5 md:pt-5">
+                      <BreadcrumbList>
+                        <BreadcrumbItem>
+                          <BreadcrumbLink
+                            asChild
+                            className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
+                            onClick={() =>
+                              navigate(
+                                `/facility/${facilityId}/settings/departments`,
+                              )
+                            }
+                          >
+                            <button type="button">{t("departments")}</button>
+                          </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbItem>
+                          <BreadcrumbSeparator />
+                        </BreadcrumbItem>
+                        {orgParents.reverse().map((parent) => (
+                          <React.Fragment key={parent.id}>
                             <BreadcrumbItem>
                               <BreadcrumbLink
                                 asChild
                                 className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-                                onClick={() =>
-                                  navigate(
-                                    `/facility/${facilityId}/settings/departments`,
-                                  )
-                                }
+                                onClick={() => handleParentClick(parent.id)}
                               >
-                                <button type="button">
-                                  {t("departments")}
-                                </button>
+                                <button type="button">{parent.name}</button>
                               </BreadcrumbLink>
                             </BreadcrumbItem>
-                            <BreadcrumbItem>
+                            <BreadcrumbItem key={`ellipsis-${parent.id}`}>
                               <BreadcrumbSeparator />
                             </BreadcrumbItem>
-                            {orgParents.reverse().map((parent) => (
-                              <React.Fragment key={parent.id}>
-                                <BreadcrumbItem>
-                                  <BreadcrumbLink
-                                    asChild
-                                    className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-                                    onClick={() => handleParentClick(parent.id)}
-                                  >
-                                    <button type="button">{parent.name}</button>
-                                  </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbItem key={`ellipsis-${parent.id}`}>
-                                  <BreadcrumbSeparator />
-                                </BreadcrumbItem>
-                              </React.Fragment>
-                            ))}
-                            <BreadcrumbItem key={org?.id}>
-                              <span className="font-semibold text-gray-900">
-                                {org?.name}
-                              </span>
-                            </BreadcrumbItem>
-                          </BreadcrumbList>
-                        </Breadcrumb>
-                      </div>
-                    )}
-                    <Page
-                      hideTitleOnPage
-                      title={org?.name || ""}
-                      className="mx-auto max-w-4xl"
-                    >
-                      {organizationId && org && (
-                        <>
-                          <div className="mt-2 flex items-center">
-                            <h2 className="text-xl font-semibold">
-                              {org.name}
-                            </h2>
-                            {org.org_type && (
-                              <Badge variant="indigo" className="ml-2 w-auto">
-                                {t(
-                                  `facility_organization_type__${org.org_type}`,
-                                )}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="mt-2">
-                            {org.description && (
-                              <p className="text-sm text-gray-500 break-all whitespace-normal">
-                                {org.description}
-                              </p>
-                            )}
-                            <Tabs
-                              defaultValue={currentTab}
-                              className="w-full mt-2"
-                              value={currentTab}
-                              onValueChange={handleTabChange}
-                            >
-                              <TabsList className="w-full justify-start border-b border-gray-300 bg-transparent p-0 h-auto rounded-none">
-                                {navItems.map((item) => (
-                                  <TabsTrigger
-                                    key={item.value}
-                                    value={item.value}
-                                    className="border-0 border-b-2 border-transparent px-2 py-2 text-gray-600 hover:text-gray-900 data-[state=active]:text-primary-800  data-[state=active]:border-primary-700 data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none"
-                                    data-cy={`${item.value}-tab`}
-                                  >
-                                    {item.title}
-                                  </TabsTrigger>
-                                ))}
-                              </TabsList>
-                            </Tabs>
-                          </div>
-                        </>
-                      )}
-                      <div className="mt-4 flex-1 overflow-y-auto">
-                        {currentTab === "users" && organizationId ? (
-                          <FacilityOrganizationUsers
-                            id={organizationId}
-                            facilityId={facilityId}
-                            permissions={facility?.permissions ?? []}
-                          />
-                        ) : (
-                          <FacilityOrganizationView
-                            id={organizationId}
-                            facilityId={facilityId}
-                            permissions={facility?.permissions ?? []}
-                          />
+                          </React.Fragment>
+                        ))}
+                        <BreadcrumbItem key={org?.id}>
+                          <span className="font-semibold text-gray-900">
+                            {org?.name}
+                          </span>
+                        </BreadcrumbItem>
+                      </BreadcrumbList>
+                    </Breadcrumb>
+                  </div>
+                )}
+                <Page
+                  hideTitleOnPage
+                  title={org?.name || ""}
+                  className="mx-auto max-w-4xl"
+                >
+                  {organizationId && org && (
+                    <>
+                      <div className="mt-2 flex items-center">
+                        <h2 className="text-xl font-semibold">{org.name}</h2>
+                        {org.org_type && (
+                          <Badge variant="indigo" className="ml-2 w-auto">
+                            {t(`facility_organization_type__${org.org_type}`)}
+                          </Badge>
                         )}
                       </div>
-                    </Page>
+                      <div className="mt-2">
+                        {org.description && (
+                          <p className="text-sm text-gray-500 break-all whitespace-normal">
+                            {org.description}
+                          </p>
+                        )}
+                        <Tabs
+                          defaultValue={currentTab}
+                          className="w-full mt-2"
+                          value={currentTab}
+                          onValueChange={handleTabChange}
+                        >
+                          <TabsList className="w-full justify-start border-b border-gray-300 bg-transparent p-0 h-auto rounded-none">
+                            {navItems.map((item) => (
+                              <TabsTrigger
+                                key={item.value}
+                                value={item.value}
+                                className="border-0 border-b-2 border-transparent px-2 py-2 text-gray-600 hover:text-gray-900 data-[state=active]:text-primary-800  data-[state=active]:border-primary-700 data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none"
+                                data-cy={`${item.value}-tab`}
+                              >
+                                {item.title}
+                              </TabsTrigger>
+                            ))}
+                          </TabsList>
+                        </Tabs>
+                      </div>
+                    </>
+                  )}
+                  <div className="mt-4 flex-1 overflow-y-auto">
+                    {currentTab === "users" && organizationId ? (
+                      <FacilityOrganizationUsers
+                        id={organizationId}
+                        facilityId={facilityId}
+                        permissions={facility?.permissions ?? []}
+                      />
+                    ) : (
+                      <FacilityOrganizationView
+                        id={organizationId}
+                        facilityId={facilityId}
+                        permissions={facility?.permissions ?? []}
+                      />
+                    )}
                   </div>
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
+                </Page>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </Page>
     </>

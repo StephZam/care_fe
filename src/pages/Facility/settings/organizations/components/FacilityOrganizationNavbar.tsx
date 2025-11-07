@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import query from "@/Utils/request/query";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
 import facilityOrganizationApi from "@/types/facilityOrganization/facilityOrganizationApi";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { useEffect } from "react";
 
 interface OrganizationTreeNodeProps {
@@ -165,31 +166,29 @@ export default function FacilityOrganizationNavbar({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="w-full h-[calc(100vh-14rem)] shadow-lg bg-white rounded-lg flex flex-col">
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto p-4">
-        <div className="inline-block min-w-full">
-          {isLoading ? (
-            <div className="p-4">
-              <Skeleton className="h-8 w-full" />
-            </div>
-          ) : (
-            organizations.map((organization) => (
-              <OrganizationTreeNode
-                key={organization.id}
-                organization={organization}
-                selectedOrganizationId={selectedOrganizationId}
-                onSelect={onOrganizationSelect}
-                expandedOrganizations={expandedOrganizations}
-                onToggleExpand={onToggleExpand}
-                facilityId={facilityId}
-              />
-            ))
-          )}
-          <div ref={ref} className="p-4">
-            {isFetchingNextPage && <Skeleton className="h-8 w-full" />}
+    <ScrollArea className="h-[calc(100vh-14rem)] rounded-lg">
+      <div className="p-4">
+        {isLoading ? (
+          <div className="p-4">
+            <Skeleton className="h-8 w-full" />
           </div>
+        ) : (
+          organizations.map((organization) => (
+            <OrganizationTreeNode
+              key={organization.id}
+              organization={organization}
+              selectedOrganizationId={selectedOrganizationId}
+              onSelect={onOrganizationSelect}
+              expandedOrganizations={expandedOrganizations}
+              onToggleExpand={onToggleExpand}
+              facilityId={facilityId}
+            />
+          ))
+        )}
+        <div ref={ref}>
+          {isFetchingNextPage && <Skeleton className="h-8 w-full" />}
         </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }

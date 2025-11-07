@@ -18,23 +18,34 @@ function ClearCacheButton() {
   const [isClearing, setIsClearing] = useState(false);
   const clearCache = async () => {
     setIsClearing(true);
-    caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
-    if ("serviceWorker" in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((reg) => reg.unregister()));
+    try {
+      const cacheNames = await caches.keys();
+      if (cacheNames.length > 0) {
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
+      }
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((reg) => reg.unregister()));
+      }
+      queryClient.clear();
+      clearQueryPersistenceCache();
+      await new Promise((res) => setTimeout(res, 800));
+      window.location.reload();
+    } finally {
+      setIsClearing(false);
     }
-    queryClient.clear();
-    clearQueryPersistenceCache();
-    window.location.reload();
   };
 
   return (
     <Button
       variant="primary"
       onClick={clearCache}
-      className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white"
+      disabled={isClearing}
+      className="rounded-md bg-primary-700 text-white shadow-sm hover:bg-primary-600 hover:text-white disabled:opacity-70"
     >
-      <RotateCwIcon className={`text-2xl ${isClearing && "animate-spin"}`} />
+      <RotateCwIcon
+        className={`text-2xl ${isClearing ? "animate-spin" : ""}`}
+      />
       <span className="ml-1">{t("clear_cache")}</span>
     </Button>
   );

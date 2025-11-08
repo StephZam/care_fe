@@ -137,7 +137,9 @@ export default function ScheduleChargeItemDefinitionSelector({
                   <FormControl>
                     <ChargeItemDefinitionPicker
                       facilityId={facilityId}
-                      resourceSubType={ResourceCategorySubType.practitioner}
+                      resourceSubType={
+                        ResourceCategorySubType.charge_item_definition_schedule_practitioner
+                      }
                       value={field.value}
                       onValueChange={(value) => field.onChange(value || "")}
                       placeholder={t("select_charge_item_definition")}
@@ -184,7 +186,9 @@ export default function ScheduleChargeItemDefinitionSelector({
                   <FormControl>
                     <ChargeItemDefinitionPicker
                       facilityId={facilityId}
-                      resourceSubType={ResourceCategorySubType.practitioner}
+                      resourceSubType={
+                        ResourceCategorySubType.charge_item_definition_schedule_practitioner
+                      }
                       value={field.value || ""}
                       onValueChange={(value) => field.onChange(value || "")}
                       placeholder={t("select_charge_item_definition")}

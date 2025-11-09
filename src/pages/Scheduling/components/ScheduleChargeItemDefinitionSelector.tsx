@@ -123,99 +123,109 @@ export default function ScheduleChargeItemDefinitionSelector({
           </SheetDescription>
         </SheetHeader>
 
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="mt-6 flex flex-col gap-6"
+        <div className="relative flex-1 h-full w-full">
+          <div
+            className="absolute inset-0 z-60 overflow-y-auto overscroll-contain touch-pan-y scroll-smooth max-h-[calc(100vh-8rem)] bg-transparent"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
           >
-            <FormField
-              control={form.control}
-              name="charge_item_definition_slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("consulation charge")}</FormLabel>
-                  <FormControl>
-                    <ChargeItemDefinitionPicker
-                      facilityId={facilityId}
-                      resourceSubType={
-                        ResourceCategorySubType.charge_item_definition_schedule_practitioner
-                      }
-                      value={field.value}
-                      onValueChange={(value) => field.onChange(value || "")}
-                      placeholder={t("select_charge_item_definition")}
-                      className="flex-1"
-                      showCreateButton={true}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="re_visit_allowed_days"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("re_visit_allowed_days")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      value={field.value}
-                      onChange={(e) => {
-                        const value =
-                          e.target.value === "" ? 0 : parseInt(e.target.value);
-                        field.onChange(value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="re_visit_charge_item_definition_slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel
-                    className={reVisitDays === 0 ? "text-gray-400" : ""}
-                  >
-                    {t("re_visit_consultation_charge")}
-                  </FormLabel>
-                  <FormControl>
-                    <ChargeItemDefinitionPicker
-                      facilityId={facilityId}
-                      resourceSubType={
-                        ResourceCategorySubType.charge_item_definition_schedule_practitioner
-                      }
-                      value={field.value || ""}
-                      onValueChange={(value) => field.onChange(value || "")}
-                      placeholder={t("select_charge_item_definition")}
-                      className="flex-1"
-                      showCreateButton={true}
-                      disabled={reVisitDays === 0}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end gap-4 border-t pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                className="w-full sm:w-auto"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="mt-6 flex flex-col gap-6"
               >
-                {t("cancel")}
-              </Button>
-              <Button type="submit" className="w-full sm:w-auto">
-                {t("save")}
-              </Button>
-            </div>
-          </form>
-        </Form>
+                <FormField
+                  control={form.control}
+                  name="charge_item_definition_slug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("consulation charge")}</FormLabel>
+                      <FormControl>
+                        <ChargeItemDefinitionPicker
+                          facilityId={facilityId}
+                          resourceSubType={
+                            ResourceCategorySubType.charge_item_definition_schedule_practitioner
+                          }
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value || "")}
+                          placeholder={t("select_charge_item_definition")}
+                          className="flex-1"
+                          showCreateButton={true}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="re_visit_allowed_days"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("re_visit_allowed_days")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={field.value}
+                          onChange={(e) => {
+                            const value =
+                              e.target.value === ""
+                                ? 0
+                                : parseInt(e.target.value);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="re_visit_charge_item_definition_slug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel
+                        className={reVisitDays === 0 ? "text-gray-400" : ""}
+                      >
+                        {t("re_visit_consultation_charge")}
+                      </FormLabel>
+                      <FormControl>
+                        <ChargeItemDefinitionPicker
+                          facilityId={facilityId}
+                          resourceSubType={
+                            ResourceCategorySubType.charge_item_definition_schedule_practitioner
+                          }
+                          value={field.value || ""}
+                          onValueChange={(value) => field.onChange(value || "")}
+                          placeholder={t("select_charge_item_definition")}
+                          className="flex-1"
+                          showCreateButton={true}
+                          disabled={reVisitDays === 0}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end gap-4 border-t pt-4 sticky bottom-0 bg-white">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsOpen(false)}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("cancel")}
+                  </Button>
+                  <Button type="submit" className="w-full sm:w-auto">
+                    {t("save")}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -713,6 +713,7 @@ export function ChargeItemDefinitionPicker({
           resetSearch();
         }
       }}
+      modal={true}
     >
       <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
       <PopoverContent

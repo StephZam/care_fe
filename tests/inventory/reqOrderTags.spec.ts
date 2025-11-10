@@ -38,33 +38,32 @@ test.describe.serial("Request Order Tag Management", () => {
    * Selects or deselects tags inside the "Add Tags" dialog
    */
   async function toggleTags(page: Page, select = true): Promise<string | null> {
-    // Locate the tag’s container
-    const tagCon = page.locator(
-      "div.p-3.max-h-\\[calc\\(100vh-28rem\\)\\].overflow-y-auto",
-    );
-
-    await expect(tagCon).toBeVisible({ timeout: 10000 });
-
     // Locate the checkbox within that specific tag row
-    const checkbox = tagCon.locator('button[role="checkbox"]').first();
+    const checkboxes = page.locator('button[role="checkbox"]');
+    await expect(checkboxes.first()).toBeVisible({ timeout: 10000 });
 
-    // Wait until it's visible
-    await expect(checkbox).toBeVisible({ timeout: 5000 });
+    const total = await checkboxes.count();
+    expect(total).toBeGreaterThan(0);
 
-    // Determine if it needs to be toggled
-    const isChecked = await checkbox.getAttribute("aria-checked");
-    const shouldClick =
-      (select && isChecked === "false") || (!select && isChecked === "true");
+    // Find first unchecked (or checked) tag
+    for (let i = 0; i < total; i++) {
+      const checkbox = checkboxes.nth(i);
+      const isChecked = await checkbox.getAttribute("aria-checked");
 
-    if (shouldClick) {
-      const tagRow = checkbox.locator("xpath=ancestor::div[1]");
-      const tagText = (await tagRow.textContent())?.trim() || "";
+      const shouldClick =
+        (select && isChecked === "false") || (!select && isChecked === "true");
 
-      await checkbox.click();
-      await page.waitForTimeout(200);
+      if (shouldClick) {
+        const tagRow = checkbox.locator("xpath=ancestor::div[1]");
+        const tagText = (await tagRow.textContent())?.trim() || "";
 
-      // Return the selected tag name for verification later
-      return tagText;
+        await checkbox.scrollIntoViewIfNeeded();
+        await checkbox.click();
+        await page.waitForTimeout(200);
+
+        // Return the selected tag name for verification later
+        return tagText;
+      }
     }
     return null;
   }

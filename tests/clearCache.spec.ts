@@ -6,7 +6,13 @@ test.describe("Clear Cache in profile successfully", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to profile page
     await page.goto("/");
-    await page.locator('[data-slot="card-content"]').first().click();
+    const firstFacilityLink = page
+      .getByRole("link")
+      .filter({ hasText: "View" })
+      .first();
+    await expect(firstFacilityLink).toBeVisible({ timeout: 10000 });
+    await firstFacilityLink.click();
+    await page.getByRole("button", { name: /toggle sidebar/i }).click();
     await page.locator('div[data-sidebar="footer"] button').first().click();
     await page.getByRole("menuitem", { name: "Profile" }).click();
 
@@ -44,6 +50,12 @@ test.describe("Clear Cache in profile successfully", () => {
 
     // Click Clear Cache button
     await page.getByRole("button", { name: /clear cache/i }).click();
+
+    await page.waitForLoadState("load"); // Wait for reload to complete
+    await page.waitForFunction(async () => {
+      const keys = await caches.keys();
+      return !keys.includes("test-cache");
+    });
 
     // Verify cache has been deleted
     const remainingCaches = await page.evaluate(() => caches.keys());

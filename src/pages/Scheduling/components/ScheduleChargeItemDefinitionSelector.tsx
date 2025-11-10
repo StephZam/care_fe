@@ -50,12 +50,8 @@ export default function ScheduleChargeItemDefinitionSelector({
 
   const scheduleChargeItemSchema = z
     .object({
-      charge_item_definition_slug: z
-        .string()
-        .min(1, "Consultation charge is required"),
-      re_visit_allowed_days: z
-        .number()
-        .min(0, "Re-visit allowed days cannot be negative"),
+      charge_item_definition_slug: z.string().min(1, t("field_required")),
+      re_visit_allowed_days: z.number().min(0, t("revisit_days_non_negative")),
       re_visit_charge_item_definition_slug: z.string().nullable(),
     })
     .refine((data) => {
@@ -133,7 +129,7 @@ export default function ScheduleChargeItemDefinitionSelector({
               name="charge_item_definition_slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("consulation charge")}</FormLabel>
+                  <FormLabel>{t("consultation charge")}</FormLabel>
                   <FormControl>
                     <ChargeItemDefinitionPicker
                       facilityId={facilityId}

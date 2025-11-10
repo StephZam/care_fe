@@ -39,12 +39,14 @@ test.describe.serial("Request Order Tag Management", () => {
    */
   async function toggleTags(page: Page, select = true): Promise<string | null> {
     // Locate the tag’s container
-    const tagRow = page.locator(
+    const tagCon = page.locator(
       "div.p-3.max-h-\\[calc\\(100vh-28rem\\)\\].overflow-y-auto",
     );
 
+    await expect(tagCon).toBeVisible({ timeout: 10000 });
+
     // Locate the checkbox within that specific tag row
-    const checkbox = tagRow.locator('button[role="checkbox"]').first();
+    const checkbox = tagCon.locator('button[role="checkbox"]').first();
 
     // Wait until it's visible
     await expect(checkbox).toBeVisible({ timeout: 5000 });

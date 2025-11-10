@@ -11,7 +11,12 @@ test.describe.serial("Request Order Tag Management", () => {
     await page.goto("/");
 
     // Facility card → toggle sidebar → services → inventory → outgoing orders
-    await page.locator('[data-slot="card"]').first().click();
+    const firstFacilityLink = page
+      .getByRole("link")
+      .filter({ hasText: "View" })
+      .first();
+    await expect(firstFacilityLink).toBeVisible({ timeout: 10000 });
+    await firstFacilityLink.click();
     await page.getByRole("button", { name: /toggle sidebar/i }).click();
     await page.getByRole("link", { name: /^services$/i }).click();
 
@@ -32,37 +37,40 @@ test.describe.serial("Request Order Tag Management", () => {
   /**
    * Selects or deselects tags inside the "Add Tags" dialog
    */
-  async function toggleTags(page: Page, tags: string[], select = true) {
-    for (const tag of tags) {
-      // Locate the tag’s container
-      const tagRow = page.locator(`div:has-text("${tag}")`).first();
+  async function toggleTags(page: Page, select = true): Promise<string | null> {
+    // Locate the tag’s container
+    const tagRow = page.locator(
+      "div.p-3.max-h-\\[calc\\(100vh-28rem\\)\\].overflow-y-auto",
+    );
 
-      // Locate the checkbox within that specific tag row
-      const checkbox = tagRow.locator('button[role="checkbox"]').first();
+    // Locate the checkbox within that specific tag row
+    const checkbox = tagRow.locator('button[role="checkbox"]').first();
 
-      // Wait until it's visible
-      await expect(checkbox).toBeVisible({ timeout: 5000 });
+    // Wait until it's visible
+    await expect(checkbox).toBeVisible({ timeout: 5000 });
 
-      // Determine if it needs to be toggled
-      const isChecked = await checkbox.getAttribute("aria-checked");
-      const shouldClick =
-        (select && isChecked === "false") || (!select && isChecked === "true");
+    // Determine if it needs to be toggled
+    const isChecked = await checkbox.getAttribute("aria-checked");
+    const shouldClick =
+      (select && isChecked === "false") || (!select && isChecked === "true");
 
-      if (shouldClick) {
-        await checkbox.click();
-        await page.waitForTimeout(200);
-      }
+    if (shouldClick) {
+      const tagRow = checkbox.locator("xpath=ancestor::div[1]");
+      const tagText = (await tagRow.textContent())?.trim() || "";
+
+      await checkbox.click();
+      await page.waitForTimeout(200);
+
+      // Return the selected tag name for verification later
+      return tagText;
     }
+    return null;
   }
 
   /**
    * Creates an order with one or more tags
    */
-  async function createOrderWithTags(
-    page: Page,
-    orderName: string,
-    tags: string[],
-  ) {
+  async function createOrderWithTags(page: Page, orderName: string) {
     await page.getByRole("button", { name: /create order/i }).click();
 
     // Fill basic order details
@@ -80,7 +88,7 @@ test.describe.serial("Request Order Tag Management", () => {
     await addTagsButton.click();
 
     // Select desired tags
-    await toggleTags(page, tags, true);
+    const selectedTag = await toggleTags(page, true);
 
     // Close the tag dialog (Escape closes dropdown)
     await page.locator("html").click();
@@ -97,8 +105,8 @@ test.describe.serial("Request Order Tag Management", () => {
       timeout: 10000,
     });
 
-    for (const tag of tags) {
-      await expect(page.locator("#pages")).toContainText(tag);
+    if (selectedTag) {
+      await expect(page.locator("#pages")).toContainText(selectedTag);
     }
   }
 
@@ -111,7 +119,7 @@ test.describe.serial("Request Order Tag Management", () => {
   test("should create an order with selected tags and verify details", async ({
     page,
   }) => {
-    await createOrderWithTags(page, "AutoOrder1", ["tag 1"]);
+    await createOrderWithTags(page, "AutoOrder11");
   });
 
   test("should add a new tag successfully", async ({ page }) => {

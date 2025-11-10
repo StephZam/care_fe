@@ -65,9 +65,7 @@ export default function HealthcareServiceShow({
       },
     }),
     onSuccess: () => {
-      queryClient.removeQueries({
-        queryKey: ["healthcareService", healthcareServiceId],
-      });
+      queryClient.clear();
       toast.success(t("healthcare_service_deleted_successfully"));
       navigate(`/facility/${facilityId}/settings/healthcare_services`);
     },
@@ -125,7 +123,7 @@ export default function HealthcareServiceShow({
           <h1 className="text-xl font-semibold text-gray-900">
             {t("healthcare_service_details")}
           </h1>
-          <div className="flex justify-end gap-2">
+          <div className="flex gap-2">
             <BackButton>{t("back_to_list")}</BackButton>
             {canWriteHealthcareService && (
               <Button
@@ -146,15 +144,15 @@ export default function HealthcareServiceShow({
             >
               {t("edit")}
             </Button>
-            <ConfirmActionDialog
-              open={showDeleteDialog}
-              onOpenChange={setShowDeleteDialog}
-              title={t("are_you_sure")}
-              description={t("are_you_sure_want_to_delete_this_service")}
-              confirmText={t("confirm")}
-              onConfirm={() => deleteHealthcareService()}
-            />
           </div>
+          <ConfirmActionDialog
+            open={showDeleteDialog}
+            onOpenChange={setShowDeleteDialog}
+            title={t("are_you_sure")}
+            description={t("are_you_sure_want_to_delete_this_service")}
+            confirmText={t("confirm")}
+            onConfirm={() => deleteHealthcareService()}
+          />
         </div>
 
         <div className="space-y-6">

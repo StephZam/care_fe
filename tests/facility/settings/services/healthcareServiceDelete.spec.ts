@@ -1,18 +1,15 @@
 import { expect, test } from "@playwright/test";
+import { getFacilityId } from "tests/support/facilityId";
 
 // Use the authenticated state
 test.use({ storageState: "tests/.auth/user.json" });
 
 test.describe("Healthcare Services Management - Delete", () => {
+  let facilityId: string;
   test.beforeEach(async ({ page }) => {
     // Navigate to profile page
-    await page.goto("/");
-    const firstFacilityLink = page
-      .getByRole("link")
-      .filter({ hasText: "View" })
-      .first();
-    await expect(firstFacilityLink).toBeVisible({ timeout: 10000 });
-    await firstFacilityLink.click();
+    facilityId = getFacilityId();
+    await page.goto(`/facility/${facilityId}/overview`);
     await page.getByRole("button", { name: /toggle sidebar/i }).click();
     await page.getByRole("button", { name: "Settings" }).click();
     await page.getByRole("link", { name: "Healthcare Services" }).click();
@@ -24,7 +21,9 @@ test.describe("Healthcare Services Management - Delete", () => {
       .getByRole("link")
       .filter({ hasText: /View Details/i });
 
-    await page.waitForTimeout(1000);
+    await expect(serviceLinks.first())
+      .toBeVisible({ timeout: 5000 })
+      .catch(() => {});
     const serviceCount = await serviceLinks.count();
 
     if (serviceCount === 0) {

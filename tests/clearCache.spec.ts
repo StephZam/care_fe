@@ -1,17 +1,14 @@
 import { expect, test } from "@playwright/test";
+import { getFacilityId } from "tests/support/facilityId";
 
 test.use({ storageState: "tests/.auth/user.json" });
 
 test.describe("Clear Cache in profile successfully", () => {
+  let facilityId: string;
+
   test.beforeEach(async ({ page }) => {
-    // Navigate to profile page
-    await page.goto("/");
-    const firstFacilityLink = page
-      .getByRole("link")
-      .filter({ hasText: "View" })
-      .first();
-    await expect(firstFacilityLink).toBeVisible({ timeout: 10000 });
-    await firstFacilityLink.click();
+    facilityId = getFacilityId();
+    await page.goto(`/facility/${facilityId}/overview`);
     await page.getByRole("button", { name: /toggle sidebar/i }).click();
     await page.locator('div[data-sidebar="footer"] button').first().click();
     await page.getByRole("menuitem", { name: "Profile" }).click();

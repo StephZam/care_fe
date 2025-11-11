@@ -137,7 +137,14 @@ export const PatientHome = (props: {
           </div>
         </div>
         <div className="lg:flex">
-          <div className="h-full lg:mr-7 lg:basis-5/6">
+          <div
+            className={cn(
+              "h-full",
+              Tab?.component === PatientNotesTab
+                ? "w-full"
+                : "lg:mr-7 lg:basis-5/6",
+            )}
+          >
             {Tab?.component && (
               <Tab.component
                 facilityId={

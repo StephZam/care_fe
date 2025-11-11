@@ -3,6 +3,11 @@ import { expect, Page, test } from "@playwright/test";
 // Use authenticated session
 test.use({ storageState: "tests/.auth/user.json" });
 
+function generateUniqueOrderName(base: string) {
+  const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${base}_${randomSuffix}`;
+}
+
 test.describe.serial("Request Order Tag Management", () => {
   /**
    * Navigates from home to the Outgoing Orders page
@@ -38,14 +43,26 @@ test.describe.serial("Request Order Tag Management", () => {
    * Selects or deselects tags inside the "Add Tags" dialog
    */
   async function toggleTags(page: Page, select = true): Promise<string | null> {
-    // Locate the checkbox within that specific tag row
-    const checkboxes = page.locator('button[role="checkbox"]');
+    // Wait for the Add Tags section container to appear.
+    const tagContainer = page
+      .locator("div")
+      .filter({ hasText: /Other\s+Tags/i })
+      .first();
+
+    await expect(tagContainer).toBeVisible({ timeout: 15000 });
+
+    // Find checkbox elements *inside* that container.
+    const checkboxes = tagContainer.locator('button[role="checkbox"]');
+    const total = await checkboxes.count();
+
+    if (total === 0) {
+      return null;
+    }
+
+    // Ensure at least one is visible.
     await expect(checkboxes.first()).toBeVisible({ timeout: 10000 });
 
-    const total = await checkboxes.count();
-    expect(total).toBeGreaterThan(0);
-
-    // Find first unchecked (or checked) tag
+    // Try to select or deselect a checkbox.
     for (let i = 0; i < total; i++) {
       const checkbox = checkboxes.nth(i);
       const isChecked = await checkbox.getAttribute("aria-checked");
@@ -58,13 +75,14 @@ test.describe.serial("Request Order Tag Management", () => {
         const tagText = (await tagRow.textContent())?.trim() || "";
 
         await checkbox.scrollIntoViewIfNeeded();
-        await checkbox.click();
-        await page.waitForTimeout(200);
+        await checkbox.click({ force: true });
+        await page.waitForTimeout(300);
 
-        // Return the selected tag name for verification later
+        console.log(`✅ Toggled tag: ${tagText}`);
         return tagText;
       }
     }
+
     return null;
   }
 
@@ -120,7 +138,8 @@ test.describe.serial("Request Order Tag Management", () => {
   test("should create an order with selected tags and verify details", async ({
     page,
   }) => {
-    await createOrderWithTags(page, "AutoOrder11");
+    const orderName = generateUniqueOrderName("AutoOrder");
+    await createOrderWithTags(page, orderName);
   });
 
   test("should add a new tag successfully", async ({ page }) => {

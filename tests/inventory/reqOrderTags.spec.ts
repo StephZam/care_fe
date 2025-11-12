@@ -1,30 +1,20 @@
+import { faker } from "@faker-js/faker";
 import { expect, Page, test } from "@playwright/test";
+import { getFacilityId } from "tests/support/facilityId";
 
 // Use authenticated session
 test.use({ storageState: "tests/.auth/user.json" });
 
-function generateUniqueOrderName(base: string) {
-  const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `${base}_${randomSuffix}`;
-}
-
 test.describe.serial("Request Order Tag Management", () => {
+  let facilityId: string;
   // Navigates from home to the Outgoing Orders page
   async function navigateToOutgoingOrders(page: Page) {
-    await page.goto("/");
-
-    // Facility card → toggle sidebar → services → inventory → outgoing orders
-    const firstFacilityLink = page
-      .getByRole("link")
-      .filter({ hasText: "View" })
-      .first();
-    await expect(firstFacilityLink).toBeVisible({ timeout: 10000 });
-    await firstFacilityLink.click();
-    await page.getByRole("button", { name: /toggle sidebar/i }).click();
-    await page.getByRole("link", { name: /^services$/i }).click();
+    facilityId = getFacilityId();
+    await page.goto(`/facility/${facilityId}/services`);
 
     await page.locator('[data-slot="card"]').first().click();
     await page.locator('[data-slot="card"]').first().click();
+    await page.getByRole("button", { name: "Toggle Sidebar" }).click();
 
     await page.getByRole("button", { name: /inventory/i }).click();
     await page.getByRole("link", { name: /outgoing orders/i }).click();
@@ -131,7 +121,7 @@ test.describe.serial("Request Order Tag Management", () => {
   test("should create an order with selected tags and verify details", async ({
     page,
   }) => {
-    const orderName = generateUniqueOrderName("AutoOrder");
+    const orderName = faker.commerce.productName();
     await createOrderWithTags(page, orderName);
   });
 

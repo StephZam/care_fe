@@ -27,7 +27,6 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useShortcutSubContext } from "@/context/ShortcutContext";
 import { cn } from "@/lib/utils";
 import BookAppointmentSheet from "@/pages/Appointments/BookAppointment/BookAppointmentSheet";
-import { PatientNotesTab } from "./PatientDetailsTab/PatientNotes";
 export const PatientHome = (props: {
   facilityId?: string;
   id: string;
@@ -140,9 +139,7 @@ export const PatientHome = (props: {
           <div
             className={cn(
               "h-full",
-              Tab?.component === PatientNotesTab
-                ? "w-full"
-                : "lg:mr-7 lg:basis-5/6",
+              Tab?.route === "notes" ? "w-full" : "lg:mr-7 lg:basis-5/6",
             )}
           >
             {Tab?.component && (
@@ -155,7 +152,7 @@ export const PatientHome = (props: {
               />
             )}
           </div>
-          {Tab?.component !== PatientNotesTab && (
+          {Tab?.route !== "notes" && (
             <div className="sticky top-20 mt-8 mx-4 md:mx-0 h-full lg:basis-1/6">
               <section className="mb-4 space-y-2 md:flex">
                 <div className="w-full lg:mx-0">

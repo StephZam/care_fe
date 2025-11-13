@@ -9,6 +9,7 @@ import patientApi from "@/types/emr/patient/patientApi";
 import prescriptionApi from "@/types/emr/prescription/prescriptionApi";
 import serviceRequestApi from "@/types/emr/serviceRequest/serviceRequestApi";
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
+import deliveryOrderApi from "@/types/inventory/deliveryOrder/deliveryOrderApi";
 import scheduleApis from "@/types/scheduling/scheduleApi";
 
 import { MultiFilterStyleTagSelector } from "./MultiFilterStyleTagSelector";
@@ -22,7 +23,8 @@ export type TagEntityType =
   | "encounter"
   | "appointment"
   | "prescription"
-  | "service_request";
+  | "service_request"
+  | "delivery_order";
 
 // Mapping from entity types to tag resources
 const ENTITY_TO_RESOURCE_MAP = {
@@ -31,6 +33,7 @@ const ENTITY_TO_RESOURCE_MAP = {
   appointment: TagResource.APPOINTMENT,
   prescription: TagResource.PRESCRIPTION,
   service_request: TagResource.SERVICE_REQUEST,
+  delivery_order: TagResource.DELIVERY_ORDER,
 } as const;
 
 // Configuration for different entity types using their respective API files
@@ -60,6 +63,11 @@ const ENTITY_CONFIG = {
     setTagsApi: serviceRequestApi.setTags,
     removeTagsApi: serviceRequestApi.removeTags,
     displayName: "service_request",
+  },
+  delivery_order: {
+    setTagsApi: deliveryOrderApi.setTags,
+    removeTagsApi: deliveryOrderApi.removeTags,
+    displayName: "delivery_order",
   },
   // TODO: Add more entity configurations here
 

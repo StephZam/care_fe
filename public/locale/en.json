@@ -5017,6 +5017,7 @@
   "supply_delivery_description": "Create or edit supply delivery details",
   "supply_delivery_details": "Supply Delivery Details",
   "supply_delivery_id": "Supply Delivery ID",
+  "supply_delivery_order": "Delivery Order",
   "supply_delivery_updated": "Supply Delivery Updated",
   "supply_request": "Supply Request",
   "supply_request_created": "Supply request created successfully",

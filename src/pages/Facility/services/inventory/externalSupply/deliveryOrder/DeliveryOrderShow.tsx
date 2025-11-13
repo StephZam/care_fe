@@ -441,7 +441,7 @@ export function DeliveryOrderShow({
         {/* Delivery Order Details */}
         <Card>
           <CardContent className="space-y-1 p-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               <div>
                 <label className="text-sm font-medium text-gray-700">
                   {t("deliver_to")}
@@ -486,18 +486,37 @@ export function DeliveryOrderShow({
                   </Badge>
                 </div>
               </div>
-            </div>
 
-            {deliveryOrder.note && (
-              <div className="pt-3">
-                <label className="text-sm font-medium text-gray-700">
-                  {t("note")}
-                </label>
-                <p className="text-sm whitespace-pre-wrap">
-                  {deliveryOrder.note}
-                </p>
-              </div>
-            )}
+              {deliveryOrder.note && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    {t("note")}
+                  </label>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {deliveryOrder.note}
+                  </p>
+                </div>
+              )}
+
+              {deliveryOrder.tags && deliveryOrder.tags.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    {t("tags_other")}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {deliveryOrder.tags.map((tag) => (
+                      <Badge
+                        key={tag.id}
+                        variant="secondary"
+                        className="rounded-sm"
+                      >
+                        {tag.display}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 

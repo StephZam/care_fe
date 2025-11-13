@@ -488,16 +488,6 @@ export function DeliveryOrderShow({
               </div>
 
               {deliveryOrder.note && (
-                <div className="pt-3">
-                  <label className="text-sm font-medium text-gray-700">
-                    {t("note")}
-                  </label>
-                  <p className="text-sm whitespace-pre-wrap">
-                    {deliveryOrder.note}
-                  </p>
-                </div>
-              )}
-              {deliveryOrder.note && (
                 <div>
                   <label className="text-sm font-medium text-gray-700">
                     {t("note")}

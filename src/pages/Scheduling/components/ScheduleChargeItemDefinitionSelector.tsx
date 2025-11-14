@@ -35,7 +35,7 @@ interface ScheduleChargeItemDefinitionSelectorProps {
   scheduleTemplate: ScheduleTemplate;
   onChange: (value: {
     charge_item_definition_slug: string;
-    re_visit_allowed_days: number;
+    re_visit_allowed_days: string | number;
     re_visit_charge_item_definition_slug: string | null;
   }) => void;
 }
@@ -50,7 +50,10 @@ export default function ScheduleChargeItemDefinitionSelector({
 
   const scheduleChargeItemSchema = z.object({
     charge_item_definition_slug: z.string().min(1, t("field_required")),
-    re_visit_allowed_days: z.number().min(0, t("revisit_days_non_negative")),
+    re_visit_allowed_days: z.union([
+      z.number().min(0, t("revisit_days_non_negative")),
+      z.string().min(1, t("field_required")),
+    ]),
     re_visit_charge_item_definition_slug: z.string().nullable(),
   });
 
@@ -158,11 +161,11 @@ export default function ScheduleChargeItemDefinitionSelector({
                             : parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
-                      onBlur={(e) => {
-                        if (e.target.value === "") {
-                          field.onChange(0);
-                        }
-                      }}
+                      // onBlur={(e) => {
+                      //   if (e.target.value === "") {
+                      //     field.onChange(0);
+                      //   }
+                      // }}
                     />
                   </FormControl>
                   <FormMessage />

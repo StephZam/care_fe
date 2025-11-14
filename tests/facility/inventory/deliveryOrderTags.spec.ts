@@ -7,8 +7,26 @@ test.use({ storageState: "tests/.auth/user.json" });
 
 test.describe.serial("Delivery Order Tag Management", () => {
   let facilityId: string;
-  // Navigates from home to the Outgoing Orders page
-  async function navigateToOutgoingOrders(page: Page) {
+
+  // Create a tag config
+  test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage({
+      storageState: "tests/.auth/user.json",
+    });
+    const tagName = faker.commerce.productName();
+
+    await page.goto(`/admin/tag_config`);
+    await page.getByRole("button", { name: "Add tag config" }).click();
+
+    await page.getByRole("textbox", { name: "Display name *" }).fill(tagName);
+    await page.getByRole("combobox", { name: "Resource" }).click();
+    await page.getByRole("option", { name: "Delivery Order" }).click();
+    await page.getByRole("button", { name: "Create tag config" }).click();
+    await page.close();
+  });
+
+  // Navigates from home to the Outgoing Deliveries page
+  async function navigateToOutgoingDelivery(page: Page) {
     facilityId = getFacilityId();
     await page.goto(`/facility/${facilityId}/services`);
 
@@ -25,8 +43,6 @@ test.describe.serial("Delivery Order Tag Management", () => {
     });
   }
 
-  // Selects or deselects tags inside the "Add Tags" dialog
-
   async function toggleTags(page: Page, select = true): Promise<string | null> {
     // Wait for the Add Tags section container to appear.
     const tagContainer = page
@@ -35,16 +51,6 @@ test.describe.serial("Delivery Order Tag Management", () => {
       .first();
 
     await expect(tagContainer).toBeVisible({ timeout: 5000 });
-
-    // Check if the section exists at all
-    const sectionCount = await tagContainer.count();
-    if (sectionCount === 0) {
-      test.info().annotations.push({
-        type: "info",
-        description: "No tags found.",
-      });
-      return null; // Skip gracefully
-    }
 
     // Find checkbox elements *inside* that container.
     const checkboxes = tagContainer.locator('button[role="checkbox"]');
@@ -62,7 +68,6 @@ test.describe.serial("Delivery Order Tag Management", () => {
         const tagRow = checkbox.locator("xpath=ancestor::div[1]");
         const tagText = (await tagRow.textContent())?.trim() || "";
 
-        // await checkbox.scrollIntoViewIfNeeded();
         await checkbox.click({ force: true });
         await page.waitForTimeout(300);
         return tagText;
@@ -117,7 +122,7 @@ test.describe.serial("Delivery Order Tag Management", () => {
   // --- TESTS START HERE ---
 
   test.beforeEach(async ({ page }) => {
-    await navigateToOutgoingOrders(page);
+    await navigateToOutgoingDelivery(page);
   });
 
   test("should create an order with selected tags and verify details", async ({

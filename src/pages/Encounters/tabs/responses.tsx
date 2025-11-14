@@ -8,11 +8,14 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useBreakpoints from "@/hooks/useBreakpoints";
 import { cn } from "@/lib/utils";
+import questionnaireApi from "@/types/questionnaire/questionnaireApi";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
+import query from "@/Utils/request/query";
 import { formatDateTime, formatName } from "@/Utils/utils";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useQueryParams } from "raviger";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface LeftCardProps {
@@ -93,7 +96,10 @@ function LeftPanel({
           }
           subjectType="encounter"
           onSelect={(q) => {
-            setQueryParams({ questionnaireId: q.id });
+            setQueryParams({
+              questionnaireSlug: q.slug,
+              questionnaireId: q.id,
+            });
             setSelectedQuestionnaireTitle(q.title);
           }}
           trigger={
@@ -165,16 +171,31 @@ export const EncounterResponsesTab = ({
 }: EncounterResponsesTabProps) => {
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{
+    questionnaireSlug?: string;
     questionnaireId?: string;
     responseId?: string;
   }>();
 
-  const { questionnaireId, responseId } = qParams;
+  const { questionnaireSlug, questionnaireId, responseId } = qParams;
 
   const [selectedQuestionnaireTitle, setSelectedQuestionnaireTitle] =
     useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isMobile = useBreakpoints({ default: true, md: false });
+
+  const { data: questionnaireData } = useQuery({
+    queryKey: ["questionnaire", questionnaireSlug],
+    queryFn: query(questionnaireApi.detail, {
+      pathParams: { id: questionnaireSlug! },
+    }),
+    enabled: !!questionnaireSlug,
+  });
+
+  useEffect(() => {
+    if (questionnaireData?.title) {
+      setSelectedQuestionnaireTitle(questionnaireData.title);
+    }
+  }, [questionnaireData]);
 
   const handleResponseClick = (response: QuestionnaireResponse) => {
     setQueryParams({ ...qParams, responseId: response.id });
@@ -256,7 +277,10 @@ export const EncounterResponsesTab = ({
                         item={response}
                         showTitle={!questionnaireId}
                         onTitleClick={(qid) => {
-                          setQueryParams({ questionnaireId: qid });
+                          setQueryParams({
+                            questionnaireSlug: response.questionnaire?.slug,
+                            questionnaireId: qid,
+                          });
                           setSelectedQuestionnaireTitle(
                             response.questionnaire?.title || "",
                           );

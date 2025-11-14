@@ -277,10 +277,7 @@ export const EncounterResponsesTab = ({
                         item={response}
                         showTitle={!questionnaireId}
                         onTitleClick={(qid) => {
-                          setQueryParams({
-                            questionnaireSlug: response.questionnaire?.slug,
-                            questionnaireId: qid,
-                          });
+                          setQueryParams({ questionnaireId: qid });
                           setSelectedQuestionnaireTitle(
                             response.questionnaire?.title || "",
                           );

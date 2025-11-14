@@ -161,11 +161,6 @@ export default function ScheduleChargeItemDefinitionSelector({
                             : parseInt(e.target.value) || 0;
                         field.onChange(value);
                       }}
-                      // onBlur={(e) => {
-                      //   if (e.target.value === "") {
-                      //     field.onChange(0);
-                      //   }
-                      // }}
                     />
                   </FormControl>
                   <FormMessage />

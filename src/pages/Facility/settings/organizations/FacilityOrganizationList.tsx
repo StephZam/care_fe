@@ -144,7 +144,7 @@ export default function FacilityOrganizationList({
 
   return (
     <>
-      <Page title={t("departments_or_teams")} hideTitleOnPage className="p-4">
+      <Page title={t("departments_or_teams")} hideTitleOnPage className="p-0">
         <div className="container mx-auto">
           <div className="flex flex-col sm:flex-row items-start justify-between mb-2 sm:mb-4">
             <h3>{t("departments_or_teams")}</h3>

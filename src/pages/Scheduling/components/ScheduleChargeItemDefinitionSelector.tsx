@@ -35,7 +35,7 @@ interface ScheduleChargeItemDefinitionSelectorProps {
   scheduleTemplate: ScheduleTemplate;
   onChange: (value: {
     charge_item_definition_slug: string;
-    re_visit_allowed_days: string | number;
+    re_visit_allowed_days: number;
     re_visit_charge_item_definition_slug: string | null;
   }) => void;
 }
@@ -50,10 +50,9 @@ export default function ScheduleChargeItemDefinitionSelector({
 
   const scheduleChargeItemSchema = z.object({
     charge_item_definition_slug: z.string().min(1, t("field_required")),
-    re_visit_allowed_days: z.union([
-      z.number().min(0, t("revisit_days_non_negative")),
-      z.string().min(1, t("field_required")),
-    ]),
+    re_visit_allowed_days: z
+      .number({ required_error: t("field_required") })
+      .min(0, t("revisit_days_non_negative")),
     re_visit_charge_item_definition_slug: z.string().nullable(),
   });
 
@@ -64,7 +63,7 @@ export default function ScheduleChargeItemDefinitionSelector({
     defaultValues: {
       charge_item_definition_slug:
         scheduleTemplate.charge_item_definition?.slug || "",
-      re_visit_allowed_days: scheduleTemplate.revisit_allowed_days,
+      re_visit_allowed_days: scheduleTemplate.revisit_allowed_days ?? undefined,
       re_visit_charge_item_definition_slug:
         scheduleTemplate.revisit_charge_item_definition?.slug || "",
     },
@@ -155,11 +154,12 @@ export default function ScheduleChargeItemDefinitionSelector({
                       min={0}
                       value={field.value}
                       onChange={(e) => {
-                        const value =
-                          e.target.value === ""
-                            ? ""
-                            : parseInt(e.target.value) || 0;
-                        field.onChange(value);
+                        const value = e.target.value;
+                        if (value === "") field.onChange(undefined);
+                        else {
+                          const parsed = Number(value);
+                          field.onChange(isNaN(parsed) ? undefined : parsed);
+                        }
                       }}
                     />
                   </FormControl>

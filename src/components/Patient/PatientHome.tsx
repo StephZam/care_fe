@@ -136,12 +136,7 @@ export const PatientHome = (props: {
           </div>
         </div>
         <div className="lg:flex">
-          <div
-            className={cn(
-              "h-full",
-              Tab?.route === "notes" ? "w-full" : "lg:mr-7 lg:basis-5/6",
-            )}
-          >
+          <div className="h-full lg:mr-7 lg:basis-5/6">
             {Tab?.component && (
               <Tab.component
                 facilityId={
@@ -152,86 +147,84 @@ export const PatientHome = (props: {
               />
             )}
           </div>
-          {Tab?.route !== "notes" && (
-            <div className="sticky top-20 mt-8 mx-4 md:mx-0 h-full lg:basis-1/6">
-              <section className="mb-4 space-y-2 md:flex">
-                <div className="w-full lg:mx-0">
-                  <div className="font-semibold text-secondary-900">
-                    {t("actions")}
-                  </div>
-                  {/* Add link to patient home page */}
-
-                  <div className="mt-2 h-full space-y-2">
-                    <Button asChild variant="outline" className="w-full">
-                      <Link
-                        href={`/facility/${facilityId}/patients/verify?${new URLSearchParams(
-                          {
-                            phone_number: patientData.phone_number,
-                            year_of_birth: patientData.year_of_birth.toString(),
-                            partial_id: patientData.id.slice(0, 5),
-                          },
-                        ).toString()}`}
-                      >
-                        {t("patient_home")}
-                      </Link>
-                    </Button>
-                    <div className="space-y-3 text-left text-lg font-semibold text-secondary-900">
-                      <div className="space-y-2">
-                        <PLUGIN_Component
-                          __name="PatientHomeActions"
-                          patient={patientData}
-                          facilityId={facilityId}
-                          className="w-full bg-white font-semibold text-green-800 hover:bg-secondary-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
+          <div className="sticky top-20 mt-8 mx-4 md:mx-0 h-full lg:basis-1/6">
+            <section className="mb-4 space-y-2 md:flex">
+              <div className="w-full lg:mx-0">
+                <div className="font-semibold text-secondary-900">
+                  {t("actions")}
                 </div>
-              </section>
-              <hr className="border-gray-200" />
-              <div
-                id="actions"
-                className="my-2 flex h-full flex-col justify-between space-y-2"
-              >
-                <div className="my-1 rounded-sm py-2">
-                  <div>
-                    <div className="text-xs font-normal leading-5 text-gray-600">
-                      {t("last_updated_by")}
-                      <div className="font-semibold text-gray-900">
-                        {patientData.updated_by?.first_name}{" "}
-                        {patientData.updated_by?.last_name}
-                      </div>
-                    </div>
+                {/* Add link to patient home page */}
 
-                    <div className="whitespace-normal text-xs font-normal text-gray-900">
-                      {patientData.modified_date ? (
-                        <RelativeDateTooltip date={patientData.modified_date} />
-                      ) : (
-                        "--:--"
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="text-xs font-normal leading-5 text-gray-600">
-                      {t("patient_profile_created_by")}
-                      <div className="font-semibold text-gray-900">
-                        {patientData.created_by?.first_name}{" "}
-                        {patientData.created_by?.last_name}
-                      </div>
-                    </div>
-                    <div className="whitespace-normal text-xs font-normal text-gray-900">
-                      {patientData.created_date ? (
-                        <RelativeDateTooltip date={patientData.created_date} />
-                      ) : (
-                        "--:--"
-                      )}
+                <div className="mt-2 h-full space-y-2">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link
+                      href={`/facility/${facilityId}/patients/verify?${new URLSearchParams(
+                        {
+                          phone_number: patientData.phone_number,
+                          year_of_birth: patientData.year_of_birth.toString(),
+                          partial_id: patientData.id.slice(0, 5),
+                        },
+                      ).toString()}`}
+                    >
+                      {t("patient_home")}
+                    </Link>
+                  </Button>
+                  <div className="space-y-3 text-left text-lg font-semibold text-secondary-900">
+                    <div className="space-y-2">
+                      <PLUGIN_Component
+                        __name="PatientHomeActions"
+                        patient={patientData}
+                        facilityId={facilityId}
+                        className="w-full bg-white font-semibold text-green-800 hover:bg-secondary-200"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
+            </section>
+            <hr className="border-gray-200" />
+            <div
+              id="actions"
+              className="my-2 flex h-full flex-col justify-between space-y-2"
+            >
+              <div className="my-1 rounded-sm py-2">
+                <div>
+                  <div className="text-xs font-normal leading-5 text-gray-600">
+                    {t("last_updated_by")}
+                    <div className="font-semibold text-gray-900">
+                      {patientData.updated_by?.first_name}{" "}
+                      {patientData.updated_by?.last_name}
+                    </div>
+                  </div>
+
+                  <div className="whitespace-normal text-xs font-normal text-gray-900">
+                    {patientData.modified_date ? (
+                      <RelativeDateTooltip date={patientData.modified_date} />
+                    ) : (
+                      "--:--"
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <div className="text-xs font-normal leading-5 text-gray-600">
+                    {t("patient_profile_created_by")}
+                    <div className="font-semibold text-gray-900">
+                      {patientData.created_by?.first_name}{" "}
+                      {patientData.created_by?.last_name}
+                    </div>
+                  </div>
+                  <div className="whitespace-normal text-xs font-normal text-gray-900">
+                    {patientData.created_date ? (
+                      <RelativeDateTooltip date={patientData.created_date} />
+                    ) : (
+                      "--:--"
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </Page>

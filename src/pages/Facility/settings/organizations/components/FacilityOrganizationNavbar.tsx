@@ -130,6 +130,7 @@ export default function FacilityOrganizationNavbar({
         pathParams: { facilityId },
         queryParams: {
           parent: "",
+          limit: 100,
         },
       }),
       refetchOnWindowFocus: false,
@@ -139,7 +140,7 @@ export default function FacilityOrganizationNavbar({
   const topLevelOrganizations = allOrganizations?.results || [];
 
   return (
-    <div className="w-64 shadow-lg bg-white rounded-lg hidden md:block">
+    <div className="min-w-64 shadow-lg bg-white rounded-lg hidden md:block">
       <ScrollArea className="h-[calc(100vh-14rem)]">
         <div className="p-4">
           {isLoadingOrganizations ? (

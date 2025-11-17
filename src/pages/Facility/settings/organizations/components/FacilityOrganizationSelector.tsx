@@ -151,9 +151,7 @@ export default function FacilityOrganizationSelector(
   const handleRemoveOrganization = (index: number) => {
     const newSelection = selectedOrganizations.filter((_, i) => i !== index);
     setSelectedOrganizations(newSelection);
-    onChange(
-      newSelection.length > 0 ? newSelection.map((org) => org.id) : null,
-    );
+    onChange(newSelection.map((org) => org.id));
   };
 
   const handleOrganizationViewChange = (value: string) => {
@@ -195,6 +193,7 @@ export default function FacilityOrganizationSelector(
       availableOrganizations.length === 1 &&
       !facilityOrgSearch &&
       selectedOrganizations.length === 0 &&
+      props.value == null &&
       !isLoadingRoot
     ) {
       const singleOrg = availableOrganizations[0];
@@ -477,7 +476,7 @@ export default function FacilityOrganizationSelector(
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-8 sm:size-9 flex-shrink-0"
+                            className="size-8 sm:size-9 flex-shrink-0 hover:bg-transparent"
                           >
                             <MoreVertical className="size-3 sm:size-4" />
                           </Button>

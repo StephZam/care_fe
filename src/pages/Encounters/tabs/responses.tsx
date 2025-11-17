@@ -15,7 +15,7 @@ import { formatDateTime, formatName } from "@/Utils/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useQueryParams } from "raviger";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface LeftCardProps {
@@ -67,9 +67,8 @@ interface LeftPanelProps {
   patientId: string;
   canAccess: boolean;
   responseId?: string;
-  selectedQuestionnaireTitle: string;
-  questionnaireId?: string;
-  setSelectedQuestionnaireTitle: (title: string) => void;
+  questionnaireTitle: string;
+  questionnaireSlug?: string;
   setQueryParams: (params: any) => void;
   onResponseClick: (response: QuestionnaireResponse) => void;
 }
@@ -79,9 +78,8 @@ function LeftPanel({
   patientId,
   canAccess,
   responseId,
-  selectedQuestionnaireTitle,
-  questionnaireId,
-  setSelectedQuestionnaireTitle,
+  questionnaireTitle,
+  questionnaireSlug,
   setQueryParams,
   onResponseClick,
 }: LeftPanelProps) {
@@ -92,15 +90,13 @@ function LeftPanel({
       <div className="relative w-full pb-2">
         <QuestionnaireSearch
           placeholder={
-            questionnaireId ? selectedQuestionnaireTitle : t("select_forms")
+            questionnaireSlug ? questionnaireTitle : t("select_forms")
           }
           subjectType="encounter"
           onSelect={(q) => {
             setQueryParams({
               questionnaireSlug: q.slug,
-              questionnaireId: q.id,
             });
-            setSelectedQuestionnaireTitle(q.title);
           }}
           trigger={
             <Button
@@ -110,27 +106,24 @@ function LeftPanel({
             >
               <div className="flex justify-start items-center gap-2 text-primary-800 flex-1">
                 <span className="text-left whitespace-normal break-words">
-                  {questionnaireId
-                    ? selectedQuestionnaireTitle
-                    : t("select_forms")}
+                  {questionnaireSlug ? questionnaireTitle : t("select_forms")}
                 </span>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                {questionnaireId && (
+                {questionnaireSlug && (
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       setQueryParams({});
-                      setSelectedQuestionnaireTitle("");
                     }}
                     className="h-5 w-5 p-0 hover:bg-gray-100"
                   >
                     <X className="size-4" />
                   </Button>
                 )}
-                {!questionnaireId && (
+                {!questionnaireSlug && (
                   <ChevronDown className="size-4 flex-shrink-0" />
                 )}
               </div>
@@ -143,13 +136,13 @@ function LeftPanel({
           encounterId={encounterId}
           patientId={patientId}
           canAccess={canAccess}
-          questionnaireId={questionnaireId}
+          questionnaireSlug={questionnaireSlug}
           renderItem={(response: QuestionnaireResponse) => (
             <LeftCard
               response={response}
               isActive={responseId === response.id}
               onClick={() => onResponseClick(response)}
-              showTitle={!questionnaireId}
+              showTitle={!questionnaireSlug}
             />
           )}
         />
@@ -172,30 +165,21 @@ export const EncounterResponsesTab = ({
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{
     questionnaireSlug?: string;
-    questionnaireId?: string;
     responseId?: string;
   }>();
 
-  const { questionnaireSlug, questionnaireId, responseId } = qParams;
+  const { questionnaireSlug, responseId } = qParams;
 
-  const [selectedQuestionnaireTitle, setSelectedQuestionnaireTitle] =
-    useState<string>("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isMobile = useBreakpoints({ default: true, md: false });
 
   const { data: questionnaireData } = useQuery({
     queryKey: ["questionnaire", questionnaireSlug],
     queryFn: query(questionnaireApi.detail, {
-      pathParams: { id: questionnaireSlug! },
+      pathParams: { slug: questionnaireSlug! },
     }),
     enabled: !!questionnaireSlug,
   });
-
-  useEffect(() => {
-    if (questionnaireData?.title) {
-      setSelectedQuestionnaireTitle(questionnaireData.title);
-    }
-  }, [questionnaireData]);
 
   const handleResponseClick = (response: QuestionnaireResponse) => {
     setQueryParams({ ...qParams, responseId: response.id });
@@ -211,9 +195,8 @@ export const EncounterResponsesTab = ({
           patientId={patientId}
           canAccess={canAccess}
           responseId={responseId}
-          questionnaireId={questionnaireId}
-          selectedQuestionnaireTitle={selectedQuestionnaireTitle}
-          setSelectedQuestionnaireTitle={setSelectedQuestionnaireTitle}
+          questionnaireSlug={questionnaireSlug}
+          questionnaireTitle={questionnaireData?.title || ""}
           setQueryParams={setQueryParams}
           onResponseClick={handleResponseClick}
         />
@@ -238,11 +221,8 @@ export const EncounterResponsesTab = ({
                     patientId={patientId}
                     canAccess={canAccess}
                     responseId={responseId}
-                    questionnaireId={questionnaireId}
-                    selectedQuestionnaireTitle={selectedQuestionnaireTitle}
-                    setSelectedQuestionnaireTitle={
-                      setSelectedQuestionnaireTitle
-                    }
+                    questionnaireSlug={questionnaireSlug}
+                    questionnaireTitle={questionnaireData?.title || ""}
                     setQueryParams={setQueryParams}
                     onResponseClick={handleResponseClick}
                   />
@@ -253,13 +233,13 @@ export const EncounterResponsesTab = ({
         </div>
       )}
       <div className="flex-1 h-full overflow-y-auto">
-        <ScrollArea key={questionnaireId} className="h-full">
+        <ScrollArea key={questionnaireSlug} className="h-full">
           <div className="space-y-4 p-3 overflow-anchor-auto">
             <QuestionnaireResponsesList
               encounterId={encounterId}
               patientId={patientId}
               canAccess={canAccess}
-              questionnaireId={questionnaireId}
+              questionnaireSlug={questionnaireSlug}
               renderItem={(response: QuestionnaireResponse) => {
                 return (
                   <div
@@ -275,12 +255,11 @@ export const EncounterResponsesTab = ({
                     >
                       <ResponseCard
                         item={response}
-                        showTitle={!questionnaireId}
-                        onTitleClick={(qid) => {
-                          setQueryParams({ questionnaireId: qid });
-                          setSelectedQuestionnaireTitle(
-                            response.questionnaire?.title || "",
-                          );
+                        showTitle={!questionnaireSlug}
+                        onTitleClick={() => {
+                          setQueryParams({
+                            questionnaireSlug: response.questionnaire?.slug,
+                          });
                         }}
                       />
                     </Card>

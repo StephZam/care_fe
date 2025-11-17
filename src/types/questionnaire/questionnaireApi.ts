@@ -13,7 +13,7 @@ export default {
   },
 
   detail: {
-    path: "/api/v1/questionnaire/{id}/",
+    path: "/api/v1/questionnaire/{slug}/",
     method: HttpMethod.GET,
     TRes: Type<QuestionnaireDetail>(),
   },

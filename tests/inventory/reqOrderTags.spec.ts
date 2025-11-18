@@ -17,10 +17,12 @@ test.describe.serial("Request Order Tag Management", () => {
     await page.getByRole("button", { name: "Toggle Sidebar" }).click();
 
     await page.getByRole("button", { name: /inventory/i }).click();
-    await page.getByRole("link", { name: /outgoing orders/i }).click();
+    await page.getByRole("link", { name: /purchase orders/i }).click();
 
     // Wait until Outgoing Orders heading appears
-    await expect(page.getByRole("heading", { name: /orders/i })).toBeVisible({
+    await expect(
+      page.getByRole("heading", { name: /purchase orders/i }),
+    ).toBeVisible({
       timeout: 10000,
     });
   }
@@ -80,7 +82,7 @@ test.describe.serial("Request Order Tag Management", () => {
 
     await page
       .getByRole("combobox")
-      .filter({ hasText: "Select Location" })
+      .filter({ hasText: "Select Vendor/Distributor" })
       .click();
     await page.getByRole("option").first().click();
 
@@ -153,7 +155,7 @@ test.describe.serial("Request Order Tag Management", () => {
         type: "info",
         description: "No unchecked tags found — skipping tag addition.",
       });
-      return; // Skip gracefully without failing
+      return;
     }
 
     // Confirm success toast
@@ -187,7 +189,7 @@ test.describe.serial("Request Order Tag Management", () => {
         type: "info",
         description: "No checked tags found — skipping tag removal.",
       });
-      return; // Skip gracefully without failing
+      return;
     }
 
     // Verify success toast only if a tag was actually removed

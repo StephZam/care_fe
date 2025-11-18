@@ -24,7 +24,7 @@ test.describe("Healthcare Services Management - Delete", () => {
       .click();
     const plusButton = page.locator("button:has(svg.lucide-plus)").first();
     await expect(plusButton).toBeVisible({ timeout: 5000 });
-    await plusButton.click({ force: true });
+    await plusButton.click();
     await page.getByRole("button", { name: "Create" }).click();
 
     // Click Delete button

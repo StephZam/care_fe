@@ -27,12 +27,15 @@ test.describe("Healthcare Services Management - Delete", () => {
     await plusButton.click();
     await page.getByRole("button", { name: "Create" }).click();
 
-    // Click Delete button
-    const serviceLink = page.getByRole("link", {
-      name: new RegExp(serviceName, "i"),
-    });
-    await serviceLink.click();
+    // Search for the created healthcare service
+    await page
+      .getByRole("textbox", { name: "Search healthcare services..." })
+      .fill(serviceName);
 
+    // Click on the service from search results
+    await page.getByRole("link", { name: serviceName }).click();
+
+    // Click Delete button
     await page.getByRole("button", { name: "Delete" }).click();
 
     // Confirm deletion

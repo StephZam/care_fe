@@ -46,9 +46,12 @@ test.describe("Healthcare Services Management - Delete", () => {
       page.getByText("Healthcare service deleted successfully"),
     ).toBeVisible({ timeout: 10000 });
 
-    const deletedServiceLink = page.getByRole("link", {
-      name: new RegExp(serviceName, "i"),
-    });
-    await expect(deletedServiceLink).toHaveCount(0);
+    // Search for the deleted service to verify it's not visible
+    await page
+      .getByRole("textbox", { name: "Search healthcare services..." })
+      .fill(serviceName);
+
+    // Verify the service link is not visible in search results
+    await expect(page.getByRole("link", { name: serviceName })).toHaveCount(0);
   });
 });

@@ -175,7 +175,6 @@ function DeleteOrganizationButton({
       size="icon"
       onClick={() => removeOrganization(organizationId)}
       disabled={isPending}
-      data-cy="delete-organization-button"
     >
       {isPending ? (
         <Loader2 className="size-4 animate-spin" />

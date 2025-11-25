@@ -29,9 +29,10 @@ function ClearCacheButton() {
       }
       queryClient.clear();
       clearQueryPersistenceCache();
-      await new Promise((res) => setTimeout(res, 800));
       window.location.reload();
-    } finally {
+    } catch (error) {
+      console.error("Cache clear failed:", error);
+      toast.error(t("cache_clear_failed"));
       setIsClearing(false);
     }
   };

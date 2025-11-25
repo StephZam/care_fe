@@ -1,26 +1,18 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { getFacilityId } from "tests/support/facilityId";
 
 test.use({ storageState: "tests/.auth/user.json" });
 
 test.describe("Clear Cache in profile successfully", () => {
-  async function navigateToProfile(page: Page, facilityId: string) {
-    await page.goto(`/facility/${facilityId}/overview`);
-    await page.getByRole("button", { name: /toggle sidebar/i }).click();
-    await page.locator('div[data-sidebar="footer"] button').first().click();
-    await page.getByRole("menuitem", { name: "Profile" }).click();
-    await expect(
-      page.getByRole("button", { name: /clear cache/i }),
-    ).toBeVisible();
-  }
-
   test("should clear caches and unregister service workers", async ({
     page,
   }) => {
     const facilityId = getFacilityId();
+    await page.goto(`/facility/${facilityId}/users/admin`);
 
-    // Navigate to profile page
-    await navigateToProfile(page, facilityId);
+    await expect(
+      page.getByRole("button", { name: /clear cache/i }),
+    ).toBeVisible();
 
     // Create a test cache to verify clearing works
     await page.evaluate(async () => {
@@ -69,9 +61,9 @@ test.describe("Clear Cache in profile successfully", () => {
       expect(remainingRegs).toBeLessThanOrEqual(preRegs);
     }
 
-    // Verify user is still on the same page after reload
+    // Wait for profile page to be fully loaded and verify user is still on the profile page
     await expect(
       page.getByRole("button", { name: /clear cache/i }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   });
 });

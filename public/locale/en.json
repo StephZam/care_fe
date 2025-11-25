@@ -920,6 +920,7 @@
   "bulk_bed_creation_info": "You are about to create multiple beds. Each bed will have a unique name based on the beds names you provided.",
   "by": "by",
   "by_name": "filed by <strong>{{by}}</strong>",
+  "cache_clear_failed": "Failed to clear cache",
   "calculation": "Calculation",
   "calculation_preview": "Calculation Preview",
   "call_next_patient": "Call Next Patient",

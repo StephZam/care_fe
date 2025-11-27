@@ -397,26 +397,28 @@ export default function DeliveryOrderForm({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="tags"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("tags_other")}</FormLabel>
-                      <FormControl>
-                        <TagSelectorPopover
-                          selected={selectedTags}
-                          onChange={(tags) =>
-                            field.onChange(tags.map((tag) => tag.id))
-                          }
-                          resource={TagResource.DELIVERY_ORDER}
-                          facilityId={facilityId}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!isEditMode && (
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t("tags_other")}</FormLabel>
+                        <FormControl>
+                          <TagSelectorPopover
+                            selected={selectedTags}
+                            onChange={(tags) =>
+                              field.onChange(tags.map((tag) => tag.id))
+                            }
+                            resource={TagResource.DELIVERY_ORDER}
+                            facilityId={facilityId}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </CardContent>
             </Card>
 

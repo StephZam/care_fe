@@ -96,7 +96,7 @@ export default function DeliveryOrderTable({
                         "deliveryOrders",
                         locationId,
                         internal,
-                        isRequester,
+                        ...(isRequester ? [isRequester] : []),
                       ],
                     });
                   }}

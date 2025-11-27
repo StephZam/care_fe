@@ -114,7 +114,7 @@ export default function DeliveryOrderForm({
     locationId,
     internal,
     false,
-    false,
+    internal ? false : true,
   );
 
   const queryClient = useQueryClient();

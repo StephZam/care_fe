@@ -83,11 +83,8 @@ export default function DeliveryOrderTable({
                 {t(delivery.status)}
               </Badge>
             </TableCell>
-            <TableCell>
+            <TableCell className="sm:w-60 md:w-80">
               <div className="flex flex-wrap gap-1">
-                {delivery.tags.map((tag) => (
-                  <Badge key={tag.id}>{tag.display}</Badge>
-                ))}
                 <TagAssignmentSheet
                   entityType="delivery_order"
                   entityId={delivery.id}
@@ -115,6 +112,9 @@ export default function DeliveryOrderTable({
                     )
                   }
                 />
+                {delivery.tags.map((tag) => (
+                  <Badge key={tag.id}>{tag.display}</Badge>
+                ))}
               </div>
             </TableCell>
             <TableCell>

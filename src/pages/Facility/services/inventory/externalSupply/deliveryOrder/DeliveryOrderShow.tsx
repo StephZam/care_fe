@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Edit, MoreVertical, Truck } from "lucide-react";
+import { ChevronLeft, Edit, Hash, MoreVertical, Truck } from "lucide-react";
 import { Link } from "raviger";
 import { useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import BackButton from "@/components/Common/BackButton";
 import Page from "@/components/Common/Page";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
+import TagAssignmentSheet from "@/components/Tags/TagAssignmentSheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -498,13 +499,35 @@ export function DeliveryOrderShow({
                 </div>
               )}
 
-              {deliveryOrder.tags && deliveryOrder.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
                 <div>
                   <label className="text-sm font-medium text-gray-700">
                     {t("tags_other")}
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {deliveryOrder.tags.map((tag) => (
+                    <TagAssignmentSheet
+                      entityType="delivery_order"
+                      entityId={deliveryOrder.id}
+                      facilityId={facilityId}
+                      currentTags={deliveryOrder.tags ?? []}
+                      onUpdate={() => {
+                        queryClient.invalidateQueries({
+                          queryKey: ["deliveryOrders", deliveryOrderId],
+                        });
+                      }}
+                      trigger={
+                        deliveryOrder.tags && deliveryOrder.tags.length > 0 ? (
+                          <Button variant="outline" size="xs">
+                            <Hash className="size-3" /> {t("tags")}
+                          </Button>
+                        ) : (
+                          <Button variant="outline" size="xs">
+                            <Hash className="size-3" /> {t("add_tags")}
+                          </Button>
+                        )
+                      }
+                    />
+                    {deliveryOrder?.tags?.map((tag) => (
                       <Badge
                         key={tag.id}
                         variant="secondary"
@@ -515,7 +538,7 @@ export function DeliveryOrderShow({
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </CardContent>
         </Card>

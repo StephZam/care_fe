@@ -408,26 +408,28 @@ export default function RequestOrderForm({
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="tags"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t("order_tags")} </FormLabel>
-                        <FormControl>
-                          <TagSelectorPopover
-                            selected={selectedTags}
-                            onChange={(tags) => {
-                              field.onChange(tags.map((tag) => tag.id));
-                            }}
-                            resource={TagResource.REQUEST_ORDER}
-                            facilityId={facilityId}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {!isEditMode && (
+                    <FormField
+                      control={form.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("order_tags")} </FormLabel>
+                          <FormControl>
+                            <TagSelectorPopover
+                              selected={selectedTags}
+                              onChange={(tags) => {
+                                field.onChange(tags.map((tag) => tag.id));
+                              }}
+                              resource={TagResource.REQUEST_ORDER}
+                              facilityId={facilityId}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}

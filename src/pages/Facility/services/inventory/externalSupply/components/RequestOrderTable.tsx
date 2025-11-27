@@ -92,13 +92,8 @@ export default function RequestOrderTable({
                 {t(request.priority)}
               </Badge>
             </TableCell>
-            <TableCell>
+            <TableCell className="sm:w-60 md:w-80">
               <div className="flex flex-wrap gap-1">
-                {request.tags.map((tag) => (
-                  <Badge key={tag.id} variant="secondary" className="text-xs">
-                    {tag.display}
-                  </Badge>
-                ))}
                 <TagAssignmentSheet
                   entityType="request_order"
                   entityId={request.id}
@@ -106,12 +101,7 @@ export default function RequestOrderTable({
                   currentTags={request.tags ?? []}
                   onUpdate={() => {
                     queryClient.invalidateQueries({
-                      queryKey: [
-                        "requestOrders",
-                        locationId,
-                        internal,
-                        isRequester,
-                      ],
+                      queryKey: ["requestOrders", locationId, internal],
                     });
                   }}
                   trigger={
@@ -126,6 +116,11 @@ export default function RequestOrderTable({
                     )
                   }
                 />
+                {request.tags.map((tag) => (
+                  <Badge key={tag.id} variant="secondary" className="text-xs">
+                    {tag.display}
+                  </Badge>
+                ))}
               </div>
             </TableCell>
             <TableCell>

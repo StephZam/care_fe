@@ -500,11 +500,6 @@ export function RequestOrderShow({
                   {t("tags_other")}
                 </label>
                 <div className="flex flex-wrap gap-1">
-                  {requestOrder.tags.map((tag) => (
-                    <Badge key={tag.id} variant="secondary" className="text-xs">
-                      {tag.display}
-                    </Badge>
-                  ))}
                   <TagAssignmentSheet
                     entityType="request_order"
                     entityId={requestOrder.id}
@@ -532,6 +527,11 @@ export function RequestOrderShow({
                       )
                     }
                   />
+                  {requestOrder.tags.map((tag) => (
+                    <Badge key={tag.id} variant="secondary" className="text-xs">
+                      {tag.display}
+                    </Badge>
+                  ))}
                 </div>
               </div>
 

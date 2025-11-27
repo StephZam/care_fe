@@ -5139,6 +5139,7 @@
   "tag_name": "Tag Name",
   "tag_slug": "Tag Slug",
   "tag_updated_successfully": "Tag updated successfully",
+  "tags": "tags",
   "tags_one": "Tag",
   "tags_other": "Tags",
   "tags_removed_successfully": "Tags removed successfully",

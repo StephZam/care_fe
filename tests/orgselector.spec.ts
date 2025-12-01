@@ -38,11 +38,12 @@ test.describe("Organization Selector Management", () => {
   });
 
   test("add and remove organization in encounter", async ({ page }) => {
-    // Click on Details tab and wait for content to load
     await page.getByRole("tab", { name: "Details" }).click();
 
-    // Click the manage departments button within the Details tab panel
+    // Click the manage departments button
     await page.getByTestId("manage-departments-button").last().click();
+
+    // Remove an organization
     await page.getByRole("button").filter({ hasText: /^$/ }).click();
     await page.getByRole("button").click();
 
@@ -51,6 +52,7 @@ test.describe("Organization Selector Management", () => {
       "Organization removed successfully",
     );
 
+    // Add an organization
     await page.getByRole("combobox").click();
     await page.getByRole("option").first().click();
     await page.getByRole("button", { name: "Save Changes" }).click();

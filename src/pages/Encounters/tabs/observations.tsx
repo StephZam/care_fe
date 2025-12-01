@@ -174,13 +174,13 @@ export const EncounterObservationsTab = () => {
                         {item.main_code.display || item.main_code.code}
                       </div>
                       {item.data_entered_by && (
-                          <div className="text-gray-600 text-sm">
-                            {t("filed_by")}{" "}
-                            <span className="font-medium text-gray-800">
-                              {formatName(item.data_entered_by)}
-                            </span>
-                          </div>
-                        )}
+                        <div className="text-gray-600 text-sm">
+                          {t("filed_by")}{" "}
+                          <span className="font-medium text-gray-800">
+                            {formatName(item.data_entered_by)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </Card>
                 </div>

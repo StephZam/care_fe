@@ -54,6 +54,7 @@ export const PERMISSION_MANAGE_ORGANIZATION = "can_manage_organization";
 export const PERMISSION_MANAGE_ORGANIZATION_USERS =
   "can_manage_organization_users";
 export const PERMISSION_LIST_ORGANIZATION_USERS = "can_list_organization_users";
+export const PERMISSION_GEO_ADMIN = "is_geo_admin";
 
 // Questionnaire Permissions
 export const PERMISSION_WRITE_QUESTIONNAIRE = "can_write_questionnaire";
@@ -88,6 +89,15 @@ export const PERMISSION_WRITE_TOKEN_CATEGORY = "can_write_token_category";
 export const PERMISSION_LIST_TOKEN_CATEGORIES = "can_list_token_category";
 export const PERMISSION_WRITE_TOKEN = "can_write_token";
 export const PERMISSION_LIST_TOKENS = "can_list_token";
+
+// Healthcare Permissions
+export const PERMISSION_WRITE_HEALTHCARE_SERVICE =
+  "can_write_healthcare_service";
+export const PERMISSION_READ_HEALTHCARE_SERVICE = "can_read_healthcare_service";
+
+// Resource Category Permissions
+export const PERMISSION_WRITE_RESOURCE_CATEGORY = "can_write_resource_category";
+export const PERMISSION_READ_RESOURCE_CATEGORY = "can_read_resource_category";
 
 export interface Permissions {
   // Patient Permissions
@@ -163,6 +173,8 @@ export interface Permissions {
   canManageOrganizationUsers: boolean;
   /** Permission slug: "can_list_organization_users" */
   canListOrganizationUsers: boolean;
+  /** Permission slug: "is_geo_admin" */
+  isGeoAdmin: boolean;
 
   // Questionnaire Permissions
   /** Permission slug: "can_write_questionnaire" */
@@ -213,6 +225,16 @@ export interface Permissions {
   canWriteToken: boolean;
   /** Permission slug: "can_list_token" */
   canListTokens: boolean;
+
+  /** Permission slug: "can_write_healthcare_service" */
+  canWriteHealthcareService: boolean;
+  /** Permission slug: "can_read_healthcare_service" */
+  canReadHealthcareService: boolean;
+
+  /** Permission slug: "can_write_resource_category" */
+  canWriteResourceCategory: boolean;
+  /** Permission slug: "can_read_resource_category" */
+  canReadResourceCategory: boolean;
 }
 
 export type HasPermissionFn = (
@@ -330,6 +352,7 @@ export function getPermissions(
       PERMISSION_LIST_ORGANIZATION_USERS,
       permissions,
     ),
+    isGeoAdmin: hasPermission(PERMISSION_GEO_ADMIN, permissions),
 
     // Questionnaire
     canWriteQuestionnaire: hasPermission(
@@ -389,5 +412,25 @@ export function getPermissions(
     ),
     canWriteToken: hasPermission(PERMISSION_WRITE_TOKEN, permissions),
     canListTokens: hasPermission(PERMISSION_LIST_TOKENS, permissions),
+
+    //Healthcare Services
+    canWriteHealthcareService: hasPermission(
+      PERMISSION_WRITE_HEALTHCARE_SERVICE,
+      permissions,
+    ),
+    canReadHealthcareService: hasPermission(
+      PERMISSION_READ_HEALTHCARE_SERVICE,
+      permissions,
+    ),
+
+    // Resource Category
+    canWriteResourceCategory: hasPermission(
+      PERMISSION_WRITE_RESOURCE_CATEGORY,
+      permissions,
+    ),
+    canReadResourceCategory: hasPermission(
+      PERMISSION_READ_RESOURCE_CATEGORY,
+      permissions,
+    ),
   };
 }

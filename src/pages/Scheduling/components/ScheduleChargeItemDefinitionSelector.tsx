@@ -78,7 +78,7 @@ export default function ScheduleChargeItemDefinitionSelector({
     if (reVisitDays === 0) {
       form.setValue("re_visit_charge_item_definition", null);
     }
-  }, [reVisitDays, form]);
+  }, [reVisitDays, form.setValue]);
 
   const handleSheetOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -134,17 +134,17 @@ export default function ScheduleChargeItemDefinitionSelector({
                   <FormLabel>{t("consultation charge")}</FormLabel>
                   <FormControl>
                     <div className="mt-2 flex gap-2 flex-col sm:flex-row">
-                    <ChargeItemDefinitionPicker
-                      facilityId={facilityId}
-                      value={field.value}
-                      onValueChange={(def) => {
-                        const selected = Array.isArray(def) ? def[0] : def;
-                        field.onChange(selected);
-                      }}
-                      placeholder={t("select_charge_item_definition")}
-                      className="grow-1"
-                      showCreateButton
-                    />
+                      <ChargeItemDefinitionPicker
+                        facilityId={facilityId}
+                        value={field.value}
+                        onValueChange={(def) => {
+                          const selected = Array.isArray(def) ? def[0] : def;
+                          field.onChange(selected);
+                        }}
+                        placeholder={t("select_charge_item_definition")}
+                        className="grow-1"
+                        showCreateButton
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -191,19 +191,23 @@ export default function ScheduleChargeItemDefinitionSelector({
                   </FormLabel>
                   <FormControl>
                     <div className="mt-2 flex gap-2 flex-col sm:flex-row">
-                    <ChargeItemDefinitionPicker
-                      facilityId={facilityId}
-                      value={reVisitDays === 0 ? undefined : (field.value ?? undefined)}
-                      onValueChange={(def) => {
-                        if (reVisitDays === 0) return;
-                        const selected = Array.isArray(def) ? def[0] : def;
-                        field.onChange(selected ?? null);
-                      }}
-                      placeholder={t("select_charge_item_definition")}
-                      className="flex-1"
-                      showCreateButton
-                      disabled={reVisitDays === 0}
-                    />
+                      <ChargeItemDefinitionPicker
+                        facilityId={facilityId}
+                        value={
+                          reVisitDays === 0
+                            ? undefined
+                            : (field.value ?? undefined)
+                        }
+                        onValueChange={(def) => {
+                          if (reVisitDays === 0) return;
+                          const selected = Array.isArray(def) ? def[0] : def;
+                          field.onChange(selected ?? null);
+                        }}
+                        placeholder={t("select_charge_item_definition")}
+                        className="grow-1"
+                        showCreateButton
+                        disabled={reVisitDays === 0}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -214,6 +218,7 @@ export default function ScheduleChargeItemDefinitionSelector({
             <div className="flex justify-end gap-4 border-t pt-4 sticky bottom-0 bg-white">
               <Button
                 variant="outline"
+                type="button"
                 onClick={() => setIsOpen(false)}
                 className="w-full sm:w-auto"
               >

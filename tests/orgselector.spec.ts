@@ -1,103 +1,61 @@
 import { expect, test } from "@playwright/test";
+import { format, subDays } from "date-fns";
+import { getFacilityId } from "tests/support/facilityId";
 
-// Use authenticated session
 test.use({ storageState: "tests/.auth/user.json" });
 
 test.describe("Organization Selector Management", () => {
   test.beforeEach(async ({ page }) => {
-    // Go to the app
-    await page.goto("/");
-    // Navigate to Facility with Patients → Encounters
-    await page.locator('[data-slot="card-content"]').first().click();
+    const facilityId = getFacilityId();
+    const createdDateAfter = format(subDays(new Date(), 90), "yyyy-MM-dd");
+    const createdDateBefore = format(new Date(), "yyyy-MM-dd");
 
-    await page
-      .getByRole("link", { name: "Encounters Manage encounters" })
-      .click();
-    const dateFilter = page.locator("div").filter({ hasText: /^Date$/ });
-    await dateFilter.click();
-    await dateFilter.scrollIntoViewIfNeeded();
-    await page.getByRole("button", { name: "Last year" }).click();
-    await page.keyboard.press("Escape");
-    await page.getByRole("button", { name: "View Encounter" }).nth(7).click();
-    const editBt = page.locator(
-      '[id="radix-«r2p»-content-details"] > div > .hidden.xl\\:flex > div:nth-child(7) > .flex.justify-between > .inline-flex',
+    // Navigate to encounters page with date filters
+    await page.goto(
+      `/facility/${facilityId}/encounters/patients/all?created_date_after=${createdDateAfter}&created_date_before=${createdDateBefore}`,
     );
 
-    // Find the scroll area that contains the edit button
-    await editBt.scrollIntoViewIfNeeded();
+    // Navigate to patient home
+    await page.getByRole("link", { name: "Patient Home" }).first().click();
 
-    await editBt.click();
-  });
-
-  // --- ADD ORGANIZATION TEST ---
-  test("should add an organization successfully", async ({ page }) => {
-    // Open the organization selector
+    // Create a new encounter
     await page
-      .getByRole("tab", { name: /all organizations|my organizations/i })
+      .getByRole("button", { name: "Create Encounter" })
       .first()
       .click();
 
-    // Select an organization from the dropdown
+    await page
+      .getByRole("button", { name: "Inpatient Patient is admitted" })
+      .click();
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: "Select Department" })
+      .click();
+    await page.getByRole("option").first().click();
+    await page
+      .getByRole("button", { name: "Create Encounter ⇧ + ENTER" })
+      .click();
+  });
+
+  test("add and remove organization in encounter", async ({ page }) => {
+    // Click on Details tab and wait for content to load
+    await page.getByRole("tab", { name: "Details" }).click();
+
+    // Click the manage departments button within the Details tab panel
+    await page.getByTestId("manage-departments-button").last().click();
+    await page.getByRole("button").filter({ hasText: /^$/ }).click();
+    await page.getByRole("button").click();
+
+    await page.getByRole("button").click();
+    await expect(page.locator("ol")).toContainText(
+      "Organization removed successfully",
+    );
+
     await page.getByRole("combobox").click();
-    const options = page.getByRole("option");
-    const count = await options.count();
-
-    const currentOrgsSection = page.locator("section, div").filter({
-      has: page.getByRole("heading", { name: "Current Organizations" }),
-    });
-
-    let selected = false;
-
-    for (let i = 0; i < count; i++) {
-      const option = options.nth(i);
-      const optionName = (await option.textContent())?.trim();
-
-      // Skip empty or invalid options
-      if (!optionName) continue;
-
-      // Check if this org is already listed in current organizations
-      const alreadyInList = await currentOrgsSection
-        .getByText(optionName, { exact: true })
-        .isVisible()
-        .catch(() => false);
-
-      if (!alreadyInList) {
-        await option.click();
-        selected = true;
-        break;
-      }
-    }
-
-    if (selected) {
-      // Save changes
-      await page.getByRole("button", { name: /save changes/i }).click();
-
-      // Verify success toast
-      const toast = page.locator("ol");
-      await expect(toast).toContainText("Organization added successfully");
-    }
-  });
-
-  // --- REMOVE ORGANIZATION TEST ---
-  test("should remove an organization successfully", async ({ page }) => {
-    // Open the organization selector
-    await page
-      .getByRole("tab", { name: /all organizations|my organizations/i })
-      .first()
-      .click();
-
-    const currentOrgsSection = page.locator("section, div").filter({
-      has: page.getByRole("heading", { name: "Current Organizations" }),
-    });
-
-    const remove = currentOrgsSection.locator('button[role="button"]').first();
-    if ((await remove.count()) > 0 && (await remove.isVisible())) {
-      await remove.click();
-      await page.getByRole("button").click();
-
-      // Remove the first selected organization
-      const toast = page.locator("ol");
-      await expect(toast).toContainText("Organization removed successfully");
-    }
+    await page.getByRole("option").first().click();
+    await page.getByRole("button", { name: "Save Changes" }).click();
+    await expect(page.locator("ol")).toContainText(
+      "Organization added successfully",
+    );
   });
 });

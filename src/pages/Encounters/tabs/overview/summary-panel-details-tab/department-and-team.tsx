@@ -25,7 +25,12 @@ export const DepartmentsAndTeams = () => {
       <div className="flex justify-between items-center pl-2 text-gray-950">
         <span className=" font-semibold">{t("departments_and_teams")}</span>
         {canEdit && (
-          <Button variant="ghost" size="sm" onClick={manageDepartments}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={manageDepartments}
+            data-testid="manage-departments-button"
+          >
             <SquarePen className="cursor-pointer" strokeWidth={1.5} />
           </Button>
         )}

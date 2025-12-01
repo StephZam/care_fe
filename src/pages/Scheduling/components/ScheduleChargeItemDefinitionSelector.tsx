@@ -131,7 +131,7 @@ export default function ScheduleChargeItemDefinitionSelector({
               name="charge_item_definition"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("consultation charge")}</FormLabel>
+                  <FormLabel>{t("consultation_charge")}</FormLabel>
                   <FormControl>
                     <div className="mt-2 flex gap-2 flex-col sm:flex-row">
                       <ChargeItemDefinitionPicker

@@ -187,7 +187,7 @@ export default function FacilityOrganizationView({
 }: Props) {
   const { t } = useTranslation();
   const { qParams, Pagination, resultsPerPage, updateQuery } = useFilters({
-    limit: 9,
+    limit: 14,
     disableCache: true,
   });
 

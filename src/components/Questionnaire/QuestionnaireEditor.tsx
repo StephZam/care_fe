@@ -114,6 +114,7 @@ import { scrollToQuestion } from "./utils";
 
 interface QuestionnaireEditorProps {
   id?: string;
+  slug?: string;
 }
 interface Organization {
   id: string;
@@ -244,7 +245,10 @@ function findFirstErrorPath(errors: any, path: number[] = []): number[] | null {
   return null;
 }
 
-export default function QuestionnaireEditor({ id }: QuestionnaireEditorProps) {
+export default function QuestionnaireEditor({
+  id,
+  slug,
+}: QuestionnaireEditorProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
@@ -321,11 +325,11 @@ export default function QuestionnaireEditor({ id }: QuestionnaireEditorProps) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["questionnaireDetail", id],
+    queryKey: ["questionnaireDetail", slug],
     queryFn: query(questionnaireApi.detail, {
-      pathParams: { id: id! },
+      pathParams: { slug: slug! },
     }),
-    enabled: !!id,
+    enabled: !!slug,
   });
 
   const { data: organizations } = useQuery({
@@ -381,7 +385,9 @@ export default function QuestionnaireEditor({ id }: QuestionnaireEditorProps) {
     }),
     onSuccess: (data: QuestionnaireDetail) => {
       toast.success(t("questionnaire_created_successfully"));
-      queryClient.invalidateQueries({ queryKey: ["questionnaireDetail", id] });
+      queryClient.invalidateQueries({
+        queryKey: ["questionnaireDetail", data.slug],
+      });
       navigate(`/admin/questionnaire/${data.slug}/edit`);
     },
     onError: (error) =>
@@ -396,7 +402,9 @@ export default function QuestionnaireEditor({ id }: QuestionnaireEditorProps) {
     onSuccess: (data: QuestionnaireDetail) => {
       toast.success(t("questionnaire_updated_successfully"));
       navigate(`/admin/questionnaire/${data.slug}/edit`);
-      queryClient.invalidateQueries({ queryKey: ["questionnaireDetail", id] });
+      queryClient.invalidateQueries({
+        queryKey: ["questionnaireDetail", data.slug],
+      });
     },
     onError: (error) =>
       handleOnErrors(error, t("failed_to_update_questionnaire")),
@@ -456,7 +464,7 @@ export default function QuestionnaireEditor({ id }: QuestionnaireEditorProps) {
 
   const [questionnaire, setQuestionnaire] =
     useState<QuestionnaireDetail | null>(() => {
-      if (!id) {
+      if (!slug) {
         return {
           id: "",
           title: "",

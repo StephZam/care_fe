@@ -387,7 +387,7 @@ export function QuestionnaireForm({
   } = useQuery({
     queryKey: ["questionnaireDetail", questionnaireSlug],
     queryFn: query(questionnaireApi.detail, {
-      pathParams: { id: questionnaireSlug ?? "" },
+      pathParams: { slug: questionnaireSlug ?? "" },
     }),
     enabled: !!questionnaireSlug && !FIXED_QUESTIONNAIRES[questionnaireSlug],
   });

@@ -928,16 +928,11 @@ export default function QuestionnaireEditor({
             variant="outline"
             onClick={handleCancel}
             disabled={isCreating || isUpdating}
-            data-cy="cancel-questionnaire-form"
           >
             {t("cancel")}
           </Button>
           {id && (
-            <Button
-              variant="outline"
-              onClick={handleDownload}
-              data-cy="download-questionnaire-form"
-            >
+            <Button variant="outline" onClick={handleDownload}>
               <CareIcon icon="l-import" className="mr-1 size-4" />
               {t("download")}
             </Button>
@@ -966,7 +961,6 @@ export default function QuestionnaireEditor({
             type="submit"
             onClick={handleSave}
             disabled={!isDirty || isCreating || isUpdating}
-            data-cy="save-questionnaire-form"
           >
             <CareIcon icon="l-save" className="mr-2 size-4" />
             {id ? t("save") : t("create")}
@@ -1364,7 +1358,6 @@ export default function QuestionnaireEditor({
                 patientId="preview"
                 subjectType={form.watch("subject_type")}
                 encounterId="preview"
-                facilityId="preview"
               />
             </CardContent>
           </Card>

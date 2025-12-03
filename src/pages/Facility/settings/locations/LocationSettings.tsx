@@ -65,11 +65,12 @@ export default function LocationSettings({
       queryParams: {
         mode: "kind",
         parent: "",
+        limit: 100,
       },
     }),
   });
 
-  const ITEMS_PER_PAGE = 9;
+  const ITEMS_PER_PAGE = 14;
 
   const {
     page: currentPage,
@@ -171,7 +172,7 @@ export default function LocationSettings({
         <div className="flex">
           {activeTab !== "map" && (
             <div className="w-64 shadow-lg bg-white rounded-lg hidden md:block flex-shrink-0">
-              <ScrollArea className="h-[calc(100vh-14rem)]">
+              <ScrollArea className="h-[calc(100vh-8rem)]">
                 <div className="p-4">
                   {parentLocations?.results?.length ? (
                     parentLocations.results.map((location) => (

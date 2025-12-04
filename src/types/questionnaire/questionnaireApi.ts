@@ -26,7 +26,7 @@ export default {
   },
 
   update: {
-    path: "/api/v1/questionnaire/{id}/",
+    path: "/api/v1/questionnaire/{slug}/",
     method: HttpMethod.PUT,
     TRes: Type<QuestionnaireDetail>(),
     TBody: Type<QuestionnaireDetail>(),
@@ -63,12 +63,12 @@ export default {
     }>(),
   },
   getOrganizations: {
-    path: "/api/v1/questionnaire/{id}/get_organizations/",
+    path: "/api/v1/questionnaire/{slug}/get_organizations/",
     method: HttpMethod.GET,
     TRes: Type<PaginatedResponse<Organization>>(),
   },
   setOrganizations: {
-    path: "/api/v1/questionnaire/{id}/set_organizations/",
+    path: "/api/v1/questionnaire/{slug}/set_organizations/",
     method: HttpMethod.POST,
     TRes: Type<PaginatedResponse<Organization>>(),
     TBody: {} as { organizations: string[] },
@@ -102,4 +102,4 @@ export default {
       TBody: Type<QuestionnaireTagModel>(),
     },
   },
-};
+} as const;

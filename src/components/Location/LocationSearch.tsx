@@ -63,7 +63,7 @@ export function LocationSearch({
     enabled: facilityId !== "preview",
   });
   const commandContent = (
-    <Command className="pt-1">
+    <Command className="pt-1" shouldFilter={false}>
       <CommandInput
         placeholder="Search locations..."
         value={search}

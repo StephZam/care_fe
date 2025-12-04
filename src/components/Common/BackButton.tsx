@@ -9,7 +9,11 @@ type BackButtonProps = {
 } & React.ComponentProps<typeof Button>;
 
 export default function BackButton({ to, ...props }: BackButtonProps) {
-  const { goBack } = useAppHistory();
+  const { goBack, history } = useAppHistory();
+
+  if (history.length <= 1) {
+    return null;
+  }
 
   return (
     <Button

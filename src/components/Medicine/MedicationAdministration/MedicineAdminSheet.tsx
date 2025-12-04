@@ -75,7 +75,7 @@ const MedicineListItem = ({
           <Checkbox
             checked={isSelected}
             onCheckedChange={onSelect}
-            aria-label="Select for administration"
+            aria-label={t("select_for_administration")}
           />
         </div>
       </div>

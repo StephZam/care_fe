@@ -134,30 +134,28 @@ export function PaymentReconciliationSheet({
   );
   useShortcutSubContext();
 
-  const getDefaultValues = () => ({
-    reconciliation_type: PaymentReconciliationType.payment,
-    status: PaymentReconciliationStatus.active,
-    kind: PaymentReconciliationKind.deposit,
-    issuer_type: PaymentReconciliationIssuerType.patient,
-    outcome: PaymentReconciliationOutcome.complete,
-    method: PaymentReconciliationPaymentMethod.cash,
-    payment_datetime: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
-    amount: String(invoice?.total_gross || "0"),
-    tendered_amount: "0",
-    returned_amount: "0",
-    target_invoice: invoice?.id,
-    reference_number: "",
-    authorization: "",
-    disposition: "",
-    note: "",
-    account: accountId,
-    is_credit_note: isCreditNote,
-    location: selectedLocationObject?.id,
-  });
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues: {
+      reconciliation_type: PaymentReconciliationType.payment,
+      status: PaymentReconciliationStatus.active,
+      kind: PaymentReconciliationKind.deposit,
+      issuer_type: PaymentReconciliationIssuerType.patient,
+      outcome: PaymentReconciliationOutcome.complete,
+      method: PaymentReconciliationPaymentMethod.cash,
+      payment_datetime: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+      amount: String(invoice?.total_gross || "0"),
+      tendered_amount: "0",
+      returned_amount: "0",
+      target_invoice: invoice?.id,
+      reference_number: "",
+      authorization: "",
+      disposition: "",
+      note: "",
+      account: accountId,
+      is_credit_note: isCreditNote,
+      location: selectedLocationObject?.id,
+    },
   });
 
   // Watch for payment method changes
@@ -245,7 +243,7 @@ export function PaymentReconciliationSheet({
 
   useEffect(() => {
     if (open) {
-      form.reset(getDefaultValues());
+      form.reset();
     }
   }, [open]);
 

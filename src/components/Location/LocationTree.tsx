@@ -120,13 +120,7 @@ export function LocationTree({
             className={`size-6 rounded-full ${completed ? "bg-gray-100" : isLatest ? "bg-green-100" : "bg-gray-100"} flex items-center justify-center z-10`}
           >
             <CareIcon
-              icon={
-                completed
-                  ? "l-check"
-                  : isLatest
-                    ? "l-location-point"
-                    : "l-check"
-              }
+              icon={completed || !isLatest ? "l-check" : "l-location-point"}
               className={`size-4 ${completed ? "text-gray-600" : isLatest ? "text-green-600" : "text-gray-600"}`}
             />
           </div>

@@ -57,7 +57,7 @@ import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import BackButton from "@/components/Common/BackButton";
 import { PatientHeader } from "@/components/Patient/PatientHeader";
 import useBreakpoints from "@/hooks/useBreakpoints";
-import useCurrentFacility from "@/src/pages/Facility/utils/useCurrentFacility";
+import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import AccountSheet from "./AccountSheet";
 import BedChargeItemsTable from "./components/BedChargeItemsTable";
 import ChargeItemsTable from "./components/ChargeItemsTable";

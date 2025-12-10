@@ -105,7 +105,7 @@ export function LocationTree({
   isLatest,
   showTimeline = false,
 }: LocationPathProps) {
-  const completed = isLatest && endTime;
+  const isCompleted = !!endTime;
 
   return (
     <div
@@ -117,11 +117,11 @@ export function LocationTree({
             className={`absolute w-px bg-gray-200 h-full ${isLatest ? "top-3" : "-top-3"}`}
           />
           <div
-            className={`size-6 rounded-full ${completed ? "bg-gray-100" : isLatest ? "bg-green-100" : "bg-gray-100"} flex items-center justify-center z-10`}
+            className={`size-6 rounded-full ${isCompleted ? "bg-gray-100" : isLatest ? "bg-green-100" : "bg-gray-100"} flex items-center justify-center z-10`}
           >
             <CareIcon
-              icon={completed || !isLatest ? "l-check" : "l-location-point"}
-              className={`size-4 ${completed ? "text-gray-600" : isLatest ? "text-green-600" : "text-gray-600"}`}
+              icon={isCompleted ? "l-check" : "l-location-point"}
+              className={`size-4 ${isCompleted ? "text-gray-600" : isLatest ? "text-green-600" : "text-gray-600"}`}
             />
           </div>
           {!isLatest && <div className="flex-1 w-px bg-gray-200" />}

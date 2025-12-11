@@ -37,7 +37,10 @@ import {
 } from "@/components/Common/Table";
 import PatientIdentifierFilter from "@/components/Patient/PatientIdentifierFilter";
 
+import { getPermissions } from "@/common/Permissions";
+import { usePermissions } from "@/context/PermissionContext";
 import useFilters from "@/hooks/useFilters";
+import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 
 import {
   ACCOUNT_BILLING_STATUS_COLORS,
@@ -81,6 +84,14 @@ export function AccountList({
     disableCache: true,
     defaultQueryParams: { status: "active" },
   });
+
+  const { facility } = useCurrentFacility();
+  const { hasPermission } = usePermissions();
+
+  const { canCreateAccount, canUpdateAccount } = getPermissions(
+    hasPermission,
+    facility?.permissions ?? [],
+  );
 
   const { created_date_after, created_date_before } = qParams;
 
@@ -201,7 +212,7 @@ export function AccountList({
             </div>
           </div>
           <div className="justify-end flex">
-            {patientId && (
+            {patientId && canCreateAccount && (
               <Button
                 className="w-full sm:w-auto mt-2"
                 onClick={() => setSheetOpen(true)}
@@ -285,18 +296,20 @@ export function AccountList({
                   </TableCell>
                   <TableCell className="whitespace-normal">
                     <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="font-semibold"
-                        onClick={() => {
-                          setEditingAccount(account);
-                          setSheetOpen(true);
-                        }}
-                      >
-                        <EditIcon strokeWidth={1.5} />
-                        <span className="underline">{t("edit")}</span>
-                      </Button>
+                      {canUpdateAccount && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="font-semibold"
+                          onClick={() => {
+                            setEditingAccount(account);
+                            setSheetOpen(true);
+                          }}
+                        >
+                          <EditIcon strokeWidth={1.5} />
+                          <span className="underline">{t("edit")}</span>
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"

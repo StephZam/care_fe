@@ -14,7 +14,10 @@ import {
 } from "@/components/ui/sheet";
 
 import query from "@/Utils/request/query";
+import { getPermissions } from "@/common/Permissions";
+import { usePermissions } from "@/context/PermissionContext";
 import AccountSheet from "@/pages/Facility/billing/account/AccountSheet";
+import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import {
   AccountBillingStatus,
   AccountRead,
@@ -40,6 +43,13 @@ export function AccountSheetButton({
   const [createAccountOpen, setCreateAccountOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<AccountRead | null>(
     null,
+  );
+
+  const { facility } = useCurrentFacility();
+  const { hasPermission } = usePermissions();
+  const { canCreateAccount, canUpdateAccount } = getPermissions(
+    hasPermission,
+    facility?.permissions ?? [],
   );
 
   const {
@@ -109,7 +119,7 @@ export function AccountSheetButton({
                     <ExternalLink className="size-4" />
                     {t("more_details")}
                   </Button>
-                  {canWrite && (
+                  {canWrite && canUpdateAccount && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -135,7 +145,7 @@ export function AccountSheetButton({
                   <p className="text-gray-500 mb-4">
                     {t("no_active_account_found")}
                   </p>
-                  {canWrite && (
+                  {canWrite && canCreateAccount && (
                     <Button
                       onClick={handleCreateAccountClick}
                       variant="outline"

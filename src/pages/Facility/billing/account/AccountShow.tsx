@@ -478,18 +478,20 @@ export function AccountShow({
                 {t("past_accounts")}
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              className="border-gray-400 gap-1"
-              onClick={() => setSheetOpen(true)}
-            >
-              <CareIcon
-                icon="l-edit"
-                className="size-5 stroke-gray-450 stroke-1"
-              />
-              {t("edit")}
-              <ShortcutBadge actionId="edit-account" />
-            </Button>
+            {canUpdateAccount && (
+              <Button
+                variant="outline"
+                className="border-gray-400 gap-1"
+                onClick={() => setSheetOpen(true)}
+              >
+                <CareIcon
+                  icon="l-edit"
+                  className="size-5 stroke-gray-450 stroke-1"
+                />
+                {t("edit")}
+                <ShortcutBadge actionId="edit-account" />
+              </Button>
+            )}
           </div>
         </div>
 

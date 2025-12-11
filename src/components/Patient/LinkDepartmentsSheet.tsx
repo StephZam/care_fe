@@ -6,11 +6,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -18,7 +13,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { MoreVertical } from "lucide-react";
 
 import mutate from "@/Utils/request/mutate";
 import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
@@ -171,16 +165,18 @@ function DeleteOrganizationButton({
 
   return (
     <Button
-      variant="ghost"
-      size="icon"
+      variant="outline"
+      size="sm"
       onClick={() => removeOrganization(organizationId)}
       disabled={isPending}
+      className="text-red-700 border-red-600 hover:text-red-600 hover:border-red-600"
     >
       {isPending ? (
-        <Loader2 className="size-4 animate-spin" />
+        <Loader2 className="size-4 animate-spin mr-1" />
       ) : (
-        <Trash2 className="size-4 text-destructive" />
+        <Trash2 className="size-4 text-red-700" />
       )}
+      <span className="text-sm">{t("delete")}</span>
     </Button>
   );
 }
@@ -304,23 +300,23 @@ export default function LinkDepartmentsSheet({
         {trigger || (
           <Button variant="outline" size="sm">
             <Building className="mr-2 size-4" />
-            {t("manage_organization", {
-              count: entityType === "device" ? 1 : 0,
+            {t("manage_department/team", {
+              count: entityType === "device" ? 1 : 2,
             })}
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="!w-[50vw] !max-w-none min-h-[50vh] overflow-auto">
+      <SheetContent className="w-[25vw] max-w-none! min-h-[50vh] overflow-auto">
         <SheetHeader>
           <SheetTitle>
-            {t("manage_organization", {
-              count: entityType === "device" ? 1 : 0,
+            {t("manage_department/team", {
+              count: entityType === "device" ? 1 : 2,
             })}
           </SheetTitle>
-          <SheetDescription>
-            {t("manage_organization_description", {
+          <SheetDescription className="text-gray-700">
+            {t("manage_department/team_description", {
               entityType,
-              count: entityType === "device" ? 1 : 0,
+              count: entityType === "device" ? 1 : 2,
             })}
           </SheetDescription>
         </SheetHeader>
@@ -332,7 +328,7 @@ export default function LinkDepartmentsSheet({
                 {currentOrganizations.length > 0 ? (
                   <>
                     <h3 className="text-sm font-semibold text-gray-950">
-                      {t("current_organization", {
+                      {t("linked_department", {
                         count: entityType === "device" ? 1 : 0,
                       })}
                     </h3>
@@ -340,11 +336,11 @@ export default function LinkDepartmentsSheet({
                       {currentOrganizations.map((org) => (
                         <div
                           key={org.id}
-                          className="flex items-start sm:items-center justify-between rounded-md border border-gray-200 bg-gray-100 p-2"
+                          className="flex items-start sm:items-center justify-between rounded-md border border-gray-200 bg-gray-50 p-2"
                         >
                           <div className="flex-1 min-w-0">
                             <div
-                              className="flex flex-wrap items-center gap-1 text-sm text-gray-900 break-words"
+                              className="flex flex-wrap items-center gap-1 text-base text-gray-900 break-words"
                               data-cy="link-organisation-name"
                             >
                               {getOrganizationPath(org).map(
@@ -367,48 +363,30 @@ export default function LinkDepartmentsSheet({
                               )}
                             </div>
                           </div>
-                          <div className="flex-shrink-0">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="size-8 sm:size-9 flex-shrink-0"
-                                >
-                                  <MoreVertical className="size-4 flex-shrink-0" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="end"
-                                className="w-auto min-w-0"
-                              >
-                                <div className="w-9">
-                                  <DeleteOrganizationButton
-                                    organizationId={org.id}
-                                    entityType={entityType}
-                                    entityId={entityId}
-                                    facilityId={facilityId}
-                                    onSuccess={onUpdate}
-                                  />
-                                </div>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                          <div className="flex items-center border-red-500">
+                            <DeleteOrganizationButton
+                              organizationId={org.id}
+                              entityType={entityType}
+                              entityId={entityId}
+                              facilityId={facilityId}
+                              onSuccess={onUpdate}
+                            />
                           </div>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <div className="bg-gray-100 p-4 sm:p-6 rounded-md space-y-2 sm:space-y-3 text-center">
+                  <div className="bg-gray-50 p-4 sm:p-6 rounded-md space-y-2 sm:space-y-3 text-center border-t-2 border-x border-gray-200">
                     <Blocks className="size-5 sm:size-6 mx-auto" />
-                    <p className="text-sm sm:text-base text-gray-950">
-                      {t("no_organization_added_yet", {
-                        count: entityType === "device" ? 1 : 0,
+                    <p className="text-sm sm:text-base text-gray-950 font-medium">
+                      {t("no_department_linked_yet", {
+                        count: entityType === "device" ? 1 : 2,
                       })}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-600">
                       {t(
-                        "start_by_adding_organization_from_your_organizations",
+                        "start_by_adding_departments/teams_from_your_organizations",
                       )}
                     </p>
                   </div>
@@ -430,17 +408,26 @@ export default function LinkDepartmentsSheet({
                 singleSelection={entityType === "device"}
               />
 
-              <Button
-                className="flex ml-auto"
-                data-cy="add-organization"
-                onClick={handleAddOrganizations}
-                disabled={!selectedOrgs?.length || isAdding}
-              >
-                {isAdding && <Loader2 className="mr-2 size-4 animate-spin" />}
-                {t("save_changes", {
-                  count: entityType === "device" ? 1 : 0,
-                })}
-              </Button>
+              <div className="flex gap-2 justify-end mt-4">
+                <Button
+                  variant="outline"
+                  data-cy="cancel-organization"
+                  onClick={() => setSelectedOrgs(null)}
+                  disabled={!selectedOrgs?.length}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  data-cy="add-organization"
+                  onClick={handleAddOrganizations}
+                  disabled={!selectedOrgs?.length || isAdding}
+                >
+                  {isAdding && <Loader2 className="mr-2 size-4 animate-spin" />}
+                  {t("save_departments", {
+                    count: entityType === "device" ? 1 : 0,
+                  })}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

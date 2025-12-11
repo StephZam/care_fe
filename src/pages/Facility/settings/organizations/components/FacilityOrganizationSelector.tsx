@@ -2,17 +2,25 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Loader2,
   X,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
 import CareIcon from "@/CAREUI/icons/CareIcon";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -23,23 +31,17 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { MoreVertical } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import useBreakpoints from "@/hooks/useBreakpoints";
 
 import query from "@/Utils/request/query";
-import { FilterTabs } from "@/components/ui/filter-tabs";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
 import facilityOrganizationApi from "@/types/facilityOrganization/facilityOrganizationApi";
 
@@ -156,10 +158,8 @@ export default function FacilityOrganizationSelector(
 
   const handleOrganizationViewChange = (value: string) => {
     setShowAllOrgs(value === "all");
-    setSelectedOrganizations([]);
     setCurrentSelection(null);
     setNavigationLevels([]);
-    onChange(null);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -224,39 +224,51 @@ export default function FacilityOrganizationSelector(
     }
   }, [facilityOrgSearch, navigationLevels]);
 
-  const renderNavigationPath = (linkStyle: boolean = false) => {
+  useEffect(() => {
+    if (props.value === null) {
+      setSelectedOrganizations([]);
+    }
+  }, [props.value]);
+
+  const renderNavigationPath = () => {
     return (
-      <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-        {navigationLevels.map((org, index) => (
-          <div key={org.id} className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setNavigationLevels(navigationLevels.slice(0, index + 1));
-                setFacilityOrgSearch("");
-              }}
-              className={`text-sm font-medium cursor-pointer ${
-                linkStyle && index < navigationLevels.length - 1
-                  ? "text-sky-600 underline underline-offset-4 hover:text-sky-700"
-                  : "text-gray-950 hover:text-sky-600"
-              }`}
-            >
-              {org.name}
-            </button>
-            {index < navigationLevels.length - 1 && (
-              <ArrowRight className="!size-2 sm:!size-3 text-gray-950 flex-shrink-0" />
-            )}
-          </div>
-        ))}
-      </div>
+      <Breadcrumb>
+        <BreadcrumbList className="gap-1 sm:gap-1.5">
+          {navigationLevels.map((org, index) => (
+            <React.Fragment key={org.id}>
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-base text-gray-950">
+                  {org.name}
+                </BreadcrumbPage>
+              </BreadcrumbItem>
+              {index < navigationLevels.length - 1 && (
+                <BreadcrumbSeparator>
+                  <ArrowRight className="size-2 sm:size-3 text-gray-700" />
+                </BreadcrumbSeparator>
+              )}
+            </React.Fragment>
+          ))}
+        </BreadcrumbList>
+      </Breadcrumb>
     );
   };
 
   const renderOrganizationCommand = (className?: string) => {
     return (
       <Command className={className}>
-        <div className="flex items-center px-3 py-2 border-b">
+        <div className="p-1 mb-1">
+          <Tabs
+            value={showAllOrgs ? "all" : "mine"}
+            onValueChange={(value) => handleOrganizationViewChange(value)}
+            className="w-full"
+          >
+            <TabsList className="w-full grid grid-cols-2 text-medium">
+              <TabsTrigger value="mine">{t("my_departments")}</TabsTrigger>
+              <TabsTrigger value="all">{t("all_departments")}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        <div className="flex items-center px-2 py-1 mx-1 mb-1 border border-gray-300 rounded-md">
           <CommandInput
             placeholder={t("search_department")}
             onValueChange={setFacilityOrgSearch}
@@ -301,7 +313,7 @@ export default function FacilityOrganizationSelector(
                         <span>{org.name}</span>
                       </div>
                       {org.has_children ? (
-                        <ChevronRight className="size-4 text-gray-500" />
+                        <ChevronRight className="size-4 text-gray-950" />
                       ) : (
                         <span className="size-1 rounded-full bg-black mr-1"></span>
                       )}
@@ -310,42 +322,139 @@ export default function FacilityOrganizationSelector(
                 })}
             </CommandGroup>
           </CommandList>
+          {currentSelection && (
+            <div className="m-1 px-2 py-1 bg-gray-50 border border-indigo-300 rounded-md mb-1">
+              <>
+                {isDisabled ? (
+                  <div className="flex flex-col gap-2 py-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-1 flex-1">
+                        <span className="text-sm text-gray-700 font-regular">
+                          {t("selected")}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {currentSelection.name}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        onClick={() => {
+                          setCurrentSelection(null);
+                          setNavigationLevels([]);
+                        }}
+                        className="text-xs text-gray-950 hover:text-gray-900 underline flex items-center gap-1 self-center"
+                      >
+                        <X className="size-4" />
+                        <span>{t("clear")}</span>
+                      </Button>
+                    </div>
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 text-xs font-medium rounded-md border whitespace-nowrap w-fit",
+                        selectedOrganizations.some(
+                          (org) => org.id === currentSelection.id,
+                        )
+                          ? "bg-indigo-100 text-indigo-900 border-indigo-300"
+                          : "bg-orange-100 text-orange-900 border-orange-300",
+                      )}
+                    >
+                      {selectedOrganizations.some(
+                        (org) => org.id === currentSelection.id,
+                      )
+                        ? t("department_already_selected")
+                        : t("department_already_linked")}
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4 pb-4 border-b border-gray-300">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 mt-1">
+                          <span className="text-sm text-gray-700 font-regular block mb-1">
+                            {t("selected")}
+                          </span>
+                          {navigationLevels.length > 0 && (
+                            <div className="text-sm font-medium text-gray-900">
+                              {renderNavigationPath()}
+                            </div>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          onClick={() => {
+                            setCurrentSelection(null);
+                            setNavigationLevels([]);
+                          }}
+                          className="text-xs text-gray-950 hover:text-gray-900 underline self-center flex items-center gap-1"
+                        >
+                          <X className="size-4" />
+                          <span>{t("clear")}</span>
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 p-2 mb-2">
+                      {navigationLevels.length > 1 ? (
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="gap-1 text-base font-regular flex items-center"
+                          onClick={() => {
+                            setNavigationLevels(navigationLevels.slice(0, -1));
+                            setCurrentSelection(
+                              navigationLevels.length > 1
+                                ? navigationLevels[navigationLevels.length - 2]
+                                : null,
+                            );
+                          }}
+                        >
+                          <ChevronLeft className="size-4" />
+                          <span>{t("back")}</span>
+                        </Button>
+                      ) : (
+                        <div />
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="lg"
+                          className="underline hover:bg-transparent text-base text-gray-950"
+                          onClick={() => {
+                            setCurrentSelection(null);
+                            setNavigationLevels([]);
+                            setOpen(false);
+                          }}
+                        >
+                          <span>{t("close")}</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          className="gap-2 border-primary-600 text-primary-700 bg-primary-50 hover:text-primary-600"
+                          onClick={() =>
+                            currentSelection &&
+                            handleConfirmSelection(currentSelection)
+                          }
+                          disabled={!currentSelection || isDisabled}
+                          data-cy="confirm-organization"
+                        >
+                          <CareIcon
+                            icon="l-check"
+                            className="text-gray-950 size-5!"
+                          />
+                          <span>{t("confirm")}</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            </div>
+          )}
         </div>
-        {currentSelection && (
-          <div className="md:m-0 m-4 flex items-center justify-between px-4 py-2  bg-indigo-50 border-sky-200 rounded-md">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-700 mb-0.5">
-                {t("selected")}
-              </span>
-              {navigationLevels.length > 0 && (
-                <div className="items-center py-1">
-                  {renderNavigationPath()}
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-2 underline hover:bg-transparent"
-                onClick={() => setCurrentSelection(null)}
-              >
-                <span>{t("cancel")}</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1 border-primary-600 text-primary-700"
-                onClick={() => handleConfirmSelection(currentSelection)}
-                disabled={isDisabled}
-                data-cy="confirm-organization"
-              >
-                <CareIcon icon="l-check" className="!size-4 text-gray-950" />
-                <span>{t("confirm")}</span>
-              </Button>
-            </div>
-          </div>
-        )}
       </Command>
     );
   };
@@ -359,26 +468,62 @@ export default function FacilityOrganizationSelector(
   }, [currentSelection, currentOrganizations, selectedOrganizations]);
 
   return (
-    <div className="space-y-4">
-      <FilterTabs
-        value={showAllOrgs ? t("all_organizations") : t("my_organizations")}
-        onValueChange={(value: string) => {
-          handleOrganizationViewChange(
-            value === t("all_organizations") ? "all" : "mine",
-          );
-        }}
-        options={[t("my_organizations"), t("all_organizations")]}
-        variant="underline"
-        showAllOption={false}
-        className="w-auto overflow-x-auto"
-      />
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-2">
+    <div className="space-y-2">
+      {selectedOrganizations.length > 0 && (
+        <>
+          <span className="font-semibold text-sm text-gray-950 mt-3">
+            {t("selected_department")}
+          </span>
+          {selectedOrganizations.map((org, index) => (
+            <div
+              key={index}
+              className="relative flex justify-between items-center rounded-md border border-sky-300 bg-sky-50 p-2 mt-2"
+            >
+              <div className="flex flex-wrap items-center gap-1 text-base text-gray-900 ml-1 flex-1">
+                {org.fullPath && org.fullPath.length > 0 ? (
+                  org.fullPath.map((name, idx) => (
+                    <span key={idx} className="flex items-center">
+                      <span
+                        className={
+                          idx === org.fullPath.length - 1
+                            ? "font-semibold"
+                            : "text-gray-950"
+                        }
+                      >
+                        {name}
+                      </span>
+                      {idx < org.fullPath.length - 1 && (
+                        <ArrowRight className="mx-1 size-3 sm:size-3 text-gray-950 shrink-0" />
+                      )}
+                    </span>
+                  ))
+                ) : (
+                  <span className="font-medium text-sm text-gray-900">
+                    {org.name}
+                  </span>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-950 hover:text-gray-900 text-xs sm:text-sm -mr-2"
+                onClick={() => handleRemoveOrganization(index)}
+              >
+                <X className="size-5" />
+              </Button>
+            </div>
+          ))}
+        </>
+      )}
+      <div className="mt-6">
+        {selectedOrganizations.length > 0 ? (
+          <Label>{t("select_another_department")}</Label>
+        ) : (
           <Label>{t("select_department")}</Label>
-        </div>
+        )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 mt-3">
         <div className="space-y-3">
           <div className="flex flex-col gap-4">
             {(!singleSelection ||
@@ -414,17 +559,19 @@ export default function FacilityOrganizationSelector(
                       variant="outline"
                       role="combobox"
                       aria-expanded={open}
-                      className="w-full justify-between border-gray-300"
+                      className="w-full justify-between border-gray-300 p-5"
                       data-cy="facility-organization"
                     >
-                      {open || navigationLevels.length > 0 ? (
+                      {navigationLevels.length > 0 ? (
                         <div className="items-center py-1">
-                          {renderNavigationPath(true)}
+                          {renderNavigationPath()}
                         </div>
                       ) : (
-                        <span>{t("select_department")}</span>
+                        <span className="text-base">
+                          {t("select_department")}
+                        </span>
                       )}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      <ChevronDown className="ml-2 size-4 text-gray-950 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
@@ -436,71 +583,6 @@ export default function FacilityOrganizationSelector(
                   </PopoverContent>
                 </Popover>
               ))}
-            {selectedOrganizations.length > 0 && (
-              <>
-                <span className="font-semibold text-sm text-gray-950 mt-3">
-                  {t("newly_added_organizations")}
-                </span>
-                {selectedOrganizations.map((org, index) => (
-                  <div
-                    key={index}
-                    className="relative flex justify-between rounded-md border border-sky-300 bg-sky-50/100 p-2"
-                  >
-                    <div className="flex flex-wrap items-center gap-1 text-sm text-gray-900 ml-1">
-                      {org.fullPath && org.fullPath.length > 0 ? (
-                        org.fullPath.map((name, idx) => (
-                          <span key={idx} className="flex items-center">
-                            <span
-                              className={
-                                idx === org.fullPath.length - 1
-                                  ? "font-semibold"
-                                  : "text-gray-950"
-                              }
-                            >
-                              {name}
-                            </span>
-                            {idx < org.fullPath.length - 1 && (
-                              <ArrowRight className="mx-1 size-3 sm:size-3 text-gray-500 flex-shrink-0" />
-                            )}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="font-medium text-sm text-gray-900">
-                          {org.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-start flex-shrink-0 pr-1">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8 sm:size-9 flex-shrink-0 hover:bg-transparent"
-                          >
-                            <MoreVertical className="size-3 sm:size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-auto min-w-0"
-                        >
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 w-full justify-start text-xs sm:text-sm"
-                            onClick={() => handleRemoveOrganization(index)}
-                          >
-                            <X className="size-4" />
-                            <span>{t("remove")}</span>
-                          </Button>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
           </div>
         </div>
       </div>

@@ -1090,7 +1090,6 @@ export function InvoiceShow({
       </div>
 
       <PaymentReconciliationSheet
-        key={isPaymentSheetOpen ? "open" : "closed"}
         open={isPaymentSheetOpen}
         onOpenChange={setIsPaymentSheetOpen}
         facilityId={facilityId}

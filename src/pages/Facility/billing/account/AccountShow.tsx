@@ -579,7 +579,6 @@ export function AccountShow({
       />
 
       <PaymentReconciliationSheet
-        key={`${paymentSheet.isOpen}`}
         open={paymentSheet.isOpen}
         onOpenChange={(isOpen) => setPaymentSheet({ ...paymentSheet, isOpen })}
         facilityId={facilityId}

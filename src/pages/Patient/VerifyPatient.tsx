@@ -16,6 +16,7 @@ import CreateEncounterForm from "@/components/Encounter/CreateEncounterForm";
 import CreateTokenForm from "@/components/Tokens/CreateTokenForm";
 import PatientTokensList from "@/components/Tokens/PatientTokensList";
 import BookAppointmentSheet from "@/pages/Appointments/BookAppointment/BookAppointmentSheet";
+import { PLUGIN_Component } from "@/PluginEngine";
 import PatientHomeTabs from "./home/PatientHomeTabs";
 
 import useAppHistory from "@/hooks/useAppHistory";
@@ -166,6 +167,15 @@ export default function VerifyPatient() {
                   facility={facility}
                 />
               )}
+
+              <div className="space-y-1 text-left text-lg font-semibold text-secondary-900">
+                <PLUGIN_Component
+                  __name="PatientHomeActions"
+                  patient={patientData}
+                  facilityId={facilityId}
+                  className="w-full bg-white font-semibold text-green-800 hover:bg-secondary-200"
+                />
+              </div>
             </div>
           </div>
         </div>

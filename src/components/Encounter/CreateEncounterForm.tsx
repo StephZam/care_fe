@@ -22,6 +22,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -161,7 +163,7 @@ export default function CreateEncounterForm({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="overflow-y-auto">
+      <SheetContent className="overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{t("initiate_encounter")}</SheetTitle>
           <SheetDescription>
@@ -180,6 +182,28 @@ export default function CreateEncounterForm({
             className="mt-4 space-y-2"
           >
             <div className="space-y-5">
+              <div className="p-2 border rounded-md border-gray-200 bg-gray-100">
+                <FormField
+                  control={form.control}
+                  name="organizations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FacilityOrganizationSelector
+                        facilityId={facilityId}
+                        value={field.value}
+                        onChange={(value) => {
+                          if (value === null) {
+                            form.setValue("organizations", []);
+                          } else {
+                            form.setValue("organizations", value);
+                          }
+                        }}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
                 name="start_date"
@@ -187,7 +211,9 @@ export default function CreateEncounterForm({
                   const date = field.value ? new Date(field.value) : new Date();
                   return (
                     <FormItem>
-                      <FormLabel>{t("date_and_time")}</FormLabel>
+                      <FormLabel className="text-gray-950">
+                        {t("date_and_time")}
+                      </FormLabel>
                       <div className="flex gap-2">
                         <DatePicker
                           date={date}
@@ -198,11 +224,11 @@ export default function CreateEncounterForm({
                             updatedDate.setMinutes(date.getMinutes());
                             field.onChange(updatedDate.toISOString());
                           }}
-                          className="h-9"
+                          className="h-9 flex-1"
                         />
                         <Input
                           type="time"
-                          className="border-gray-400 text-sm sm:py-px shadow-sm"
+                          className="w-32 border-gray-400 text-sm sm:py-px shadow-sm"
                           value={date.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -230,35 +256,50 @@ export default function CreateEncounterForm({
                 name="encounter_class"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("type_of_encounter")}</FormLabel>
-                    <div className="grid grid-cols-2 gap-3">
-                      {careConfig.encounterClasses.map((value) => {
-                        const Icon = ENCOUNTER_CLASS_ICONS[value];
-                        return (
-                          <Button
-                            key={value}
-                            type="button"
-                            className={cn(
-                              "h-auto min-h-24 w-full justify-center text-lg",
-                              field.value === value &&
-                                "ring-2 ring-primary text-primary",
-                            )}
-                            variant="outline"
-                            onClick={() => field.onChange(value)}
-                          >
-                            <div className="flex flex-col items-center text-center">
-                              <Icon className="size-6" />
-                              <div className="text-sm font-bold">
-                                {t(`encounter_class__${value}`)}
-                              </div>
-                              <div className="whitespace-normal break-words text-center text-xs text-gray-500">
-                                {t(`encounter_class_description__${value}`)}
-                              </div>
+                    <FormLabel className="text-gray-950">
+                      {t("type_of_encounter")}
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="grid grid-cols-2 gap-3"
+                      >
+                        {careConfig.encounterClasses.map((value) => {
+                          const Icon = ENCOUNTER_CLASS_ICONS[value];
+                          return (
+                            <div key={value} className="relative">
+                              <RadioGroupItem
+                                value={value}
+                                id={`encounter-class-${value}`}
+                                className="absolute left-2 top-2"
+                              />
+                              <Label
+                                htmlFor={`encounter-class-${value}`}
+                                className={cn(
+                                  "flex h-30 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white p-4 pt-6 text-lg",
+                                  field.value === value &&
+                                    "ring-2 ring-primary-500 text-primary-900 bg-primary-100",
+                                )}
+                              >
+                                <Icon className="size-6" />
+                                <div className="text-base font-semibold">
+                                  {t(`encounter_class__${value}`)}
+                                </div>
+                                <div
+                                  className={cn(
+                                    "whitespace-normal break-words text-center text-base text-gray-600",
+                                    field.value === value && "text-primary-700",
+                                  )}
+                                >
+                                  {t(`encounter_class_description__${value}`)}
+                                </div>
+                              </Label>
                             </div>
-                          </Button>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -268,28 +309,43 @@ export default function CreateEncounterForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("status")}</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger ref={field.ref}>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value={EncounterStatus.IN_PROGRESS}>
-                          {t("in_progress")}
-                        </SelectItem>
-                        <SelectItem value={EncounterStatus.PLANNED}>
-                          {t("planned")}
-                        </SelectItem>
-                        <SelectItem value={EncounterStatus.ON_HOLD}>
-                          {t("on_hold")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel className="text-gray-950">
+                      {t("status")}
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex gap-2"
+                      >
+                        {[
+                          { value: EncounterStatus.PLANNED, label: "planned" },
+                          {
+                            value: EncounterStatus.IN_PROGRESS,
+                            label: "in_progress",
+                          },
+                          { value: EncounterStatus.ON_HOLD, label: "on_hold" },
+                        ].map(({ value, label }) => (
+                          <div key={value} className="relative">
+                            <RadioGroupItem
+                              value={value}
+                              id={`status-${value}`}
+                              className="absolute left-2 top-1/2 -translate-y-1/2"
+                            />
+                            <Label
+                              htmlFor={`status-${value}`}
+                              className={cn(
+                                "flex h-9 cursor-pointer items-center rounded-md border-2 border-gray-300 bg-white py-2 pl-8 pr-3 text-sm text-gray-950",
+                                field.value === value &&
+                                  "border-primary-500 bg-primary-100",
+                              )}
+                            >
+                              {t(label)}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -300,7 +356,7 @@ export default function CreateEncounterForm({
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                    <FormLabel className="text-gray-950">Priority</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -327,7 +383,9 @@ export default function CreateEncounterForm({
                 name="tags"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("tags", { count: 2 })}</FormLabel>
+                    <FormLabel className="text-gray-950">
+                      {t("tags", { count: 2 })}
+                    </FormLabel>
                     <FormControl className="mt-0">
                       <TagSelectorPopover
                         selected={selectedTags}
@@ -337,26 +395,6 @@ export default function CreateEncounterForm({
                         resource={TagResource.ENCOUNTER}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="organizations"
-                render={({ field }) => (
-                  <FormItem>
-                    <FacilityOrganizationSelector
-                      facilityId={facilityId}
-                      value={field.value}
-                      onChange={(value) => {
-                        if (value === null) {
-                          form.setValue("organizations", []);
-                        } else {
-                          form.setValue("organizations", value);
-                        }
-                      }}
-                    />
                     <FormMessage />
                   </FormItem>
                 )}

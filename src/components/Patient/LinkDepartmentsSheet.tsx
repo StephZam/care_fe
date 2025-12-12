@@ -306,7 +306,7 @@ export default function LinkDepartmentsSheet({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-[25vw] max-w-none! min-h-[50vh] overflow-auto">
+      <SheetContent className="w-full md:w-[50vw] lg:w-[25vw] sm:max-w-none! min-h-[50vh] overflow-auto">
         <SheetHeader>
           <SheetTitle>
             {t("manage_department/team", {

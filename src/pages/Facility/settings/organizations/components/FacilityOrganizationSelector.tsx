@@ -515,9 +515,9 @@ export default function FacilityOrganizationSelector(
           ))}
         </>
       )}
-      <div className="mt-6">
+      <div className="mt-1">
         {selectedOrganizations.length > 0 ? (
-          <Label>{t("select_another_department")}</Label>
+          <Label className="mt-4">{t("select_another_department")}</Label>
         ) : (
           <Label>{t("select_department")}</Label>
         )}

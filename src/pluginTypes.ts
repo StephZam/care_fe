@@ -9,6 +9,7 @@ import { UserReadMinimal } from "@/types/user/user";
 import { LazyExoticComponent } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { QuestionnaireFormState } from "./components/Questionnaire/QuestionnaireForm";
+import { ButtonVariant } from "./components/ui/button";
 import { pluginMap } from "./pluginMap";
 import { AppRoutes } from "./Routers/AppRouter";
 
@@ -68,6 +69,13 @@ export type PatientSearchActionsComponentType = React.FC<{
   className?: string;
 }>;
 
+export type PrintIdCardComponentType = React.FC<{
+  facilityId: string;
+  patient: PatientRead;
+  className?: string;
+  variant?: ButtonVariant;
+}>;
+
 // Define supported plugin components
 export type SupportedPluginComponents = {
   DoctorConnectButtons: DoctorConnectButtonComponentType;
@@ -81,6 +89,7 @@ export type SupportedPluginComponents = {
   PatientDetailsTabDemographyGeneralInfo: PatientDetailsTabDemographyGeneralInfoComponentType;
   InvoiceRecordPaymentOptions: InvoiceRecordPaymentOptionsComponentType;
   PatientSearchActions: PatientSearchActionsComponentType;
+  PrintIDCardButton: PrintIdCardComponentType;
 };
 
 // Create a type for lazy-loaded components

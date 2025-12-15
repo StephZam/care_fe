@@ -25,13 +25,13 @@ test.describe("Organization Selector Management", () => {
       .click();
 
     await page
-      .getByRole("button", { name: "Inpatient Patient is admitted" })
-      .click();
-    await page
       .getByRole("combobox")
       .filter({ hasText: "Select Department" })
       .click();
     await page.getByRole("option").first().click();
+
+    await page.getByRole("radio", { name: "Inpatient Admitted to" }).click();
+
     await page
       .getByRole("button", { name: "Create Encounter ⇧ + ENTER" })
       .click();
@@ -44,18 +44,15 @@ test.describe("Organization Selector Management", () => {
     await page.getByTestId("manage-departments-button").last().click();
 
     // Remove an organization
-    await page.getByRole("button").filter({ hasText: /^$/ }).click();
-    await page.getByRole("button").click();
-
-    await page.getByRole("button").click();
+    await page.getByRole("button", { name: "Delete" }).click();
     await expect(page.locator("ol")).toContainText(
       "Organization removed successfully",
     );
 
     // Add an organization
     await page.getByRole("combobox").click();
-    await page.getByRole("option").first().click();
-    await page.getByRole("button", { name: "Save Changes" }).click();
+    await page.getByRole("option", { name: "Administration" }).click();
+    await page.getByRole("button", { name: "Save Departments" }).click();
     await expect(page.locator("ol")).toContainText(
       "Organization added successfully",
     );

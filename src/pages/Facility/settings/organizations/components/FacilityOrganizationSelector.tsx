@@ -139,7 +139,9 @@ export default function FacilityOrganizationSelector(
           ],
         };
 
-        const newSelection = [...selectedOrganizations, orgWithPath];
+        const newSelection = singleSelection
+          ? [orgWithPath]
+          : [...selectedOrganizations, orgWithPath];
         setSelectedOrganizations(newSelection);
         onChange(newSelection.map((org) => org.id));
       }
@@ -147,7 +149,7 @@ export default function FacilityOrganizationSelector(
       setNavigationLevels([]);
       setOpen(false);
     },
-    [selectedOrganizations, onChange, navigationLevels],
+    [selectedOrganizations, onChange, navigationLevels, singleSelection],
   );
 
   const handleRemoveOrganization = (index: number) => {
@@ -526,63 +528,61 @@ export default function FacilityOrganizationSelector(
       <div className="space-y-3 mt-3">
         <div className="space-y-3">
           <div className="flex flex-col gap-4">
-            {(!singleSelection ||
-              (singleSelection && selectedOrganizations.length < 1)) &&
-              (isMobile ? (
-                <>
-                  <Drawer open={open} onOpenChange={setOpen}>
-                    <DrawerTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className="w-full flex flex-row items-center justify-between border-gray-100 text-left px-2 py-5 gap-1 sm:gap-3"
-                        data-cy="facility-organization"
-                        onClick={() => setOpen(true)}
-                        type="button" // Prevents unintended form submission
-                      >
-                        <span className="flex-1 break-words whitespace-normal text-sm sm:text-base">
-                          {t("select_department")}
-                        </span>
-                        <ChevronDown className="size-4 shrink-0 opacity-50 self-center" />
-                      </Button>
-                    </DrawerTrigger>
-                    <DrawerContent className="min-h-[40vh] sm:min-h-[50vh] max-h-[75vh] sm:max-h-[85vh]">
-                      {renderOrganizationCommand()}
-                    </DrawerContent>
-                  </Drawer>
-                </>
-              ) : (
-                <Popover open={open} onOpenChange={handleOpenChange}>
-                  <PopoverTrigger asChild>
+            {isMobile ? (
+              <>
+                <Drawer open={open} onOpenChange={setOpen}>
+                  <DrawerTrigger asChild>
                     <Button
                       variant="outline"
                       role="combobox"
                       aria-expanded={open}
-                      className="w-full justify-between border-gray-300 p-5"
+                      className="w-full flex flex-row items-center justify-between border-gray-100 text-left px-2 py-5 gap-1 sm:gap-3"
                       data-cy="facility-organization"
+                      onClick={() => setOpen(true)}
+                      type="button" // Prevents unintended form submission
                     >
-                      {navigationLevels.length > 0 ? (
-                        <div className="items-center py-1">
-                          {renderNavigationPath()}
-                        </div>
-                      ) : (
-                        <span className="text-base">
-                          {t("select_department")}
-                        </span>
-                      )}
-                      <ChevronDown className="ml-2 size-4 text-gray-950 shrink-0 opacity-50" />
+                      <span className="flex-1 break-words whitespace-normal text-sm sm:text-base">
+                        {t("select_department")}
+                      </span>
+                      <ChevronDown className="size-4 shrink-0 opacity-50 self-center" />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    sideOffset={4}
-                    className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[80vh] overflow-auto"
-                  >
+                  </DrawerTrigger>
+                  <DrawerContent className="min-h-[40vh] sm:min-h-[50vh] max-h-[75vh] sm:max-h-[85vh]">
                     {renderOrganizationCommand()}
-                  </PopoverContent>
-                </Popover>
-              ))}
+                  </DrawerContent>
+                </Drawer>
+              </>
+            ) : (
+              <Popover open={open} onOpenChange={handleOpenChange}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between border-gray-300 p-5"
+                    data-cy="facility-organization"
+                  >
+                    {navigationLevels.length > 0 ? (
+                      <div className="items-center py-1">
+                        {renderNavigationPath()}
+                      </div>
+                    ) : (
+                      <span className="text-base">
+                        {t("select_department")}
+                      </span>
+                    )}
+                    <ChevronDown className="ml-2 size-4 text-gray-950 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  sideOffset={4}
+                  className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[80vh] overflow-auto"
+                >
+                  {renderOrganizationCommand()}
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
         </div>
       </div>

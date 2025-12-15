@@ -47,7 +47,7 @@ test.describe("Device Organization Association", () => {
 
     // Sheet should open
     await expect(
-      page.getByRole("heading", { name: "Manage Organization" }),
+      page.getByRole("heading", { name: "Manage Department/team" }),
     ).toBeVisible();
   });
 
@@ -61,11 +61,11 @@ test.describe("Device Organization Association", () => {
 
     // Wait for the sheet to open
     await expect(
-      page.getByRole("heading", { name: "Manage Organization" }),
+      page.getByRole("heading", { name: "Manage Department/team" }),
     ).toBeVisible();
 
     // Administration is pre-selected by default, click Add Organization
-    await page.getByRole("button", { name: "Add Organization" }).click();
+    await page.getByRole("button", { name: "Save Department" }).click();
 
     // Should show success message
     await expect(
@@ -89,11 +89,11 @@ test.describe("Device Organization Association", () => {
       .click();
 
     await expect(
-      page.getByRole("heading", { name: "Manage Organization" }),
+      page.getByRole("heading", { name: "Manage Department/team" }),
     ).toBeVisible();
 
     // Administration is pre-selected by default, click Add Organization
-    await page.getByRole("button", { name: "Add Organization" }).click();
+    await page.getByRole("button", { name: "Save Department" }).click();
 
     await expect(
       page.getByText(/Organization added successfully/i),
@@ -110,17 +110,18 @@ test.describe("Device Organization Association", () => {
       .click();
 
     // Should show current organization
-    await expect(page.getByText("Current Organization")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Linked Department" }),
+    ).toBeVisible();
     await expect(page.getByText("Administration").first()).toBeVisible();
-
-    // Click "All Organizations" tab to see more options
-    await page.getByRole("tab", { name: "All Organizations" }).click();
-
     // Click the Select Department dropdown (using popover-trigger)
     await page
       .locator('[data-slot="popover-trigger"]')
       .filter({ hasText: "Select Department" })
       .click();
+
+    // Click "All Departments" tab to see more options
+    await page.getByRole("tab", { name: "All Departments" }).click();
 
     // Wait for the department list to load and select any item
     const departmentItem = page.locator('[data-slot="command-item"]').first();
@@ -128,7 +129,7 @@ test.describe("Device Organization Association", () => {
     await departmentItem.click();
 
     // Click Add Organization
-    await page.getByRole("button", { name: "Add Organization" }).click();
+    await page.getByRole("button", { name: "Save Department" }).click();
 
     // Should show success message
     await expect(

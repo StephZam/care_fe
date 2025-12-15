@@ -7,12 +7,12 @@ import {
   PatientListRead,
   PatientRead,
   PublicPatientRead,
-} from "@/types/emr/patient/patient";import { FacilityRead } from "@/types/facility/facility";
+} from "@/types/emr/patient/patient";
+import { FacilityRead } from "@/types/facility/facility";
 import { UserReadMinimal } from "@/types/user/user";
 import { LazyExoticComponent } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { QuestionnaireFormState } from "./components/Questionnaire/QuestionnaireForm";
-import { ButtonVariant } from "./components/ui/button";
 import { pluginMap } from "./pluginMap";
 import { AppRoutes } from "./Routers/AppRouter";
 
@@ -72,11 +72,10 @@ export type PatientSearchActionsComponentType = React.FC<{
   className?: string;
 }>;
 
-export type PrintIdCardComponentType = React.FC<{
+export type PatientInfoCardActionsComponentType = React.FC<{
   facilityId: string;
   patient: PatientRead | PatientListRead | PublicPatientRead;
   className?: string;
-  variant?: ButtonVariant;
 }>;
 
 // Define supported plugin components
@@ -92,7 +91,7 @@ export type SupportedPluginComponents = {
   PatientDetailsTabDemographyGeneralInfo: PatientDetailsTabDemographyGeneralInfoComponentType;
   InvoiceRecordPaymentOptions: InvoiceRecordPaymentOptionsComponentType;
   PatientSearchActions: PatientSearchActionsComponentType;
-  PrintIDCardButton: PrintIdCardComponentType;
+  PatientInfoCardActions: PatientInfoCardActionsComponentType;
 };
 
 // Create a type for lazy-loaded components

@@ -9,28 +9,14 @@ type BackButtonProps = {
 } & React.ComponentProps<typeof Button>;
 
 export default function BackButton({ to, ...props }: BackButtonProps) {
-  const { goBack, history } = useAppHistory();
-
-  if (to) {
-    return (
-      <Button variant="outline" data-shortcut-id="go-back" asChild {...props}>
-        <Link href={to}>{props.children}</Link>
-      </Button>
-    );
+  const { history } = useAppHistory();
+  to ??= history[1];
+  if (!to) {
+    return;
   }
-
-  if (history.length <= 1) {
-    return null;
-  }
-
   return (
-    <Button
-      variant="outline"
-      data-shortcut-id="go-back"
-      onClick={() => {
-        goBack();
-      }}
-      {...props}
-    />
+    <Button variant="outline" data-shortcut-id="go-back" asChild {...props}>
+      <Link href={to}>{props.children}</Link>
+    </Button>
   );
 }

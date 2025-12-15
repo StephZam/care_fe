@@ -175,7 +175,7 @@ export const EncounterResponsesTab = ({
 
   const { data: questionnaireData } = useQuery({
     queryKey: ["questionnaire", questionnaireSlug],
-    queryFn: query(questionnaireApi.detail, {
+    queryFn: query(questionnaireApi.get, {
       pathParams: { slug: questionnaireSlug! },
     }),
     enabled: !!questionnaireSlug,

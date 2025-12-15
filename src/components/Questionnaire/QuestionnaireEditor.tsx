@@ -99,9 +99,9 @@ import {
   QuestionType,
   SUPPORTED_QUESTION_TYPES,
 } from "@/types/questionnaire/question";
-import { QuestionnaireDetail } from "@/types/questionnaire/questionnaire";
+import { QuestionnaireRead } from "@/types/questionnaire/questionnaire";
 import questionnaireApi from "@/types/questionnaire/questionnaireApi";
-import { QuestionnaireTagModel } from "@/types/questionnaire/tags";
+import { QuestionnaireTagRead } from "@/types/questionnaire/tags";
 
 import { generateSlug } from "@/Utils/utils";
 import { CodingEditor } from "./CodingEditor";
@@ -254,7 +254,7 @@ export default function QuestionnaireEditor({
     new Set(),
   );
   const [selectedOrgs, setSelectedOrgs] = useState<Organization[]>([]);
-  const [selectedTags, setSelectedTags] = useState<QuestionnaireTagModel[]>([]);
+  const [selectedTags, setSelectedTags] = useState<QuestionnaireTagRead[]>([]);
   const [orgSearchQuery, setOrgSearchQuery] = useState("");
   const [tagSearchQuery, setTagSearchQuery] = useState("");
   const [orgError, setOrgError] = useState<string | undefined>();
@@ -267,7 +267,7 @@ export default function QuestionnaireEditor({
   const [selectedImportFile, setSelectedImportFile] = useState<File | null>(
     null,
   );
-  const [importedData, setImportedData] = useState<QuestionnaireDetail | null>(
+  const [importedData, setImportedData] = useState<QuestionnaireRead | null>(
     null,
   );
   const queryClient = useQueryClient();
@@ -324,7 +324,7 @@ export default function QuestionnaireEditor({
     error,
   } = useQuery({
     queryKey: ["questionnaireDetail", slug],
-    queryFn: query(questionnaireApi.detail, {
+    queryFn: query(questionnaireApi.get, {
       pathParams: { slug: slug! },
     }),
     enabled: !!slug,
@@ -381,7 +381,7 @@ export default function QuestionnaireEditor({
     mutationFn: mutate(questionnaireApi.create, {
       silent: true,
     }),
-    onSuccess: (data: QuestionnaireDetail) => {
+    onSuccess: (data: QuestionnaireRead) => {
       toast.success(t("questionnaire_created_successfully"));
       queryClient.invalidateQueries({
         queryKey: ["questionnaireDetail", data.slug],
@@ -397,7 +397,7 @@ export default function QuestionnaireEditor({
       pathParams: { slug: slug! },
       silent: true,
     }),
-    onSuccess: (data: QuestionnaireDetail) => {
+    onSuccess: (data: QuestionnaireRead) => {
       toast.success(t("questionnaire_updated_successfully"));
       navigate(`/admin/questionnaire/${data.slug}/edit`);
       queryClient.invalidateQueries({
@@ -460,8 +460,8 @@ export default function QuestionnaireEditor({
     ),
   });
 
-  const [questionnaire, setQuestionnaire] =
-    useState<QuestionnaireDetail | null>(() => {
+  const [questionnaire, setQuestionnaire] = useState<QuestionnaireRead | null>(
+    () => {
       if (!slug) {
         return {
           id: "",
@@ -473,10 +473,11 @@ export default function QuestionnaireEditor({
           questions: [],
           slug: "",
           tags: [],
-        } as QuestionnaireDetail;
+        };
       }
       return null;
-    });
+    },
+  );
 
   const form = useForm<any>({
     resolver: zodResolver(QuestionnaireFormPartialSchema),
@@ -603,7 +604,7 @@ export default function QuestionnaireEditor({
   }
 
   const updateQuestionnaireField = (
-    field: keyof QuestionnaireDetail,
+    field: keyof QuestionnaireRead,
     value: unknown,
   ) => {
     form.setValue(field, value, {
@@ -613,8 +614,8 @@ export default function QuestionnaireEditor({
     });
   };
   const handleValidatedChange = (
-    field: keyof QuestionnaireDetail,
-    value: QuestionnaireDetail[keyof QuestionnaireDetail],
+    field: keyof QuestionnaireRead,
+    value: QuestionnaireRead[keyof QuestionnaireRead],
   ) => {
     let finalValue = value;
     if (field === "slug" && typeof value === "string") {
@@ -805,7 +806,7 @@ export default function QuestionnaireEditor({
     if (!importedData) return;
 
     // Map only the necessary fields, ignoring id, created_by, tags etc.
-    const mappedData: Partial<QuestionnaireDetail> = {
+    const mappedData: Partial<QuestionnaireRead> = {
       title: importedData.title,
       description: importedData.description,
       status: importedData.status,
@@ -826,7 +827,8 @@ export default function QuestionnaireEditor({
     setQuestionnaire({
       ...form.getValues(),
       ...mappedData,
-    } as QuestionnaireDetail);
+    });
+
     form.reset({
       title: mappedData.title || "",
       slug: mappedData.slug || "",
@@ -888,7 +890,7 @@ export default function QuestionnaireEditor({
     );
   };
 
-  const handleTagCreated = (tag: QuestionnaireTagModel) => {
+  const handleTagCreated = (tag: QuestionnaireTagRead) => {
     setSelectedTags((current) => [...current, tag]);
   };
 

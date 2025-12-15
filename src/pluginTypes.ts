@@ -3,8 +3,11 @@ import { PluginEncounterTabProps } from "@/pages/Encounters/EncounterShow";
 import { InvoiceRead } from "@/types/billing/invoice/invoice";
 import { DeviceDetail } from "@/types/device/device";
 import { EncounterRead } from "@/types/emr/encounter/encounter";
-import { PatientRead } from "@/types/emr/patient/patient";
-import { FacilityRead } from "@/types/facility/facility";
+import {
+  PatientListRead,
+  PatientRead,
+  PublicPatientRead,
+} from "@/types/emr/patient/patient";import { FacilityRead } from "@/types/facility/facility";
 import { UserReadMinimal } from "@/types/user/user";
 import { LazyExoticComponent } from "react";
 import { UseFormReturn } from "react-hook-form";
@@ -71,7 +74,7 @@ export type PatientSearchActionsComponentType = React.FC<{
 
 export type PrintIdCardComponentType = React.FC<{
   facilityId: string;
-  patient: PatientRead;
+  patient: PatientRead | PatientListRead | PublicPatientRead;
   className?: string;
   variant?: ButtonVariant;
 }>;

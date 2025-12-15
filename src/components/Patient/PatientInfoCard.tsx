@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
 import { PatientHoverCard } from "@/pages/Facility/services/serviceRequests/PatientHoverCard";
 import { PLUGIN_Component } from "@/PluginEngine";
-import { PatientRead } from "@/types/emr/patient/patient";
+import {
+  PatientListRead,
+  PatientRead,
+  PublicPatientRead,
+} from "@/types/emr/patient/patient";
 import {
   getTagHierarchyDisplay,
   TagConfig,
@@ -23,7 +27,7 @@ export const PatientInfoCard = ({
   tagEntityType,
   tagEntityId,
 }: {
-  patient: PatientRead;
+  patient: PublicPatientRead | PatientListRead | PatientRead;
   tags: TagConfig[];
   facilityId: string;
   onTagsUpdate: () => void;

@@ -76,6 +76,7 @@ export function EncounterCommandDialog({
         subject_type: "encounter",
       },
     }),
+    enabled: !!search,
   });
 
   const getShortcutDisplay = useEncounterShortcutDisplays();

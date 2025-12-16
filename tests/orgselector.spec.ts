@@ -4,7 +4,7 @@ import { getFacilityId } from "tests/support/facilityId";
 
 test.use({ storageState: "tests/.auth/user.json" });
 
-test.describe("Organization Selector Management", () => {
+test.describe("Department Selector Management", () => {
   test.beforeEach(async ({ page }) => {
     const facilityId = getFacilityId();
     const createdDateAfter = format(subDays(new Date(), 90), "yyyy-MM-dd");
@@ -50,7 +50,10 @@ test.describe("Organization Selector Management", () => {
     );
 
     // Add an organization
-    await page.getByRole("combobox").click();
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: "Select Department" })
+      .click();
     await page.getByRole("option", { name: "Administration" }).click();
     await page.getByRole("button", { name: "Save Departments" }).click();
     await expect(page.locator("ol")).toContainText(

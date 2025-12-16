@@ -445,7 +445,7 @@ export default function FacilityOrganizationSelector(
                         >
                           <CareIcon
                             icon="l-check"
-                            className="text-gray-950 size-5!"
+                            className="text-primary-700 size-5!"
                           />
                           <span>{t("confirm")}</span>
                         </Button>

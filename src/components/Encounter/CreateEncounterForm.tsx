@@ -356,14 +356,16 @@ export default function CreateEncounterForm({
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-950">Priority</FormLabel>
+                    <FormLabel className="text-gray-950">
+                      {t("priority")}
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger ref={field.ref}>
-                          <SelectValue placeholder="Select priority" />
+                          <SelectValue placeholder={t("select_priority")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

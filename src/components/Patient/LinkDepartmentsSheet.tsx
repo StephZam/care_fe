@@ -363,7 +363,7 @@ export default function LinkDepartmentsSheet({
                               )}
                             </div>
                           </div>
-                          <div className="flex items-center border-red-500">
+                          <div className="flex items-center">
                             <DeleteOrganizationButton
                               organizationId={org.id}
                               entityType={entityType}

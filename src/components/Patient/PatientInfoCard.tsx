@@ -40,7 +40,7 @@ export const PatientInfoCard = ({
   return (
     <>
       <Card className="bg-white shadow-sm rounded-md">
-        <CardHeader className="pb-4 flex flex-row items-center justify-between px-2">
+        <CardHeader className="pb-4 flex flex-col sm:flex-row sm:items-center justify-between px-2">
           <div className="space-y-4">
             <PatientHoverCard patient={patient} facilityId={facilityId} />
           </div>
@@ -49,6 +49,7 @@ export const PatientInfoCard = ({
             __name="PatientInfoCardActions"
             patient={patient}
             facilityId={facilityId}
+            className="flex justify-end"
           />
         </CardHeader>
       </Card>

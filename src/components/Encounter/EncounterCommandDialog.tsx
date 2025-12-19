@@ -79,6 +79,12 @@ export function EncounterCommandDialog({
     enabled: !!search,
   });
 
+  useEffect(() => {
+    if (!open) {
+      setSearch("");
+    }
+  }, [open]);
+
   const getShortcutDisplay = useEncounterShortcutDisplays();
   const { handleAction } = useEncounterShortcuts();
 

@@ -165,11 +165,10 @@ function DeleteOrganizationButton({
 
   return (
     <Button
-      variant="outline"
+      variant="danger"
       size="sm"
       onClick={() => removeOrganization(organizationId)}
       disabled={isPending}
-      className="text-red-700 border-red-600 hover:text-red-600 hover:border-red-600"
     >
       {isPending ? (
         <Loader2 className="size-4 animate-spin mr-1" />
@@ -306,7 +305,7 @@ export default function LinkDepartmentsSheet({
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-full md:w-[50vw] lg:w-[25vw] sm:max-w-none! min-h-[50vh] overflow-auto">
+      <SheetContent className="w-full overflow-auto sm:max-w-none md:w-[50vw] lg:w-[25vw]">
         <SheetHeader>
           <SheetTitle>
             {t("manage_department/team", {
@@ -377,7 +376,7 @@ export default function LinkDepartmentsSheet({
                     </div>
                   </>
                 ) : (
-                  <div className="bg-gray-50 p-4 sm:p-6 rounded-md space-y-2 sm:space-y-3 text-center border-t-2 border-x border-gray-200">
+                  <div className="bg-gray-50 px-4 py-2 sm:p-6 rounded-md space-y-2 sm:space-y-3 text-center border-t-2 border-x border-gray-200">
                     <Blocks className="size-5 sm:size-6 mx-auto" />
                     <p className="text-sm sm:text-base text-gray-950 font-medium">
                       {t("no_department_linked_yet", {
@@ -392,7 +391,7 @@ export default function LinkDepartmentsSheet({
                   </div>
                 )}
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 p-1">
                 {[...Array(3)].map((_, idx) => (
                   <div
                     key={idx}

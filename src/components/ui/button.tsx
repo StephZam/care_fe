@@ -33,6 +33,8 @@ const buttonVariants = cva(
           "bg-warning-100 text-warning-900 border border-warning-300 shadow-xs hover:bg-warning-100/80 dark:bg-warning-900 dark:text-warning-50 dark:hover:bg-warning-900/80",
         alert:
           "bg-alert-100 text-alert-900 border border-alert-300 shadow-xs hover:bg-alert-100/80 dark:bg-alert-900 dark:text-alert-50 dark:hover:bg-alert-900/80",
+        danger:
+          "bg-white/70 text-red-600 border border-red-500 shadow-sm hover:bg-white/70 dark:bg-gray-900 dark:text-red-900 dark:hover:bg-gray-900",
       },
       size: {
         default: "h-9 px-4 py-2",

@@ -2849,7 +2849,7 @@
   "manage_charges": "Manage Charges",
   "manage_consents": "Manage Consents",
   "manage_consents_description": "View and manage consents for the patient",
-  "manage_department/team_description_one": "Add or remove Departments/teams from this {{entityType}}",
+  "manage_department/team_description_one": "Add or remove Department/team from this {{entityType}}",
   "manage_department/team_description_other": "Add or remove Departments/teams from this {{entityType}}",
   "manage_department/team_one": "Manage Department/team",
   "manage_department/team_other": "Manage Departments/teams",

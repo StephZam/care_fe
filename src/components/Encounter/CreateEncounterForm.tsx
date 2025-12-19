@@ -57,6 +57,12 @@ import useTagConfigs from "@/types/emr/tagConfig/useTagConfig";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import mutate from "@/Utils/request/mutate";
 
+const ENCOUNTER_STATUS_OPTIONS = [
+  { value: EncounterStatus.PLANNED, label: "planned" },
+  { value: EncounterStatus.IN_PROGRESS, label: "in_progress" },
+  { value: EncounterStatus.ON_HOLD, label: "on_hold" },
+] as const;
+
 interface Props {
   patientId: string;
   facilityId: string;
@@ -318,14 +324,7 @@ export default function CreateEncounterForm({
                         value={field.value}
                         className="flex gap-2"
                       >
-                        {[
-                          { value: EncounterStatus.PLANNED, label: "planned" },
-                          {
-                            value: EncounterStatus.IN_PROGRESS,
-                            label: "in_progress",
-                          },
-                          { value: EncounterStatus.ON_HOLD, label: "on_hold" },
-                        ].map(({ value, label }) => (
+                        {ENCOUNTER_STATUS_OPTIONS.map(({ value, label }) => (
                           <div key={value} className="relative">
                             <RadioGroupItem
                               value={value}

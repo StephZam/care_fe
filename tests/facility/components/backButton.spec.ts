@@ -10,42 +10,39 @@ test.describe("Back button should not appear when page is opened in a new tab wi
     facilityId = getFacilityId();
   });
 
-  test("Back Button in Products", async ({ page, context }) => {
-    // Navigate to product page to get a product URL
-    await page.goto(`/facility/${facilityId}/settings/product`);
+  test("Back Button in Patient Registration", async ({ page, context }) => {
+    // Navigate to patient registration page
+    await page.goto(`/facility/${facilityId}/patient/create`);
 
-    // Click on a product to view it
-    await page.getByRole("link", { name: "View" }).first().click();
+    // Get the current patient registration URL
+    const patientRegUrl = page.url();
 
-    // Get the current product view URL
-    const productViewUrl = page.url();
-
-    // Open the same product view page directly in a new tab (no navigation history)
+    // Open the same patient registration page directly in a new tab (no navigation history)
     const newPage = await context.newPage();
-    await newPage.goto(productViewUrl);
+    await newPage.goto(patientRegUrl);
 
     // Verify back button does NOT appear (no history)
-    const backButton = newPage.getByRole("link", { name: /back to list/i });
+    const backButton = newPage.getByRole("link", { name: /back/i });
     const count = await backButton.count();
     expect(count).toBe(0);
   });
 
-  test("Back button in Healthcare Services", async ({ page, context }) => {
-    // Navigate to healthcare services page
-    await page.goto(`/facility/${facilityId}/settings/healthcare_services`);
+  test("Back button in Account Show", async ({ page, context }) => {
+    // Navigate to account show page
+    await page.goto(`/facility/${facilityId}/billing/account`);
 
-    // Click on the first "View Details" link inside card-content
-    await page.locator('[data-slot="card-content"]').first().click();
+    // Click on the first "Go to account" button
+    await page.getByRole("button", { name: "Go to account" }).first().click();
 
-    // Get the current view URL
-    const serviceViewUrl = page.url();
+    // Get the current URL
+    const accountUrl = page.url();
 
     // Open the same page directly in a new tab (no navigation history)
     const newPage = await context.newPage();
-    await newPage.goto(serviceViewUrl);
-
+    await newPage.goto(accountUrl);
     // Verify back button does NOT appear (no history)
-    const backButton = newPage.getByRole("link", { name: "Back to List" });
+    const backButton = newPage.getByRole("link", { name: /back/i });
+
     const count = await backButton.count();
     expect(count).toBe(0);
   });

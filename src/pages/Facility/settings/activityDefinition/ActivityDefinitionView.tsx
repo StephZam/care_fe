@@ -139,7 +139,7 @@ export default function ActivityDefinitionView({
           variant="outline"
           size="xs"
           className="mb-2"
-          to={`/activity_definitions/categories/${definition.category.slug}`}
+          to={`/facility/${facilityId}/settings/activity_definitions/categories/${definition.category.slug}`}
         >
           <CareIcon icon="l-arrow-left" className="size-4" />
           {t("back")}

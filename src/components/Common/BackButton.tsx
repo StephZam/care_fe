@@ -10,13 +10,18 @@ type BackButtonProps = {
 
 export default function BackButton({ to, ...props }: BackButtonProps) {
   const { history } = useAppHistory();
-  to ??= history[1];
-  if (!to) {
+
+  const href = to && history.length > 1 ? to : history[1];
+
+  if (!href) {
     return;
   }
+
   return (
     <Button variant="outline" data-shortcut-id="go-back" asChild {...props}>
-      <Link href={to}>{props.children}</Link>
+      <Link basePath="/" href={href}>
+        {props.children}
+      </Link>
     </Button>
   );
 }

@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/sheet";
 
 import mutate from "@/Utils/request/mutate";
+import DottedDivider from "@/components/ui/dotteddivider";
 import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
-import DottedDivider from "@/src/components/ui/dotteddivider";
 import { BatchRequestBody } from "@/types/base/batch/batch";
 import batchApi from "@/types/base/batch/batchApi";
 import deviceApi from "@/types/device/deviceApi";

@@ -8,11 +8,8 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import useBreakpoints from "@/hooks/useBreakpoints";
 import { cn } from "@/lib/utils";
-import questionnaireApi from "@/types/questionnaire/questionnaireApi";
 import { QuestionnaireResponse } from "@/types/questionnaire/questionnaireResponse";
-import query from "@/Utils/request/query";
 import { formatDateTime, formatName } from "@/Utils/utils";
-import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { useQueryParams } from "raviger";
 import { useState } from "react";
@@ -96,6 +93,7 @@ function LeftPanel({
           onSelect={(q) => {
             setQueryParams({
               questionnaireSlug: q.slug,
+              questionnaireTitle: q.title,
             });
           }}
           trigger={
@@ -165,21 +163,14 @@ export const EncounterResponsesTab = ({
   const { t } = useTranslation();
   const [qParams, setQueryParams] = useQueryParams<{
     questionnaireSlug?: string;
+    questionnaireTitle?: string;
     responseId?: string;
   }>();
 
-  const { questionnaireSlug, responseId } = qParams;
+  const { questionnaireSlug, questionnaireTitle, responseId } = qParams;
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isMobile = useBreakpoints({ default: true, md: false });
-
-  const { data: questionnaireData } = useQuery({
-    queryKey: ["questionnaire", questionnaireSlug],
-    queryFn: query(questionnaireApi.get, {
-      pathParams: { slug: questionnaireSlug! },
-    }),
-    enabled: !!questionnaireSlug,
-  });
 
   const handleResponseClick = (response: QuestionnaireResponse) => {
     setQueryParams({ ...qParams, responseId: response.id });
@@ -196,7 +187,7 @@ export const EncounterResponsesTab = ({
           canAccess={canAccess}
           responseId={responseId}
           questionnaireSlug={questionnaireSlug}
-          questionnaireTitle={questionnaireData?.title || ""}
+          questionnaireTitle={questionnaireTitle || ""}
           setQueryParams={setQueryParams}
           onResponseClick={handleResponseClick}
         />
@@ -222,7 +213,7 @@ export const EncounterResponsesTab = ({
                     canAccess={canAccess}
                     responseId={responseId}
                     questionnaireSlug={questionnaireSlug}
-                    questionnaireTitle={questionnaireData?.title || ""}
+                    questionnaireTitle={questionnaireTitle || ""}
                     setQueryParams={setQueryParams}
                     onResponseClick={handleResponseClick}
                   />
@@ -258,7 +249,9 @@ export const EncounterResponsesTab = ({
                         showTitle={!questionnaireSlug}
                         onTitleClick={() => {
                           setQueryParams({
+                            ...qParams,
                             questionnaireSlug: response.questionnaire?.slug,
+                            questionnaireTitle: response.questionnaire?.title,
                           });
                         }}
                       />

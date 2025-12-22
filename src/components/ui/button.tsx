@@ -63,7 +63,8 @@ export type ButtonVariant =
   | "white"
   | "alert"
   | "warning"
-  | "outline_primary";
+  | "outline_primary"
+  | "danger";
 
 function Button({
   className,

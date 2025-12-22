@@ -16,6 +16,7 @@ import {
 
 import mutate from "@/Utils/request/mutate";
 import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
+import DottedDivider from "@/src/components/ui/dotteddivider";
 import { BatchRequestBody } from "@/types/base/batch/batch";
 import batchApi from "@/types/base/batch/batchApi";
 import deviceApi from "@/types/device/deviceApi";
@@ -391,14 +392,7 @@ export default function LinkDepartmentsSheet({
                   </div>
                 )}
               </div>
-              <div className="space-y-1 p-1">
-                {[...Array(3)].map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full h-0.5 bg-[repeating-linear-gradient(to_right,_#D1D5DB_0_1px,_transparent_2px_5px)]"
-                  ></div>
-                ))}
-              </div>
+              <DottedDivider />
               <FacilityOrganizationSelector
                 facilityId={facilityId}
                 value={selectedOrgs}

@@ -29,13 +29,11 @@ import { EncounterRead } from "@/types/emr/encounter/encounter";
 interface AccountSheetButtonProps {
   encounter: EncounterRead;
   trigger: React.ReactNode;
-  canWrite: boolean;
 }
 
 export function AccountSheetButton({
   encounter,
   trigger,
-  canWrite,
 }: AccountSheetButtonProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -119,7 +117,7 @@ export function AccountSheetButton({
                     <ExternalLink className="size-4" />
                     {t("more_details")}
                   </Button>
-                  {canWrite && canUpdateAccount && (
+                  {canUpdateAccount && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -145,7 +143,7 @@ export function AccountSheetButton({
                   <p className="text-gray-500 mb-4">
                     {t("no_active_account_found")}
                   </p>
-                  {canWrite && canCreateAccount && (
+                  {canCreateAccount && (
                     <Button
                       onClick={handleCreateAccountClick}
                       variant="outline"

@@ -60,6 +60,7 @@ export default function FacilityOrganizationSelector(
 ) {
   const { t } = useTranslation();
   const {
+    value,
     onChange,
     facilityId,
     currentOrganizations,
@@ -108,14 +109,29 @@ export default function FacilityOrganizationSelector(
     })),
   });
 
+  useEffect(() => {
+    if (value && value.length > 0) {
+      const resolvedOrganizations = value
+        .map((id) => currentOrganizations?.find((org) => org.id === id))
+        .filter((org) => org !== undefined)
+        .map((org) => ({
+          ...org,
+          fullPath: [org.name],
+        }));
+      if (resolvedOrganizations.length > 0) {
+        setSelectedOrganizations(resolvedOrganizations);
+      }
+    } else {
+      setSelectedOrganizations([]);
+    }
+  }, [value, currentOrganizations, showAllOrgs]);
+
   const handleSelect = (org: FacilityOrganizationRead) => {
     const isAlreadySelected =
       !!currentOrganizations?.find((o) => o.id === org.id) ||
       selectedOrganizations.some((o) => o.id === org.id);
     if (isAlreadySelected) {
       setCurrentSelection(org);
-      setFacilityOrgSearch("");
-      return;
     }
     if (org.has_children) {
       setNavigationLevels([...navigationLevels, org]);

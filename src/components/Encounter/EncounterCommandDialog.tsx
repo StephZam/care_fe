@@ -12,6 +12,7 @@ import {
   useEncounterShortcutDisplays,
   useEncounterShortcuts,
 } from "@/hooks/useEncounterShortcuts";
+import { Skeleton } from "@/src/components/ui/skeleton";
 import {
   ArrowBigRight,
   Building2,
@@ -67,7 +68,7 @@ export function EncounterCommandDialog({
 
   const questionnaireOptions = useQuestionnaireOptions("encounter_actions");
 
-  const { data: questionnaires } = useQuery({
+  const { data: questionnaires, isLoading } = useQuery({
     queryKey: ["questionnaires", search, "encounter"],
     queryFn: query.debounced(questionnaireApi.list, {
       queryParams: {
@@ -310,7 +311,14 @@ export function EncounterCommandDialog({
         ],
       },
     ],
-    [t, questionnaireOptions, questionnaires, search, getShortcutDisplay],
+    [
+      t,
+      questionnaireOptions,
+      questionnaires,
+      search,
+      getShortcutDisplay,
+      isLoading,
+    ],
   );
 
   const findRecentActions = useCallback(
@@ -367,7 +375,32 @@ export function EncounterCommandDialog({
           />
         </div>
         <CommandList className="h-[80vh] max-h-[80vh] w-full">
-          <CommandEmpty>{t("no_results")}</CommandEmpty>
+          <CommandEmpty>
+            {isLoading && search.length > 0 ? (
+              <div className="p-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-6 rounded" />
+                  <div className="space-y-1 flex-1">
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-6 rounded" />
+                  <div className="space-y-1 flex-1">
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-6 rounded" />
+                  <div className="space-y-1 flex-1">
+                    <Skeleton className="h-6 w-full" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              t("no_results")
+            )}
+          </CommandEmpty>
           {encounterActions.map((group) => (
             <div key={group.group}>
               <CommandGroup heading={group.group} className="px-2">

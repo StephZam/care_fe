@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { ArrowUpRightSquare, EditIcon, PlusIcon } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowUpRightSquare, EditIcon, Hash, PlusIcon } from "lucide-react";
 import { navigate } from "raviger";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/Common/Table";
 import PatientIdentifierFilter from "@/components/Patient/PatientIdentifierFilter";
+import TagAssignmentSheet from "@/components/Tags/TagAssignmentSheet";
 
 import { getPermissions } from "@/common/Permissions";
 import { usePermissions } from "@/context/PermissionContext";
@@ -76,6 +77,7 @@ export function AccountList({
   className?: string;
 }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [editingAccount, setEditingAccount] =
     React.useState<AccountRead | null>(null);
@@ -240,6 +242,7 @@ export function AccountList({
                 <TableHead>{t("account_status")}</TableHead>
                 <TableHead>{t("billing_status")}</TableHead>
                 <TableHead>{t("period")}</TableHead>
+                <TableHead>{t("tags_other")}</TableHead>
                 <TableHead>{t("action")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -293,6 +296,43 @@ export function AccountList({
                       {account.service_period?.end &&
                         ` - ${formatDate(account.service_period?.end)}`}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      <TagAssignmentSheet
+                        entityType="account"
+                        entityId={account.id}
+                        facilityId={facilityId}
+                        currentTags={account.tags ?? []}
+                        onUpdate={() => {
+                          queryClient.invalidateQueries({
+                            queryKey: ["accounts", qParams],
+                          });
+                        }}
+                        patientId={account.patient.id}
+                        trigger={
+                          <Button
+                            variant="outline"
+                            size="xs"
+                            className="rounded-sm"
+                          >
+                            <Hash strokeWidth={1.5} />
+                            {account.tags && account.tags.length > 0
+                              ? t("manage_tags")
+                              : t("add_tags")}
+                          </Button>
+                        }
+                      />
+                      {account.tags?.map((tag) => (
+                        <Badge
+                          key={tag.id}
+                          variant="secondary"
+                          className="text-xs"
+                        >
+                          {tag.display}
+                        </Badge>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell className="whitespace-normal">
                     <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">

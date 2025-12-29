@@ -8,11 +8,11 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useEncounterShortcutDisplays,
   useEncounterShortcuts,
 } from "@/hooks/useEncounterShortcuts";
-import { Skeleton } from "@/src/components/ui/skeleton";
 import {
   ArrowBigRight,
   Building2,

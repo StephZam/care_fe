@@ -12,7 +12,12 @@ test.describe("Back button should not appear when page is opened in a new tab wi
 
   test("Back Button in Patient Registration", async ({ page, context }) => {
     // Navigate to patient registration page
-    await page.goto(`/facility/${facilityId}/patient/create`);
+    await page.goto(`/facility/${facilityId}/patients`);
+    await page.getByRole("button", { name: /add new patient/i }).click();
+
+    // Verify back button IS visible (has history)
+    const backButtonOriginal = page.getByRole("link", { name: /back/i });
+    await expect(backButtonOriginal).toBeVisible();
 
     // Get the current patient registration URL
     const patientRegUrl = page.url();
@@ -21,10 +26,9 @@ test.describe("Back button should not appear when page is opened in a new tab wi
     const newPage = await context.newPage();
     await newPage.goto(patientRegUrl);
 
-    // Verify back button does NOT appear (no history)
+    // Verify back button is NOT visible (no history)
     const backButton = newPage.getByRole("link", { name: /back/i });
-    const count = await backButton.count();
-    expect(count).toBe(0);
+    await expect(backButton).not.toBeVisible();
   });
 
   test("Back button in Account Show", async ({ page, context }) => {
@@ -34,16 +38,19 @@ test.describe("Back button should not appear when page is opened in a new tab wi
     // Click on the first "Go to account" button
     await page.getByRole("button", { name: "Go to account" }).first().click();
 
+    // Verify back button IS visible (has history)
+    const backButtonOriginal = page.getByRole("link", { name: /back/i });
+    await expect(backButtonOriginal).toBeVisible();
+
     // Get the current URL
     const accountUrl = page.url();
 
     // Open the same page directly in a new tab (no navigation history)
     const newPage = await context.newPage();
     await newPage.goto(accountUrl);
-    // Verify back button does NOT appear (no history)
-    const backButton = newPage.getByRole("link", { name: /back/i });
 
-    const count = await backButton.count();
-    expect(count).toBe(0);
+    // Verify back button is NOT visible (no history)
+    const backButton = newPage.getByRole("link", { name: /back/i });
+    await expect(backButton).not.toBeVisible();
   });
 });

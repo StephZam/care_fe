@@ -20,7 +20,6 @@ import { useLocationManagement } from "@/hooks/useLocationManagement";
 
 import query from "@/Utils/request/query";
 import { LocationTreeNode } from "@/pages/Facility/locations/LocationNavbar";
-import facilityApi from "@/types/facility/facilityApi";
 import { LocationRead as LocationListType } from "@/types/location/location";
 import locationApi from "@/types/location/locationApi";
 

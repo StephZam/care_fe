@@ -154,7 +154,6 @@ test.describe("Create an Encounter", () => {
       .getByRole("radio", { name: new RegExp(randomEncounterClass, "i") })
       .click();
 
-    // await page.getByRole("combobox", { name: "Status" }).click();
     await page.getByRole("radio", { name: randomEncounterStatus }).click();
     await page.getByRole("combobox", { name: "Priority" }).click();
     await page.getByRole("option", { name: randomEncounterPriority }).click();

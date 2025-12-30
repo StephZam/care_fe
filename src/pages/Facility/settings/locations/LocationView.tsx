@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { AnimatedWrapper } from "@/components/Common/AnimatedWrapper";
-import Page from "@/components/Common/Page";
 import Pagination from "@/components/Common/Pagination";
 import {
   CardGridSkeleton,
@@ -33,6 +32,12 @@ import query from "@/Utils/request/query";
 import { LocationList } from "@/types/location/location";
 import locationApi from "@/types/location/locationApi";
 
+import {
+  RightPanel,
+  RightPanelContent,
+  RightPanelFooter,
+  RightPanelHeader,
+} from "@/components/Common/TwoColumnLayout";
 import LocationSheet from "./LocationSheet";
 import { LocationCard } from "./components/LocationCard";
 import { LocationTable } from "./components/LocationTable";
@@ -144,223 +149,226 @@ export default function LocationView({
     handleMove(location, "down");
 
   return (
-    <>
-      <Breadcrumb className="md:m-5">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink
-              asChild={!isNested}
-              className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-              onClick={isNested && onBackToParent ? onBackToParent : undefined}
-            >
-              {isNested ? (
-                <span>{t("home")}</span>
-              ) : (
-                <Link href={`/facility/${facilityId}/settings/locations`}>
-                  {t("home")}
-                </Link>
-              )}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          {breadcrumbs.map((breadcrumb, index) => (
-            <React.Fragment key={breadcrumb.id}>
+    <RightPanel>
+      <RightPanelHeader>
+        <div className="w-full space-y-4">
+          <Breadcrumb>
+            <BreadcrumbList>
               <BreadcrumbItem>
-                {index === breadcrumbs.length - 1 ? (
-                  <span className="font-semibold text-gray-900">
-                    {breadcrumb.name}
-                  </span>
-                ) : (
-                  <BreadcrumbLink
-                    asChild={!isNested}
-                    className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-                    onClick={
-                      isNested
-                        ? () => handleBreadcrumbClick(breadcrumb.id)
-                        : undefined
-                    }
-                  >
-                    {isNested ? (
-                      <span>{breadcrumb.name}</span>
-                    ) : (
-                      <Link
-                        href={`/facility/${facilityId}/settings/locations/${breadcrumb.id}`}
-                      >
-                        {breadcrumb.name}
-                      </Link>
-                    )}
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
-              {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
-            </React.Fragment>
-          ))}
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <Page hideTitleOnPage title={location?.name || t("location")}>
-        <div className="space-y-6">
-          <div className="flex flex-col justify-between items-start gap-4">
-            <div className="flex items-center gap-2 flex-wrap">
-              {isLocationLoading ? (
-                <>
-                  <Skeleton className="h-8 w-48" />
-                  <Skeleton className="h-6 w-24" />
-                  <Skeleton className="h-6 w-24" />
-                </>
-              ) : (
-                <>
-                  <h2 className="text-xl font-semibold">{location?.name}</h2>
-                  <Badge variant="outline" className="whitespace-nowrap">
-                    {t(`location_form__${location?.form}`)}
-                  </Badge>
-                  <Badge
-                    variant={
-                      location?.status === "active" ? "primary" : "secondary"
-                    }
-                    className="capitalize whitespace-nowrap"
-                  >
-                    {location?.status}
-                  </Badge>
-                </>
-              )}
-            </div>
-            <div className="flex flex-col xl:flex-row justify-between items-start w-full gap-4">
-              <div className="w-full xl:w-72">
-                <Input
-                  placeholder={t("search_by_name")}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex flex-col lg:flex-row gap-2 w-full lg:w-auto justify-evenly">
-                {!isLocationLoading &&
-                  location &&
-                  "mode" in location &&
-                  location.mode === "kind" && (
-                    <Button
-                      variant="primary"
-                      onClick={handleAddLocation}
-                      className="w-full sm:w-auto"
-                    >
-                      <CareIcon icon="l-plus" className="size-4 mr-2" />
-                      {t("add_location")}
-                    </Button>
+                <BreadcrumbLink
+                  asChild={!isNested}
+                  className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
+                  onClick={
+                    isNested && onBackToParent ? onBackToParent : undefined
+                  }
+                >
+                  {isNested ? (
+                    <span>{t("home")}</span>
+                  ) : (
+                    <Link href={`/facility/${facilityId}/settings/locations`}>
+                      {t("home")}
+                    </Link>
                   )}
-                {!isLocationLoading && locationOrganizations && (
-                  <LinkDepartmentsSheet
-                    entityType="location"
-                    entityId={id}
-                    currentOrganizations={locationOrganizations.results}
-                    facilityId={facilityId}
-                    trigger={
-                      <Button variant="outline" className="w-full md:w-auto">
-                        <CareIcon icon="l-building" className="size-4 mr-2" />
-                        {t("manage_organization", { count: 0 })}
-                      </Button>
-                    }
-                    onUpdate={() => {
-                      queryClient.invalidateQueries({
-                        queryKey: ["location", facilityId, id],
-                      });
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              {breadcrumbs.map((breadcrumb, index) => (
+                <React.Fragment key={breadcrumb.id}>
+                  <BreadcrumbItem>
+                    {index === breadcrumbs.length - 1 ? (
+                      <span className="font-semibold text-gray-900">
+                        {breadcrumb.name}
+                      </span>
+                    ) : (
+                      <BreadcrumbLink
+                        asChild={!isNested}
+                        className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
+                        onClick={
+                          isNested
+                            ? () => handleBreadcrumbClick(breadcrumb.id)
+                            : undefined
+                        }
+                      >
+                        {isNested ? (
+                          <span>{breadcrumb.name}</span>
+                        ) : (
+                          <Link
+                            href={`/facility/${facilityId}/settings/locations/${breadcrumb.id}`}
+                          >
+                            {breadcrumb.name}
+                          </Link>
+                        )}
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                  {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                </React.Fragment>
+              ))}
+            </BreadcrumbList>
+          </Breadcrumb>
 
-          <div className="space-y-4">
-            {isLoading ? (
+          <div className="flex items-center gap-2 flex-wrap">
+            {isLocationLoading ? (
               <>
-                {/* Desktop view skeleton */}
-                <div className="hidden lg:block">
-                  <TableSkeleton count={5} />
-                </div>
-
-                {/* Mobile view skeleton */}
-                <div className="lg:hidden flex flex-col gap-4">
-                  <CardGridSkeleton count={3} />
-                </div>
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-6 w-24" />
               </>
             ) : (
               <>
-                {/* Desktop table view */}
-                <div className="hidden lg:block">
-                  {currentPageItems?.length ? (
-                    <LocationTable
-                      locations={currentPageItems}
-                      onEdit={handleEditLocation}
-                      onView={handleViewLocation}
-                      onMoveUp={handleMoveUp}
-                      onMoveDown={handleMoveDown}
-                      facilityId={facilityId}
-                      isFirstPage={page === 1}
-                      isLastPage={isLastPage}
-                      currentPage={page}
-                      setPage={setPage}
-                    />
-                  ) : (
-                    <Card>
-                      <CardContent className="p-4 text-center text-gray-500">
-                        {searchQuery
-                          ? t("no_locations_found")
-                          : t("no_child_locations_found")}
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
-                {/* Mobile and tablet card view */}
-                <div className="lg:hidden flex flex-col gap-4">
-                  {currentPageItems?.length ? (
-                    <div className="flex flex-col gap-4">
-                      {currentPageItems.map((child, index) => (
-                        <AnimatedWrapper key={child.id} keyValue={child.id}>
-                          <LocationCard
-                            location={child}
-                            onEdit={handleEditLocation}
-                            onView={handleViewLocation}
-                            onMoveUp={handleMoveUp}
-                            onMoveDown={handleMoveDown}
-                            facilityId={facilityId}
-                            index={index}
-                            totalCount={currentPageItems.length}
-                            isFirstPage={page === 1}
-                            isLastPage={isLastPage}
-                            currentPage={page}
-                            setPage={setPage}
-                          />
-                        </AnimatedWrapper>
-                      ))}
-                    </div>
-                  ) : (
-                    <Card>
-                      <CardContent className="p-4 text-center text-gray-500">
-                        {searchQuery
-                          ? t("no_locations_found")
-                          : t("no_child_locations_found")}
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
-                {children && children.count > limit && (
-                  <div className="flex justify-center mt-4">
-                    <Pagination
-                      data={{ totalCount: children.count }}
-                      onChange={setPage}
-                      defaultPerPage={limit}
-                      cPage={page}
-                    />
-                  </div>
-                )}
+                <h2 className="text-xl font-semibold">{location?.name}</h2>
+                <Badge variant="outline" className="whitespace-nowrap">
+                  {t(`location_form__${location?.form}`)}
+                </Badge>
+                <Badge
+                  variant={
+                    location?.status === "active" ? "primary" : "secondary"
+                  }
+                  className="capitalize whitespace-nowrap"
+                >
+                  {location?.status}
+                </Badge>
               </>
             )}
           </div>
+
+          <div className="flex flex-col xl:flex-row justify-between items-start w-full gap-4">
+            <div className="w-full xl:w-72">
+              <Input
+                placeholder={t("search_by_name")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="flex flex-col lg:flex-row gap-2 w-full lg:w-auto justify-evenly">
+              {!isLocationLoading &&
+                location &&
+                "mode" in location &&
+                location.mode === "kind" && (
+                  <Button
+                    variant="primary"
+                    onClick={handleAddLocation}
+                    className="w-full sm:w-auto"
+                  >
+                    <CareIcon icon="l-plus" className="size-4 mr-2" />
+                    {t("add_location")}
+                  </Button>
+                )}
+              {!isLocationLoading && locationOrganizations && (
+                <LinkDepartmentsSheet
+                  entityType="location"
+                  entityId={id}
+                  currentOrganizations={locationOrganizations.results}
+                  facilityId={facilityId}
+                  trigger={
+                    <Button variant="outline" className="w-full md:w-auto">
+                      <CareIcon icon="l-building" className="size-4 mr-2" />
+                      {t("manage_organization", { count: 0 })}
+                    </Button>
+                  }
+                  onUpdate={() => {
+                    queryClient.invalidateQueries({
+                      queryKey: ["location", facilityId, id],
+                    });
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </div>
-      </Page>
+      </RightPanelHeader>
+      <RightPanelContent>
+        <div className="space-y-4">
+          {isLoading ? (
+            <>
+              {/* Desktop view skeleton */}
+              <div className="hidden lg:block">
+                <TableSkeleton count={5} />
+              </div>
+
+              {/* Mobile view skeleton */}
+              <div className="lg:hidden flex flex-col gap-4">
+                <CardGridSkeleton count={3} />
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Desktop table view */}
+              <div className="hidden lg:block">
+                {currentPageItems?.length ? (
+                  <LocationTable
+                    locations={currentPageItems}
+                    onEdit={handleEditLocation}
+                    onView={handleViewLocation}
+                    onMoveUp={handleMoveUp}
+                    onMoveDown={handleMoveDown}
+                    facilityId={facilityId}
+                    isFirstPage={page === 1}
+                    isLastPage={isLastPage}
+                    currentPage={page}
+                    setPage={setPage}
+                  />
+                ) : (
+                  <Card>
+                    <CardContent className="p-4 text-center text-gray-500">
+                      {searchQuery
+                        ? t("no_locations_found")
+                        : t("no_child_locations_found")}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              {/* Mobile and tablet card view */}
+              <div className="lg:hidden flex flex-col gap-4">
+                {currentPageItems?.length ? (
+                  <div className="flex flex-col gap-4">
+                    {currentPageItems.map((child, index) => (
+                      <AnimatedWrapper key={child.id} keyValue={child.id}>
+                        <LocationCard
+                          location={child}
+                          onEdit={handleEditLocation}
+                          onView={handleViewLocation}
+                          onMoveUp={handleMoveUp}
+                          onMoveDown={handleMoveDown}
+                          facilityId={facilityId}
+                          index={index}
+                          totalCount={currentPageItems.length}
+                          isFirstPage={page === 1}
+                          isLastPage={isLastPage}
+                          currentPage={page}
+                          setPage={setPage}
+                        />
+                      </AnimatedWrapper>
+                    ))}
+                  </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-4 text-center text-gray-500">
+                      {searchQuery
+                        ? t("no_locations_found")
+                        : t("no_child_locations_found")}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </RightPanelContent>
+      <RightPanelFooter>
+        {children && children.count > limit && (
+          <div className="flex justify-center">
+            <Pagination
+              data={{ totalCount: children.count }}
+              onChange={setPage}
+              defaultPerPage={limit}
+              cPage={page}
+            />
+          </div>
+        )}
+      </RightPanelFooter>
 
       <LocationSheet
         open={isSheetOpen}
@@ -369,6 +377,6 @@ export default function LocationView({
         location={selectedLocation || undefined}
         parentId={id}
       />
-    </>
+    </RightPanel>
   );
 }

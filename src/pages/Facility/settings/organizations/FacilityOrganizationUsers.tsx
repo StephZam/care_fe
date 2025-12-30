@@ -9,6 +9,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 import { CardGridSkeleton } from "@/components/Common/SkeletonLoading";
+import {
+  RightPanelContent,
+  RightPanelFooter,
+  RightPanelHeader,
+} from "@/components/Common/TwoColumnLayout";
 import { UserCard } from "@/components/Users/UserListAndCard";
 
 import useFilters from "@/hooks/useFilters";
@@ -84,9 +89,9 @@ export default function FacilityOrganizationUsers({
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-center md:items-end gap-4 w-full justify-between">
-        <div className="relative w-full md:w-auto">
+    <>
+      <RightPanelHeader className="flex-row items-center -mt-3 gap-4">
+        <div className="relative">
           <CareIcon
             icon="l-search"
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-4"
@@ -97,10 +102,10 @@ export default function FacilityOrganizationUsers({
             onChange={(e) => {
               updateQuery({ search: e.target.value || undefined });
             }}
-            className="w-full pl-8"
+            className="pl-8"
           />
         </div>
-        <div className="flex gap-2 w-full md:w-auto justify-end">
+        <div className="flex gap-2 flex-shrink-0 justify-end ml-auto">
           {(isGeoAdmin || canCreateUser) && (
             <AddUserSheet
               open={openAddUserSheet}
@@ -127,55 +132,56 @@ export default function FacilityOrganizationUsers({
             />
           )}
         </div>
-      </div>
-
-      {isLoadingUsers ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
-          <CardGridSkeleton count={2} />
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4 md:pb-6">
-            {!users?.results?.length ? (
-              <Card className="col-span-full">
-                <CardContent className="p-6 text-center text-gray-500">
-                  {t("no_users_found")}
-                </CardContent>
-              </Card>
-            ) : (
-              users.results.map((userRole: OrganizationUserRole) => (
-                <UserCard
-                  key={userRole.user.id}
-                  user={userRole.user}
-                  roleName={userRole.role.name}
-                  facility={facilityId}
-                  actions={
-                    (isGeoAdmin || canManageFacilityOrganizationUsers) && (
-                      <EditFacilityUserRoleSheet
-                        facilityId={facilityId}
-                        organizationId={id}
-                        userRole={userRole}
-                        trigger={
-                          <Button variant="outline" size="sm">
-                            <span>{t("edit_role")}</span>
-                          </Button>
-                        }
-                      />
-                    )
-                  }
-                />
-              ))
-            )}
+      </RightPanelHeader>
+      <RightPanelContent>
+        {isLoadingUsers ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+            <CardGridSkeleton count={2} />
           </div>
-          {(users?.results || []).length > 0 &&
-            users?.count &&
-            users.count > resultsPerPage && (
-              <div className="flex justify-center">
-                <Pagination totalCount={users.count} />
-              </div>
-            )}
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4 md:pb-6">
+              {!users?.results?.length ? (
+                <Card className="col-span-full">
+                  <CardContent className="p-6 text-center text-gray-500">
+                    {t("no_users_found")}
+                  </CardContent>
+                </Card>
+              ) : (
+                users.results.map((userRole: OrganizationUserRole) => (
+                  <UserCard
+                    key={userRole.user.id}
+                    user={userRole.user}
+                    roleName={userRole.role.name}
+                    facility={facilityId}
+                    actions={
+                      (isGeoAdmin || canManageFacilityOrganizationUsers) && (
+                        <EditFacilityUserRoleSheet
+                          facilityId={facilityId}
+                          organizationId={id}
+                          userRole={userRole}
+                          trigger={
+                            <Button variant="outline" size="sm">
+                              <span>{t("edit_role")}</span>
+                            </Button>
+                          }
+                        />
+                      )
+                    }
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </RightPanelContent>
+      <RightPanelFooter>
+        {(users?.results || []).length > 0 &&
+          users?.count &&
+          users.count > resultsPerPage && (
+            <Pagination totalCount={users.count} />
+          )}
+      </RightPanelFooter>
+    </>
   );
 }

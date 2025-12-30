@@ -28,6 +28,11 @@ import {
 
 import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
 import { CardListSkeleton } from "@/components/Common/SkeletonLoading";
+import {
+  RightPanelContent,
+  RightPanelFooter,
+  RightPanelHeader,
+} from "@/components/Common/TwoColumnLayout";
 
 import useFilters from "@/hooks/useFilters";
 
@@ -215,161 +220,165 @@ export default function FacilityOrganizationView({
   );
 
   return (
-    <div className="space-y-4 mx-auto max-w-4xl md:px-2">
-      <div className="flex flex-col flex-wrap sm:flex-row sm:items-center sm:justify-between w-full gap-4">
-        <div className="relative w-full sm:w-72 max-w-full">
-          <CareIcon
-            icon="l-search"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-4"
-          />
-          <Input
-            placeholder={t("search_by_department_team_name")}
-            value={qParams.search || ""}
-            onChange={(e) => {
-              updateQuery({ search: e.target.value || undefined });
-            }}
-            className="w-full pl-8"
-          />
-        </div>
-
-        {(canCreateFacilityOrganization || isGeoAdmin) && (
-          <div className="w-full sm:w-auto flex justify-center sm:justify-start">
-            <FacilityOrganizationFormSheet
-              facilityId={facilityId}
-              parentId={id}
-              trigger={
-                <Button className="w-full">
-                  <CareIcon icon="l-plus" className="mr-2 size-4" />
-                  {t("add_department_team")}
-                </Button>
-              }
+    <>
+      <RightPanelHeader>
+        <div className="flex flex-col -mt-3 flex-wrap sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+          <div className="relative w-full sm:w-72 max-w-full">
+            <CareIcon
+              icon="l-search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 size-4"
+            />
+            <Input
+              placeholder={t("search_by_department_team_name")}
+              value={qParams.search || ""}
+              onChange={(e) => {
+                updateQuery({ search: e.target.value || undefined });
+              }}
+              className="w-full pl-8"
             />
           </div>
-        )}
-      </div>
-      {isLoading ? (
-        <div className="grid grid-cols-1  gap-3">
-          <CardListSkeleton count={4} />
-        </div>
-      ) : (
-        <div className="md:pb-4">
-          {children?.results?.length ? (
-            <>
-              <div className="hidden sm:block rounded-lg border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("name")}</TableHead>
-                      <TableHead>{t("type")}</TableHead>
-                      <TableHead className="text-right">
-                        {t("actions")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {children.results.map((org) => (
-                      <TableRow
-                        key={org.id}
-                        onClick={() =>
-                          navigate(
-                            `/facility/${facilityId}/settings/departments/${org.id}/departments`,
-                          )
-                        }
-                        className="hover:cursor-pointer group"
-                      >
-                        <TableCell>
-                          <div className="font-medium flex items-center gap-2 py-2">
-                            <Building className="size-4" />
-                            <span className="group-hover:underline group-hover:text-primary">
-                              {org.name}
-                            </span>
-                            {org.has_children && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <span className="cursor-help">
-                                      <FolderOpen className="size-3 text-gray-400" />
-                                    </span>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    {t("has_child_organizations")}
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {" "}
-                          <Badge variant="indigo" className="w-fit">
-                            {t(`facility_organization_type__${org.org_type}`)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell
-                          className="text-right"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="flex items-center justify-end gap-1">
-                            {(canManageFacilityOrganization || isGeoAdmin) &&
-                            org.org_type !== "root" ? (
-                              <FacilityOrganizationFormSheet
-                                facilityId={facilityId}
-                                parentId={id}
-                                org={org}
-                                tooltip={t("edit")}
-                                trigger={
-                                  <Button variant="ghost" size="icon">
-                                    <PenLine className="size-4" />
-                                  </Button>
-                                }
-                              />
-                            ) : (
-                              <div className="size-9" />
-                            )}
 
-                            {(canManageFacilityOrganization || isGeoAdmin) &&
-                            !org.has_children &&
-                            org.org_type !== "root" ? (
-                              <DeleteOrgDialog
-                                org={org}
-                                facilityId={facilityId}
-                              />
-                            ) : (
-                              <div className="size-9" />
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              <div className="block sm:hidden space-y-4">
-                {children.results.map((org) => (
-                  <OrganizationCard
-                    key={org.id}
-                    org={org}
-                    facilityId={facilityId}
-                    canWrite={canManageFacilityOrganization || isGeoAdmin}
-                    parentId={id}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <Card className="col-span-full">
-              <CardContent className="p-6 text-center text-gray-500">
-                {t("no_departments_teams_found")}
-              </CardContent>
-            </Card>
-          )}
-          {children && children.count > resultsPerPage && (
-            <div className="flex justify-center">
-              <Pagination totalCount={children.count} />
+          {(canCreateFacilityOrganization || isGeoAdmin) && (
+            <div className="w-full sm:w-auto flex justify-center sm:justify-start">
+              <FacilityOrganizationFormSheet
+                facilityId={facilityId}
+                parentId={id}
+                trigger={
+                  <Button className="w-full">
+                    <CareIcon icon="l-plus" className="mr-2 size-4" />
+                    {t("add_department_team")}
+                  </Button>
+                }
+              />
             </div>
           )}
         </div>
+      </RightPanelHeader>
+      <RightPanelContent>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-3">
+            <CardListSkeleton count={4} />
+          </div>
+        ) : (
+          <div>
+            {children?.results?.length ? (
+              <>
+                <div className="hidden sm:block rounded-lg p-1">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t("name")}</TableHead>
+                        <TableHead>{t("type")}</TableHead>
+                        <TableHead className="text-right">
+                          {t("actions")}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {children.results.map((org) => (
+                        <TableRow
+                          key={org.id}
+                          onClick={() =>
+                            navigate(
+                              `/facility/${facilityId}/settings/departments/${org.id}/departments`,
+                            )
+                          }
+                          className="hover:cursor-pointer group"
+                        >
+                          <TableCell>
+                            <div className="font-medium flex items-center gap-2 py-2">
+                              <Building className="size-4" />
+                              <span className="group-hover:underline group-hover:text-primary">
+                                {org.name}
+                              </span>
+                              {org.has_children && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="cursor-help">
+                                        <FolderOpen className="size-3 text-gray-400" />
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {t("has_child_organizations")}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {" "}
+                            <Badge variant="indigo" className="w-fit">
+                              {t(`facility_organization_type__${org.org_type}`)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell
+                            className="text-right"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-end gap-1">
+                              {(canManageFacilityOrganization || isGeoAdmin) &&
+                              org.org_type !== "root" ? (
+                                <FacilityOrganizationFormSheet
+                                  facilityId={facilityId}
+                                  parentId={id}
+                                  org={org}
+                                  tooltip={t("edit")}
+                                  trigger={
+                                    <Button variant="ghost" size="icon">
+                                      <PenLine className="size-4" />
+                                    </Button>
+                                  }
+                                />
+                              ) : (
+                                <div className="size-9" />
+                              )}
+
+                              {(canManageFacilityOrganization || isGeoAdmin) &&
+                              !org.has_children &&
+                              org.org_type !== "root" ? (
+                                <DeleteOrgDialog
+                                  org={org}
+                                  facilityId={facilityId}
+                                />
+                              ) : (
+                                <div className="size-9" />
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                <div className="block sm:hidden space-y-4">
+                  {children.results.map((org) => (
+                    <OrganizationCard
+                      key={org.id}
+                      org={org}
+                      facilityId={facilityId}
+                      canWrite={canManageFacilityOrganization || isGeoAdmin}
+                      parentId={id}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Card className="col-span-full">
+                <CardContent className="p-6 text-center text-gray-500">
+                  {t("no_departments_teams_found")}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+      </RightPanelContent>
+      {!isLoading && children && children.count > resultsPerPage && (
+        <RightPanelFooter>
+          <Pagination totalCount={children.count} />
+        </RightPanelFooter>
       )}
-    </div>
+    </>
   );
 }

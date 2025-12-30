@@ -4,7 +4,6 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import query from "@/Utils/request/query";
@@ -139,28 +138,26 @@ export default function FacilityOrganizationNavbar({
   const topLevelOrganizations = allOrganizations?.results || [];
 
   return (
-    <div className="min-w-64 shadow-lg bg-white rounded-lg hidden md:block">
-      <ScrollArea className="h-[calc(100vh-14rem)]">
-        <div className="p-4">
-          {isLoadingOrganizations ? (
-            <div className="p-4">
-              <Skeleton className="h-8 w-full" />
-            </div>
-          ) : (
-            topLevelOrganizations.map((organization) => (
-              <OrganizationTreeNode
-                key={organization.id}
-                organization={organization}
-                selectedOrganizationId={selectedOrganizationId}
-                onSelect={onOrganizationSelect}
-                expandedOrganizations={expandedOrganizations}
-                onToggleExpand={onToggleExpand}
-                facilityId={facilityId}
-              />
-            ))
-          )}
-        </div>
-      </ScrollArea>
+    <div className="h-full flex flex-col bg-white">
+      <div className="p-4">
+        {isLoadingOrganizations ? (
+          <div className="p-4">
+            <Skeleton className="h-8 w-full" />
+          </div>
+        ) : (
+          topLevelOrganizations.map((organization) => (
+            <OrganizationTreeNode
+              key={organization.id}
+              organization={organization}
+              selectedOrganizationId={selectedOrganizationId}
+              onSelect={onOrganizationSelect}
+              expandedOrganizations={expandedOrganizations}
+              onToggleExpand={onToggleExpand}
+              facilityId={facilityId}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }

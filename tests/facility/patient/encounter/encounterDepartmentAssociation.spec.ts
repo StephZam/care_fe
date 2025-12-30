@@ -40,8 +40,9 @@ test.describe("Manage departments/teams association to an encounter", () => {
   }
 
   async function selectAllOrganizationsTab(page: Page) {
-    await page.getByRole("tab", { name: "All Organizations" }).click();
     await page.getByRole("combobox").click();
+    await page.getByRole("tab", { name: "All Departments" }).click();
+    await page.getByRole("combobox").first().click();
   }
 
   async function selectDepartment(page: Page, departmentName?: string) {
@@ -49,12 +50,13 @@ test.describe("Manage departments/teams association to an encounter", () => {
     if (departmentName) {
       await page.getByRole("option", { name: departmentName }).click();
     } else {
+      await page.getByRole("combobox").first().click();
       await page.getByRole("option").first().click();
     }
   }
 
   async function submitAddOrganization(page: Page) {
-    await page.getByRole("button", { name: "Add Organizations" }).click();
+    await page.getByRole("button", { name: "Save Departments" }).click();
   }
 
   async function verifyOrganizationAdded(page: Page) {

@@ -62,11 +62,20 @@ test.describe("Create an Encounter", () => {
 
     await page.getByRole("button", { name: "Create Encounter" }).click();
 
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: "Select Department" })
+      .click();
+    await page.getByRole("option").first().click();
+
     // Use the random encounter type selected in beforeEach
-    await page.getByRole("button", { name: randomEncounterClass }).click();
+    await page
+      .getByRole("radio", { name: new RegExp(randomEncounterClass, "i") })
+      .click();
 
-    await page.getByRole("button", { name: "Create Encounter" }).click();
-
+    const createButton = page.getByRole("button", { name: "Create Encounter" });
+    await createButton.scrollIntoViewIfNeeded();
+    await createButton.click();
     // Wait for success message and verify on encounter page
     await expect(
       page.getByText("Encounter created successfully"),
@@ -134,11 +143,19 @@ test.describe("Create an Encounter", () => {
 
     await page.getByRole("button", { name: "Create Encounter" }).click();
 
-    // Use the random encounter type selected in beforeEach
-    await page.getByRole("button", { name: randomEncounterClass }).click();
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: "Select Department" })
+      .click();
+    await page.getByRole("option").first().click();
 
-    await page.getByRole("combobox", { name: "Status" }).click();
-    await page.getByRole("option", { name: randomEncounterStatus }).click();
+    // Use the random encounter type selected in beforeEach
+    await page
+      .getByRole("radio", { name: new RegExp(randomEncounterClass, "i") })
+      .click();
+
+    // await page.getByRole("combobox", { name: "Status" }).click();
+    await page.getByRole("radio", { name: randomEncounterStatus }).click();
     await page.getByRole("combobox", { name: "Priority" }).click();
     await page.getByRole("option", { name: randomEncounterPriority }).click();
     await page.getByRole("button", { name: "Create Encounter" }).click();

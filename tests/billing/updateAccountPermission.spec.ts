@@ -7,7 +7,7 @@ test.describe("Account Management Permissions", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to healthcare services
     facilityId = getFacilityId();
-    await page.goto(`/facility/${facilityId}/billing/accounts`);
+    await page.goto(`/facility/${facilityId}/billing/account`);
   });
 
   test.describe("facility admin", () => {
@@ -15,18 +15,24 @@ test.describe("Account Management Permissions", () => {
 
     test("can edit and rebalance accounts", async ({ page }) => {
       // Verify Edit button is visible on accounts list
-      const editButton = page.getByRole("button", { name: "Edit" }).first();
+      await expect(
+        page.getByRole("heading", { name: /accounts/i }),
+      ).toBeVisible();
+      const editButton = page.getByRole("button", { name: /edit/i });
       await expect(editButton).toBeVisible();
 
       // Navigate to account detail page
-      await page.getByRole("button", { name: "Go to account" }).first().click();
+      await page
+        .getByRole("button", { name: /go to account/i })
+        .first()
+        .click();
 
       // Verify Edit button is visible on account details
-      const accountEditButton = page.getByRole("button", { name: "Edit E" });
+      const accountEditButton = page.getByRole("button", { name: /edit/i });
       await expect(accountEditButton).toBeVisible();
 
       // Verify Rebalance button is visible
-      const rebalanceButton = page.getByRole("button", { name: "Rebalance" });
+      const rebalanceButton = page.getByRole("button", { name: /rebalance/i });
       await expect(rebalanceButton).toBeVisible();
     });
   });
@@ -36,18 +42,24 @@ test.describe("Account Management Permissions", () => {
 
     test("can edit and rebalance accounts", async ({ page }) => {
       // Verify Edit button is visible on accounts list
-      const editButton = page.getByRole("button", { name: "Edit" }).first();
+      await expect(
+        page.getByRole("heading", { name: /accounts/i }),
+      ).toBeVisible();
+      const editButton = page.getByRole("button", { name: /edit/i }).first();
       await expect(editButton).toBeVisible();
 
       // Navigate to account detail page
-      await page.getByRole("button", { name: "Go to account" }).first().click();
+      await page
+        .getByRole("button", { name: /go to account/i })
+        .first()
+        .click();
 
       // Verify Edit button is visible on account details
-      const accountEditButton = page.getByRole("button", { name: "Edit E" });
+      const accountEditButton = page.getByRole("button", { name: /edit/i });
       await expect(accountEditButton).toBeVisible();
 
       // Verify Rebalance button is visible
-      const rebalanceButton = page.getByRole("button", { name: "Rebalance" });
+      const rebalanceButton = page.getByRole("button", { name: /rebalance/i });
       await expect(rebalanceButton).toBeVisible();
     });
   });
@@ -57,18 +69,21 @@ test.describe("Account Management Permissions", () => {
 
     test("cannot edit or rebalance accounts", async ({ page }) => {
       // Verify Edit button is not visible on accounts list
-      const editButton = page.getByRole("button", { name: "Edit" }).first();
+      const editButton = page.getByRole("button", { name: /edit/i }).first();
       await expect(editButton).not.toBeVisible();
 
       // Navigate to account detail page
-      await page.getByRole("button", { name: "Go to account" }).first().click();
+      await page
+        .getByRole("button", { name: /go to account/i })
+        .first()
+        .click();
 
       // Verify Edit button is not visible on account details
-      const accountEditButton = page.getByRole("button", { name: "Edit E" });
+      const accountEditButton = page.getByRole("button", { name: /edit/i });
       await expect(accountEditButton).not.toBeVisible();
 
       // Verify Rebalance button is not visible
-      const rebalanceButton = page.getByRole("button", { name: "Rebalance" });
+      const rebalanceButton = page.getByRole("button", { name: /rebalance/i });
       await expect(rebalanceButton).not.toBeVisible();
     });
   });

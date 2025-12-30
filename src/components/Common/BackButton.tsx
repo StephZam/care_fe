@@ -14,7 +14,7 @@ export default function BackButton({ to, ...props }: BackButtonProps) {
   to ??= history[1];
 
   if (!to) {
-    return;
+    return null;
   }
 
   return (

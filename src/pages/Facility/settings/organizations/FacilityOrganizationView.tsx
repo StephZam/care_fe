@@ -264,7 +264,7 @@ export default function FacilityOrganizationView({
             {children?.results?.length ? (
               <>
                 <div className="hidden sm:block rounded-lg p-1">
-                  <Table>
+                  <Table className="border-b">
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t("name")}</TableHead>

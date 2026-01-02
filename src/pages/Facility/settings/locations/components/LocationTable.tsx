@@ -92,7 +92,7 @@ export function LocationTable({
 
   return (
     <div>
-      <Table>
+      <Table className="border-b">
         <TableHeader>
           <TableRow>
             <TableHead>{t("name")}</TableHead>

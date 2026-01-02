@@ -98,7 +98,7 @@ function RightPanelHeader({
   return (
     <div
       className={cn(
-        "flex bg-white px-3 py-3 sm:px-6 sm:py-4",
+        "flex bg-white px-3 py-3 mt-3 sm:px-6 sm:py-4",
         isMobile
           ? "flex-col gap-4"
           : "flex-row items-center border-b border-gray-300 gap-4 sticky top-0 z-10",

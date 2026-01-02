@@ -1,3 +1,4 @@
+import { useView } from "@/Utils/useView";
 import { useQuery } from "@tanstack/react-query";
 import { navigate } from "raviger";
 import { useCallback, useEffect, useState } from "react";
@@ -15,11 +16,13 @@ import {
   CardGridSkeleton,
   TableSkeleton,
 } from "@/components/Common/SkeletonLoading";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useLocationManagement } from "@/hooks/useLocationManagement";
 
 import query from "@/Utils/request/query";
 import { LocationTreeNode } from "@/pages/Facility/locations/LocationNavbar";
+import facilityApi from "@/types/facility/facilityApi";
 import { LocationRead as LocationListType } from "@/types/location/location";
 import locationApi from "@/types/location/locationApi";
 
@@ -32,6 +35,7 @@ import {
   TwoColumnLayout,
 } from "@/components/Common/TwoColumnLayout";
 import useBreakpoints from "@/hooks/useBreakpoints";
+import LocationMap from "./LocationMap";
 import LocationSheet from "./LocationSheet";
 import LocationView from "./LocationView";
 import { LocationCard } from "./components/LocationCard";
@@ -47,6 +51,7 @@ export default function LocationSettings({
   locationId,
 }: LocationSettingsProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useView("locations", "list");
   const [expandedLocations, setExpandedLocations] = useState<Set<string>>(
     new Set(),
   );
@@ -87,6 +92,24 @@ export default function LocationSettings({
     itemsPerPage: ITEMS_PER_PAGE,
   });
 
+  const { data: facilityData } = useQuery({
+    queryKey: ["facility", facilityId],
+    queryFn: query(facilityApi.get, {
+      pathParams: { facilityId },
+    }),
+  });
+
+  const { data: mapLocations } = useQuery({
+    queryKey: ["locations", facilityId, "map"],
+    queryFn: query(locationApi.list, {
+      pathParams: { facility_id: facilityId },
+      queryParams: {
+        limit: 1000,
+      },
+    }),
+    enabled: activeTab === "map",
+  });
+
   // Reset page to 1 when locationId changes
   useEffect(() => {
     setCurrentPage(1);
@@ -123,7 +146,7 @@ export default function LocationSettings({
 
   return (
     <TwoColumnLayout>
-      {!isMobile && (
+      {!isMobile && activeTab !== "map" && (
         <LeftPanel title={t("locations")}>
           <div className="p-4">
             {parentLocations?.results?.length ? (
@@ -158,96 +181,168 @@ export default function LocationSettings({
         />
       ) : (
         <RightPanel>
-          <RightPanelHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
-              <Input
-                placeholder={t("search_by_name")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full lg:w-72"
-              />
-              <div className="w-full sm:w-auto flex justify-center sm:justify-start">
-                <Button
-                  variant="primary"
-                  onClick={handleAddLocation}
-                  className="w-full sm:w-auto"
+          <RightPanelHeader className="mt-0">
+            {activeTab === "map" ? (
+              <div className="flex justify-end w-full">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    setActiveTab(value as "list" | "map")
+                  }
                 >
-                  <CareIcon icon="l-plus" className="h-4 w-4 mr-2" />
-                  {t("add_location")}
-                </Button>
+                  <TabsList className="flex">
+                    <TabsTrigger
+                      value="list"
+                      id="location-list-view"
+                      className="data-[state=active]:text-primary"
+                    >
+                      <CareIcon icon="l-list-ul" className="text-lg" />
+                      <span>{t("list")}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="map"
+                      id="location-map-view"
+                      className="data-[state=active]:text-primary"
+                    >
+                      <CareIcon icon="l-map" className="text-lg" />
+                      <span>{t("map")}</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                <Input
+                  placeholder={t("search_by_name")}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full lg:w-72"
+                />
+                <div className="flex gap-2 justify-between sm:justify-start sm:w-auto w-full">
+                  <Tabs
+                    value={activeTab}
+                    onValueChange={(value) =>
+                      setActiveTab(value as "list" | "map")
+                    }
+                  >
+                    <TabsList className="flex">
+                      <TabsTrigger
+                        value="list"
+                        id="location-list-view"
+                        className="data-[state=active]:text-primary"
+                      >
+                        <CareIcon icon="l-list-ul" className="text-lg" />
+                        <span>{t("list")}</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="map"
+                        id="location-map-view"
+                        className="data-[state=active]:text-primary"
+                      >
+                        <CareIcon icon="l-map" className="text-lg" />
+                        <span>{t("map")}</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <Button
+                    variant="primary"
+                    onClick={handleAddLocation}
+                    className="px-6 sm:w-auto"
+                  >
+                    <CareIcon icon="l-plus" className="h-4 w-4 mr-2" />
+                    {t("add_location")}
+                  </Button>
+                </div>
+              </div>
+            )}
           </RightPanelHeader>
           <RightPanelContent>
-            {isLoading ? (
-              <TableSkeleton count={5} />
-            ) : currentPageItems?.length ? (
-              <LocationTable
-                locations={currentPageItems}
-                onEdit={handleEditLocation}
-                onView={handleLocationSelect}
-                onMoveUp={handleMoveUp}
-                onMoveDown={handleMoveDown}
-                facilityId={facilityId}
-                isFirstPage={currentPage === 1}
-                isLastPage={isLastPage}
-                currentPage={currentPage}
-                setPage={setCurrentPage}
+            {activeTab === "map" ? (
+              <LocationMap
+                locations={mapLocations?.results || []}
+                onLocationClick={handleLocationSelect}
+                onLocationEdit={handleEditLocation}
+                facilityName={facilityData?.name || t("facility")}
+                searchQuery={searchQuery}
+                isEditing={isSheetOpen}
               />
             ) : (
-              <Card>
-                <CardContent className="p-4 text-center text-gray-500">
-                  {t("no_locations_found")}
-                </CardContent>
-              </Card>
-            )}
-            <div className="lg:hidden flex flex-col gap-4 sm:px-4">
-              {isLoading ? (
-                <CardGridSkeleton count={3} />
-              ) : currentPageItems?.length ? (
-                <div className="flex flex-col gap-4">
-                  {currentPageItems.map((childLocation, index) => (
-                    <AnimatedWrapper
-                      key={childLocation.id}
-                      keyValue={childLocation.id}
-                    >
-                      <LocationCard
-                        location={childLocation}
-                        onEdit={handleEditLocation}
-                        onView={handleLocationSelect}
-                        onMoveUp={handleMoveUp}
-                        onMoveDown={handleMoveDown}
-                        facilityId={facilityId}
-                        index={index}
-                        totalCount={currentPageItems.length}
-                        isFirstPage={currentPage === 1}
-                        isLastPage={isLastPage}
-                        currentPage={currentPage}
-                        setPage={setCurrentPage}
-                      />
-                    </AnimatedWrapper>
-                  ))}
+              <>
+                <div className="hidden lg:block">
+                  {isLoading ? (
+                    <TableSkeleton count={5} />
+                  ) : currentPageItems?.length ? (
+                    <LocationTable
+                      locations={currentPageItems}
+                      onEdit={handleEditLocation}
+                      onView={handleLocationSelect}
+                      onMoveUp={handleMoveUp}
+                      onMoveDown={handleMoveDown}
+                      facilityId={facilityId}
+                      isFirstPage={currentPage === 1}
+                      isLastPage={isLastPage}
+                      currentPage={currentPage}
+                      setPage={setCurrentPage}
+                    />
+                  ) : (
+                    <Card>
+                      <CardContent className="p-4 text-center text-gray-500">
+                        {t("no_locations_found")}
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
-              ) : (
-                <Card>
-                  <CardContent className="p-4 text-center text-gray-500">
-                    {t("no_locations_found")}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                <div className="lg:hidden flex flex-col gap-4 sm:px-4">
+                  {isLoading ? (
+                    <CardGridSkeleton count={3} />
+                  ) : currentPageItems?.length ? (
+                    <div className="flex flex-col gap-4">
+                      {currentPageItems.map((childLocation, index) => (
+                        <AnimatedWrapper
+                          key={childLocation.id}
+                          keyValue={childLocation.id}
+                        >
+                          <LocationCard
+                            location={childLocation}
+                            onEdit={handleEditLocation}
+                            onView={handleLocationSelect}
+                            onMoveUp={handleMoveUp}
+                            onMoveDown={handleMoveDown}
+                            facilityId={facilityId}
+                            index={index}
+                            totalCount={currentPageItems.length}
+                            isFirstPage={currentPage === 1}
+                            isLastPage={isLastPage}
+                            currentPage={currentPage}
+                            setPage={setCurrentPage}
+                          />
+                        </AnimatedWrapper>
+                      ))}
+                    </div>
+                  ) : (
+                    <Card>
+                      <CardContent className="p-4 text-center text-gray-500">
+                        {t("no_locations_found")}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </>
+            )}
           </RightPanelContent>
           <RightPanelFooter>
-            {childLocations && childLocations.count > ITEMS_PER_PAGE && (
-              <div className="flex justify-center">
-                <Pagination
-                  data={{ totalCount: childLocations.count }}
-                  onChange={setCurrentPage}
-                  defaultPerPage={ITEMS_PER_PAGE}
-                  cPage={currentPage}
-                />
-              </div>
-            )}
+            {activeTab === "list" &&
+              childLocations &&
+              childLocations.count > ITEMS_PER_PAGE && (
+                <div className="flex justify-center">
+                  <Pagination
+                    data={{ totalCount: childLocations.count }}
+                    onChange={setCurrentPage}
+                    defaultPerPage={ITEMS_PER_PAGE}
+                    cPage={currentPage}
+                  />
+                </div>
+              )}
           </RightPanelFooter>
         </RightPanel>
       )}

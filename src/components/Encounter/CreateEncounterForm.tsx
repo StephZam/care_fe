@@ -196,7 +196,7 @@ export default function CreateEncounterForm({
                     <FormItem>
                       <FacilityOrganizationSelector
                         facilityId={facilityId}
-                        value={field.value}
+                        value={field.value.length > 0 ? field.value : null}
                         onChange={(value) => {
                           if (value === null) {
                             form.setValue("organizations", []);
@@ -283,18 +283,18 @@ export default function CreateEncounterForm({
                               <Label
                                 htmlFor={`encounter-class-${value}`}
                                 className={cn(
-                                  "flex h-30 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white p-4 pt-6 text-lg",
+                                  "flex h-30 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-400 bg-white p-4 pt-6 text-lg",
                                   field.value === value &&
-                                    "ring-2 ring-primary-500 text-primary-900 bg-primary-100",
+                                    "ring-1 ring-primary-500 text-primary-900 bg-primary-100",
                                 )}
                               >
-                                <Icon className="size-6" />
-                                <div className="text-base font-semibold">
+                                <Icon className="size-6 flex-shrink-0" />
+                                <div className="text-sm font-semibold">
                                   {t(`encounter_class__${value}`)}
                                 </div>
                                 <div
                                   className={cn(
-                                    "whitespace-normal break-words text-center text-base text-gray-600",
+                                    "text-center text-sm font-normal text-gray-600 -mt-1 whitespace-nowrap",
                                     field.value === value && "text-primary-700",
                                   )}
                                 >

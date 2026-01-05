@@ -13,8 +13,6 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
-import CareIcon from "@/CAREUI/icons/CareIcon";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -274,8 +272,8 @@ export default function FacilityOrganizationSelector(
 
   const renderOrganizationCommand = (className?: string) => {
     return (
-      <Command className={className}>
-        <div className="p-1 mb-1">
+      <Command className={cn("flex flex-col", className)}>
+        <div className="p-1 mb-1 shrink-0">
           <Tabs
             value={showAllOrgs ? "all" : "mine"}
             onValueChange={(value) => handleOrganizationViewChange(value)}
@@ -287,7 +285,7 @@ export default function FacilityOrganizationSelector(
             </TabsList>
           </Tabs>
         </div>
-        <div className="flex items-center px-2 mx-1 mb-1 border border-gray-300 rounded-md">
+        <div className="flex items-center px-2 mx-1 mb-1 border border-gray-300 rounded-md shrink-0">
           <CommandInput
             placeholder={t("search_department")}
             onValueChange={setFacilityOrgSearch}
@@ -295,7 +293,7 @@ export default function FacilityOrganizationSelector(
             className="border-none focus:ring-0 text-medium text-gray-800 sm:text-sm"
           />
         </div>
-        <div className="max-h-[60vh] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0 max-h-[30vh]">
           <CommandList onWheel={(e) => e.stopPropagation()}>
             <CommandEmpty>
               {isLoadingRoot ||
@@ -342,7 +340,12 @@ export default function FacilityOrganizationSelector(
             </CommandGroup>
           </CommandList>
         </div>
-        <div className="m-1 px-2 py-2 bg-gray-50 border border-indigo-300 rounded-md">
+        <div
+          className={cn(
+            "m-1 px-2 py-2 bg-gray-50 border rounded-md shrink-0",
+            currentSelection ? "border-indigo-300" : "border-gray-200",
+          )}
+        >
           {currentSelection ? (
             isDisabled ? (
               <div className="flex flex-col gap-2">
@@ -413,12 +416,12 @@ export default function FacilityOrganizationSelector(
                     <span>{t("clear")}</span>
                   </Button>
                 </div>
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-indigo-200">
+                <div className="flex items-center justify-between gap-1 pt-2 border-t border-indigo-200">
                   {navigationLevels.length > 1 ? (
                     <Button
                       variant="outline"
-                      size="lg"
-                      className="gap-1 text-base font-regular flex items-center"
+                      size="default"
+                      className="gap-1 text-base font-regular flex items-center px-2 py-1"
                       onClick={() => {
                         setNavigationLevels(navigationLevels.slice(0, -1));
                         setCurrentSelection(
@@ -429,16 +432,16 @@ export default function FacilityOrganizationSelector(
                       }}
                     >
                       <ChevronLeft className="size-4" />
-                      <span>{t("back")}</span>
+                      <span className="hidden sm:inline">{t("back")}</span>
                     </Button>
                   ) : (
                     <div />
                   )}
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <Button
                       variant="ghost"
-                      size="lg"
-                      className="underline hover:bg-transparent text-base text-gray-950"
+                      size="default"
+                      className="underline hover:bg-transparent text-base text-gray-950 px-2 py-1"
                       onClick={() => {
                         setCurrentSelection(null);
                         setNavigationLevels([]);
@@ -449,8 +452,8 @@ export default function FacilityOrganizationSelector(
                     </Button>
                     <Button
                       variant="outline"
-                      size="lg"
-                      className="gap-2 border-primary-600 text-primary-700 bg-primary-50 hover:text-primary-600"
+                      size="default"
+                      className="gap-2 border-primary-600 text-primary-700 bg-primary-50 hover:text-primary-600 px-2 py-1"
                       onClick={() =>
                         currentSelection &&
                         handleConfirmSelection(currentSelection)
@@ -470,8 +473,8 @@ export default function FacilityOrganizationSelector(
               {navigationLevels.length > 1 ? (
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="gap-1 text-base font-regular flex items-center"
+                  size="default"
+                  className="gap-1 text-base sm:text-xs font-regular flex items-center px-2 py-1"
                   onClick={() => {
                     setNavigationLevels(navigationLevels.slice(0, -1));
                     setCurrentSelection(
@@ -482,7 +485,7 @@ export default function FacilityOrganizationSelector(
                   }}
                 >
                   <ChevronLeft className="size-4" />
-                  <span>{t("back")}</span>
+                  <span className="hidden sm:inline">{t("back")}</span>
                 </Button>
               ) : (
                 <div />
@@ -490,8 +493,8 @@ export default function FacilityOrganizationSelector(
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
-                  size="lg"
-                  className="underline hover:bg-transparent text-base text-gray-950"
+                  size="default"
+                  className="underline hover:bg-transparent text-base text-gray-950 px-2 py-1"
                   onClick={() => {
                     setCurrentSelection(null);
                     setNavigationLevels([]);
@@ -502,18 +505,15 @@ export default function FacilityOrganizationSelector(
                 </Button>
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="gap-2 border-primary-600 text-primary-700 bg-primary-50 hover:text-primary-600"
+                  size="default"
+                  className="gap-2 border-primary-600 text-primary-700 bg-primary-50 hover:text-primary-600 px-2 py-1"
                   onClick={() =>
                     currentSelection && handleConfirmSelection(currentSelection)
                   }
                   disabled={!currentSelection || isDisabled}
                   data-cy="confirm-organization"
                 >
-                  <CareIcon
-                    icon="l-check"
-                    className="text-primary-700 size-5!"
-                  />
+                  <Check className="text-primary-700 size-4" />
                   <span>{t("confirm")}</span>
                 </Button>
               </div>
@@ -616,7 +616,11 @@ export default function FacilityOrganizationSelector(
                 </Drawer>
               </>
             ) : (
-              <Popover open={open} onOpenChange={handleOpenChange}>
+              <Popover
+                open={open}
+                onOpenChange={handleOpenChange}
+                modal={false}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -640,7 +644,7 @@ export default function FacilityOrganizationSelector(
                 <PopoverContent
                   align="start"
                   sideOffset={4}
-                  className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[80vh] overflow-auto"
+                  className="p-0 w-[var(--radix-popover-trigger-width)] max-h-[52vh] overflow-auto"
                 >
                   {renderOrganizationCommand()}
                 </PopoverContent>

@@ -1,11 +1,11 @@
 import {
-  Ambulance,
   BadgeCheck,
   Ban,
   BedDouble,
   Calendar,
   CirclePause,
   CircleX,
+  DoorOpen,
   FileQuestion,
   Home,
   LoaderCircle,
@@ -139,7 +139,7 @@ export const ENCOUNTER_STATUS_COLORS = {
 
 export const ENCOUNTER_CLASS_ICONS = {
   imp: BedDouble,
-  amb: Ambulance,
+  amb: DoorOpen,
   obsenc: Stethoscope,
   emer: Siren,
   vr: MonitorSmartphone,

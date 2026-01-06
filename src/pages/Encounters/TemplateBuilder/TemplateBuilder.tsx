@@ -207,7 +207,7 @@ export default function TemplateBuilder({
   const handleSaveTemplate = async () => {
     const formData = form.getValues();
     const templateData = {
-      template_type: template?.template_type || "discharge_summary",
+      template_type: formData.template_type,
       name: formData.name,
       slug_value: formData.slug_value,
       status: formData.status,
@@ -482,12 +482,11 @@ export default function TemplateBuilder({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {schema?.report_types &&
-                        Object.keys(schema.report_types).map((key) => (
-                          <SelectItem key={key} value={key}>
-                            {schema.report_types[key].display_name}
-                          </SelectItem>
-                        ))}
+                      {TemplateTypes.map((reportType) => (
+                        <SelectItem key={reportType} value={reportType}>
+                          {t(reportType)}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

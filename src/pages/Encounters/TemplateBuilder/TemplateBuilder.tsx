@@ -475,21 +475,19 @@ export default function TemplateBuilder({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("report_type")}</FormLabel>
-                  <Select
-                    value={field.value || "discharge_summary"}
-                    onValueChange={field.onChange}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder={t("select_report_type")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {TemplateTypes.map((reportType) => (
-                        <SelectItem key={reportType} value={reportType}>
-                          {t(reportType)}
-                        </SelectItem>
-                      ))}
+                      {schema?.report_types &&
+                        Object.keys(schema.report_types).map((key) => (
+                          <SelectItem key={key} value={key}>
+                            {schema.report_types[key].display_name}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -183,4 +183,38 @@ test.describe("Create an Encounter", () => {
       page.getByRole("combobox").filter({ hasText: randomEncounterPriority }),
     ).toBeVisible();
   });
+
+  test("should create two encounters consecutively to verify department auto selection", async ({
+    page,
+  }) => {
+    await page.getByText("Patient Home").first().click();
+
+    // Create first encounter (Inpatient)
+    await page.getByRole("button", { name: "Create Encounter" }).click();
+    await page
+      .getByRole("radio", { name: new RegExp(randomEncounterClass, "i") })
+      .click();
+    await page
+      .getByRole("button", { name: "Create Encounter ⇧ + ENTER" })
+      .click();
+    await expect(
+      page.getByText("Encounter created successfully"),
+    ).toBeVisible();
+
+    // Navigate back to patient home
+    await page.getByRole("button", { name: /.*Y,.*/ }).click();
+    await page.getByRole("link", { name: "Patient Home" }).click();
+
+    // Create second encounter
+    await page.getByRole("button", { name: "Create Encounter" }).click();
+    await page
+      .getByRole("radio", { name: new RegExp(randomEncounterClass, "i") })
+      .click();
+    await page
+      .getByRole("button", { name: "Create Encounter ⇧ + ENTER" })
+      .click();
+    await expect(
+      page.getByText("Encounter created successfully"),
+    ).toBeVisible();
+  });
 });

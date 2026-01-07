@@ -283,7 +283,7 @@ export default function CreateEncounterForm({
                               <Label
                                 htmlFor={`encounter-class-${value}`}
                                 className={cn(
-                                  "flex h-30 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-400 bg-white p-4 pt-6 text-lg",
+                                  "flex h-25 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-400 bg-white p-2 pt-4 text-lg",
                                   field.value === value &&
                                     "ring-1 ring-primary-500 text-primary-900 bg-primary-100",
                                 )}

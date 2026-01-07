@@ -11,15 +11,13 @@ const DottedDivider: React.FC<DottedDividerProps> = ({
   height = 8,
   colorClass = "text-gray-500",
 }) => {
-  const patternId = React.useMemo(
-    () => `dotted-pattern-${Math.random().toString(36).slice(2, 11)}`,
-    [],
-  );
+  const patternId = React.useId();
 
   return (
     <div
       className={`w-full ${colorClass} ${className}`}
       style={{ height: `${height}px` }}
+      aria-hidden="true"
     >
       <svg
         width="100%"

@@ -130,6 +130,7 @@ export default function FacilityOrganizationSelector(
       selectedOrganizations.some((o) => o.id === org.id);
     if (isAlreadySelected) {
       setCurrentSelection(org);
+      return;
     }
     if (org.has_children) {
       setNavigationLevels([...navigationLevels, org]);
@@ -210,7 +211,6 @@ export default function FacilityOrganizationSelector(
       availableOrganizations.length === 1 &&
       !facilityOrgSearch &&
       selectedOrganizations.length === 0 &&
-      props.value == null &&
       !isLoadingRoot
     ) {
       const singleOrg = availableOrganizations[0];

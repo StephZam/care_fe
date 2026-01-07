@@ -172,7 +172,7 @@ function DeleteOrganizationButton({
       disabled={isPending}
     >
       {isPending ? (
-        <Loader2 className="size-4 animate-spin mr-1" />
+        <Loader2 className="size-4 animate-spin" />
       ) : (
         <Trash2 className="size-4 text-red-700" />
       )}
@@ -300,7 +300,7 @@ export default function LinkDepartmentsSheet({
         {trigger || (
           <Button variant="outline" size="sm">
             <Building className="mr-2 size-4" />
-            {t("manage_department/team", {
+            {t("manage_department_team", {
               count: entityType === "device" ? 1 : 2,
             })}
           </Button>
@@ -309,12 +309,12 @@ export default function LinkDepartmentsSheet({
       <SheetContent className="w-full overflow-auto sm:max-w-none md:w-[50vw] lg:w-[25vw]">
         <SheetHeader>
           <SheetTitle>
-            {t("manage_department/team", {
+            {t("manage_department_team", {
               count: entityType === "device" ? 1 : 2,
             })}
           </SheetTitle>
           <SheetDescription className="text-gray-700">
-            {t("manage_department/team_description", {
+            {t("manage_department_team_description", {
               entityType,
               count: entityType === "device" ? 1 : 2,
             })}

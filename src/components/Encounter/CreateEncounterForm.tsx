@@ -294,7 +294,7 @@ export default function CreateEncounterForm({
                                 </div>
                                 <div
                                   className={cn(
-                                    "text-center text-sm font-normal text-gray-600 -mt-1 whitespace-nowrap",
+                                    "text-center text-xs sm:text-sm font-normal text-gray-600 -mt-1 px-1",
                                     field.value === value && "text-primary-700",
                                   )}
                                 >

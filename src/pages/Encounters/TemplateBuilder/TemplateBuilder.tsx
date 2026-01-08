@@ -1,4 +1,3 @@
-import BackButton from "@/components/Common/BackButton";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -30,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import useAppHistory from "@/hooks/useAppHistory";
 
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
@@ -102,6 +102,8 @@ export default function TemplateBuilder({
     data: Blob | string | null;
     format: TemplateFormat | null;
   }>({ isActive: false, data: null, format: null });
+
+  const { goBack } = useAppHistory();
 
   const form = useForm({
     resolver: zodResolver(templateBuilderSchema),
@@ -342,15 +344,19 @@ export default function TemplateBuilder({
   return (
     <div className="h-screen flex flex-col">
       <div className="border-b p-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => goBack(`/facility/${facilityId}/template`)}
+          className="mb-4"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span>{t("back")}</span>
+        </Button>
         <div className="flex flex-col sm:flex-row gap-2 items-center justify-between mb-4">
           <div>
-            <div className="flex items-center gap-4">
-              <BackButton size="sm">
-                <ChevronLeft />
-              </BackButton>
-              <h1 className="text-2xl font-bold">{t("template_builder")}</h1>
-            </div>
-            <p className="text-sm mt-2 text-muted-foreground">
+            <h1 className="text-2xl font-bold">{t("template_builder")}</h1>
+            <p className="text-sm text-muted-foreground">
               {t("template_builder_description")}
             </p>
           </div>

@@ -571,6 +571,7 @@ export default function FacilityOrganizationSelector(
               <Button
                 variant="ghost"
                 size="sm"
+                type="button"
                 className="text-gray-900 text-sm sm:text-sm -mr-2"
                 onClick={() => handleRemoveOrganization(index)}
               >

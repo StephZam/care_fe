@@ -90,7 +90,7 @@ export default function FacilityOrganizationUsers({
 
   return (
     <>
-      <RightPanelHeader className="flex-row items-center -mt-3 gap-4">
+      <RightPanelHeader className="flex-row items-center -mt-3 gap-4 border-0">
         <div className="relative">
           <CareIcon
             icon="l-search"

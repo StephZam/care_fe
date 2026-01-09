@@ -48,8 +48,8 @@ function OrganizationTreeNode({
     <div className="space-y-1">
       <div
         className={cn(
-          "flex items-center py-1 px-2 rounded-md cursor-pointer hover:bg-gray-100",
-          isSelected && "bg-blue-100 text-blue-800",
+          "flex items-center py-1 rounded-md cursor-pointer transition-colors min-w-max pr-7",
+          isSelected ? "bg-blue-100 text-blue-800" : "hover:bg-gray-100",
         )}
         style={{ paddingLeft: `${level}rem` }}
       >
@@ -57,7 +57,7 @@ function OrganizationTreeNode({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6"
+            className="size-6 flex-shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               onToggleExpand(organization.id);
@@ -72,7 +72,7 @@ function OrganizationTreeNode({
             )}
           </Button>
         ) : (
-          <span className="w-6" />
+          <span className="w-6 flex-shrink-0" />
         )}
         <div
           onClick={() => {

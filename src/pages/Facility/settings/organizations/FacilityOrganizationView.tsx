@@ -221,8 +221,8 @@ export default function FacilityOrganizationView({
 
   return (
     <>
-      <RightPanelHeader>
-        <div className="flex flex-col -mt-3 flex-wrap sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+      <RightPanelHeader className={id ? "border-b-0" : ""}>
+        <div className="flex flex-col flex-wrap sm:flex-row sm:items-center sm:justify-between w-full gap-4">
           <div className="relative w-full sm:w-72 max-w-full">
             <CareIcon
               icon="l-search"
@@ -263,7 +263,7 @@ export default function FacilityOrganizationView({
           <div>
             {children?.results?.length ? (
               <>
-                <div className="hidden sm:block rounded-lg p-1">
+                <div className="hidden sm:block rounded-lg">
                   <Table className="border-b">
                     <TableHeader>
                       <TableRow>
@@ -376,7 +376,7 @@ export default function FacilityOrganizationView({
       </RightPanelContent>
       {!isLoading && children && children.count > resultsPerPage && (
         <RightPanelFooter>
-          <Pagination totalCount={children.count} />
+          <Pagination totalCount={children.count} noMargin />
         </RightPanelFooter>
       )}
     </>

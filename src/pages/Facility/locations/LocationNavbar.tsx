@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { CardGridSkeleton } from "@/components/Common/SkeletonLoading";
 
@@ -57,7 +56,7 @@ export function LocationTreeNode({
     <div className="space-y-1">
       <div
         className={cn(
-          "flex items-center py-1 px-2 rounded-md cursor-pointer hover:bg-gray-100",
+          "flex items-center py-1 px-2 rounded-md cursor-pointer hover:bg-gray-100 min-w-max",
           isSelected && "bg-blue-100 text-blue-800",
         )}
         style={{ paddingLeft: `${level}rem` }}
@@ -86,7 +85,7 @@ export function LocationTreeNode({
           <span className="w-6" />
         )}
         <div
-          className="flex items-center flex-1 text-sm gap-2 w-0"
+          className="flex items-center flex-1 text-sm gap-2"
           onClick={(e) => {
             e.stopPropagation();
             onSelect(location);
@@ -94,7 +93,7 @@ export function LocationTreeNode({
           }}
         >
           <Icon className="size-4 shrink-0" />
-          <span className="truncate">{location.name}</span>
+          <span className="whitespace-nowrap">{location.name}</span>
         </div>
       </div>
       {isExpanded && children?.results && children.results.length > 0 && (
@@ -153,12 +152,12 @@ export default function LocationNavbar({
   }
 
   return (
-    <div className="w-64 shadow-lg bg-white rounded-lg hidden md:block">
-      <div className="p-4">
+    <div className="w-64 shadow-lg bg-white rounded-lg hidden md:block overflow-x-auto">
+      <div className="p-4 min-w-max">
         <h2 className="text-lg font-semibold">{t("locations")}</h2>
       </div>
-      <ScrollArea>
-        <div className="p-2">
+      <div className="overflow-x-auto">
+        <div className="p-2 min-w-max">
           {isLoadingLocations ? (
             <div className="p-4">
               <CardGridSkeleton count={3} />
@@ -177,7 +176,7 @@ export default function LocationNavbar({
             ))
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

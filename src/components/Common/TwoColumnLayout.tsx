@@ -17,10 +17,7 @@ function TwoColumnLayout({
   return (
     <div
       className={cn(
-        "fixed right-0 bottom-0 m-1 mr-3 mb-3 rounded",
-        "transition-[left] duration-200 ease-linear",
-        "flex flex-col",
-        "left-2",
+        "fixed right-0 bottom-0 m-1 mr-3 mb-3 rounded transition-[left] duration-200 ease-linear flex flex-col left-2",
         isMobile ? "top-18 m-0" : "top-2 md:top-2",
         isCollapsed
           ? "md:left-(--sidebar-width-icon)"
@@ -50,12 +47,12 @@ function LeftPanel({
   return (
     <div
       className={cn(
-        "w-64 flex-shrink-0 border-r border-gray-200 bg-white h-full flex flex-col",
+        "flex-shrink-0 border-r border-gray-200 bg-white h-full flex flex-col",
         className,
       )}
     >
       {title && (
-        <div className="flex-shrink-0 bg-white z-10 px-4 py-5 border-b border-gray-200">
+        <div className="flex-shrink-0 bg-white z-10 px-4 py-5 border-b border-gray-300">
           <h2 className="font-semibold text-gray-900 text-lg">{title}</h2>
         </div>
       )}
@@ -98,7 +95,7 @@ function RightPanelHeader({
   return (
     <div
       className={cn(
-        "flex bg-white px-3 py-3 mt-3 sm:px-6 sm:py-4",
+        "flex bg-white px-3 py-4 sm:px-6 sm:mr-10",
         isMobile
           ? "flex-col gap-4"
           : "flex-row items-center border-b border-gray-300 gap-4 sticky top-0 z-10",

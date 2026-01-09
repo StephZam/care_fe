@@ -11,6 +11,11 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
@@ -144,111 +149,140 @@ export default function FacilityOrganizationList({
     currentParent = currentParent.parent;
   }
 
-  return (
-    <TwoColumnLayout>
-      {!isMobile && (
-        <LeftPanel title={t("departments_or_teams")}>
-          <FacilityOrganizationNavbar
-            facilityId={facilityId}
-            selectedOrganizationId={organizationId || null}
-            expandedOrganizations={expandedOrganizations}
-            onToggleExpand={handleToggleExpand}
-            onOrganizationSelect={handleOrganizationSelect}
-          />
-        </LeftPanel>
-      )}
+  const renderHeader = () => {
+    if (!organizationId || !org) return null;
 
-      <RightPanel>
-        {organizationId && org && (
-          <RightPanelHeader className="border-b-0">
-            <div className="w-full space-y-3">
-              <Breadcrumb>
-                <BreadcrumbList>
+    return (
+      <RightPanelHeader className="border-b-0">
+        <div className="w-full space-y-3">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink
+                  asChild
+                  className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
+                  onClick={() =>
+                    navigate(`/facility/${facilityId}/settings/departments`)
+                  }
+                >
+                  <button type="button">{t("departments")}</button>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              {orgParents.reverse().map((parent) => (
+                <React.Fragment key={parent.id}>
                   <BreadcrumbItem>
                     <BreadcrumbLink
                       asChild
                       className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-                      onClick={() =>
-                        navigate(`/facility/${facilityId}/settings/departments`)
-                      }
+                      onClick={() => handleParentClick(parent.id)}
                     >
-                      <button type="button">{t("departments")}</button>
+                      <button type="button">{parent.name}</button>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
-                  {orgParents.reverse().map((parent) => (
-                    <React.Fragment key={parent.id}>
-                      <BreadcrumbItem>
-                        <BreadcrumbLink
-                          asChild
-                          className="text-sm text-gray-900 cursor-pointer hover:underline hover:underline-offset-2"
-                          onClick={() => handleParentClick(parent.id)}
-                        >
-                          <button type="button">{parent.name}</button>
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                    </React.Fragment>
-                  ))}
-                  <BreadcrumbItem key={org?.id}>
-                    <span className="font-semibold text-gray-900">
-                      {org?.name}
-                    </span>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
+                </React.Fragment>
+              ))}
+              <BreadcrumbItem key={org.id}>
+                <span className="font-semibold text-gray-900">{org.name}</span>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-              <div className="flex items-center">
-                <h2 className="text-xl font-semibold">{org.name}</h2>
-                {org.org_type && (
-                  <Badge variant="indigo" className="ml-2 w-auto">
-                    {t(`facility_organization_type__${org.org_type}`)}
-                  </Badge>
-                )}
-              </div>
+          <div className="flex items-center">
+            <h2 className="text-xl font-semibold">{org.name}</h2>
+            {org.org_type && (
+              <Badge variant="indigo" className="ml-2 w-auto">
+                {t(`facility_organization_type__${org.org_type}`)}
+              </Badge>
+            )}
+          </div>
 
-              {org.description && (
-                <p className="text-sm text-gray-500 break-all whitespace-normal">
-                  {org.description}
-                </p>
-              )}
+          {org.description && (
+            <p className="text-sm text-gray-500 break-all whitespace-normal">
+              {org.description}
+            </p>
+          )}
 
-              <Tabs
-                defaultValue={currentTab}
-                className="w-full"
-                value={currentTab}
-                onValueChange={handleTabChange}
-              >
-                <TabsList className="justify-start border-b border-gray-300 bg-transparent p-0 h-auto rounded-none">
-                  {navItems.map((item) => (
-                    <TabsTrigger
-                      key={item.value}
-                      value={item.value}
-                      className="border-0 border-b-2 border-transparent px-2 py-2 text-gray-600 hover:text-gray-900 data-[state=active]:text-primary-800  data-[state=active]:border-primary-700 data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none"
-                    >
-                      {item.title}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </div>
-          </RightPanelHeader>
-        )}
+          <Tabs
+            defaultValue={currentTab}
+            className="w-full"
+            value={currentTab}
+            onValueChange={handleTabChange}
+          >
+            <TabsList className="justify-start border-b border-gray-300 bg-transparent p-0 h-auto rounded-none">
+              {navItems.map((item) => (
+                <TabsTrigger
+                  key={item.value}
+                  value={item.value}
+                  className="border-0 border-b-2 border-transparent px-2 py-2 text-gray-600 hover:text-gray-900 data-[state=active]:text-primary-800  data-[state=active]:border-primary-700 data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none"
+                >
+                  {item.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      </RightPanelHeader>
+    );
+  };
 
-        {currentTab === "users" && organizationId ? (
-          <FacilityOrganizationUsers
-            id={organizationId}
-            facilityId={facilityId}
-            permissions={facility?.permissions ?? []}
+  const renderContent = () => {
+    return currentTab === "users" && organizationId ? (
+      <FacilityOrganizationUsers
+        id={organizationId}
+        facilityId={facilityId}
+        permissions={facility?.permissions ?? []}
+      />
+    ) : (
+      <FacilityOrganizationView
+        id={organizationId}
+        facilityId={facilityId}
+        permissions={facility?.permissions ?? []}
+      />
+    );
+  };
+
+  return (
+    <TwoColumnLayout>
+      {isMobile ? (
+        <RightPanel>
+          {renderHeader()}
+          {renderContent()}
+        </RightPanel>
+      ) : (
+        <ResizablePanelGroup direction="horizontal" className="h-full gap-0">
+          <ResizablePanel
+            defaultSize={15}
+            minSize={10}
+            maxSize={20}
+            className="overflow-hidden"
+          >
+            <LeftPanel title={t("departments_or_teams")}>
+              <FacilityOrganizationNavbar
+                facilityId={facilityId}
+                selectedOrganizationId={organizationId || null}
+                expandedOrganizations={expandedOrganizations}
+                onToggleExpand={handleToggleExpand}
+                onOrganizationSelect={handleOrganizationSelect}
+              />
+            </LeftPanel>
+          </ResizablePanel>
+          <ResizableHandle
+            withHandle
+            className="w-px bg-gray-300 hover:w-1 hover:bg-gray-500 transition-all cursor-col-resize m-0 p-0"
           />
-        ) : (
-          <FacilityOrganizationView
-            id={organizationId}
-            facilityId={facilityId}
-            permissions={facility?.permissions ?? []}
-          />
-        )}
-      </RightPanel>
+          <ResizablePanel
+            defaultSize={80}
+            className="flex flex-col overflow-hidden"
+          >
+            <RightPanel>
+              {renderHeader()}
+              {renderContent()}
+            </RightPanel>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
     </TwoColumnLayout>
   );
 }

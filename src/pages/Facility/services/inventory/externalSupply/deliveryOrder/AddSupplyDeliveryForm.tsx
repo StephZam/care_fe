@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/table";
 
 import {
-  getExtensionFieldsWithOwner,
+  getExtensionFieldsWithName,
   processExtensions,
 } from "@/hooks/useExtensions";
 import useExtensionSchemas from "@/hooks/useExtensionSchemas";
@@ -167,9 +167,9 @@ export function AddSupplyDeliveryForm({
     [allExtensions],
   );
 
-  // Get extension field metadata with owner info for table headers
+  // Get extension field metadata with extension name for table headers
   const extensionFields = useMemo(
-    () => getExtensionFieldsWithOwner(allExtensions),
+    () => getExtensionFieldsWithName(allExtensions),
     [allExtensions],
   );
 
@@ -670,7 +670,7 @@ export function AddSupplyDeliveryForm({
                                 </TableHead>
                                 {extensionFields.map((field) => (
                                   <TableHead
-                                    key={`${field.owner}-${field.name}`}
+                                    key={`${field.extensionName}-${field.name}`}
                                     className="min-w-[100px] text-xs font-semibold"
                                   >
                                     {field.label}

@@ -468,12 +468,12 @@ export function SmartExternalDeliveryRow({
         </span>
       </TableCell>
 
-      {/* Extension Fields - each field in its own column, owner-namespaced */}
+      {/* Extension Fields - each field in its own column, name-namespaced */}
       {extensionsWithFields.flatMap(
         ({ config, fieldMetadata, conditionalRules }) =>
           fieldMetadata.map((fieldMeta) => (
             <TableCell
-              key={`${config.owner}-${fieldMeta.name}`}
+              key={`${config.name}-${fieldMeta.name}`}
               className="align-top"
             >
               <SchemaField
@@ -484,7 +484,7 @@ export function SmartExternalDeliveryRow({
                   required: false, // Hide asterisk - shown in table header
                 }}
                 control={form.control}
-                basePath={`items.${index}.extensions.${config.owner}`}
+                basePath={`items.${index}.extensions.${config.name}`}
                 className="min-w-[100px] [&_input]:h-9 gap-0"
                 conditionalRules={conditionalRules}
               />

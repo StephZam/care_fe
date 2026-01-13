@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  getExtensionFieldsWithOwner,
+  getExtensionFieldsWithName,
   getExtensionValue,
   NamespacedExtensionData,
 } from "@/hooks/useExtensions";
@@ -84,9 +84,9 @@ export function SupplyDeliveryTable({
     "read",
   );
 
-  // Get field metadata with owner info for reading namespaced values
+  // Get field metadata with extension name for reading namespaced values
   const extensionFields = useMemo(
-    () => getExtensionFieldsWithOwner(allExtensions),
+    () => getExtensionFieldsWithName(allExtensions),
     [allExtensions],
   );
 
@@ -178,7 +178,7 @@ export function SupplyDeliveryTable({
           <TableHead>{t("status")}</TableHead>
           <TableHead>{t("condition")}</TableHead>
           {extensionFields.map((field) => (
-            <TableHead key={`${field.owner}-${field.name}`}>
+            <TableHead key={`${field.extensionName}-${field.name}`}>
               {field.label}
             </TableHead>
           ))}
@@ -294,11 +294,11 @@ export function SupplyDeliveryTable({
             {extensionFields.map((field) => {
               const value = getExtensionValue(
                 delivery.extensions as NamespacedExtensionData,
-                field.owner,
+                field.extensionName,
                 field.name,
               );
               return (
-                <TableCell key={`${field.owner}-${field.name}`}>
+                <TableCell key={`${field.extensionName}-${field.name}`}>
                   {value !== undefined && value !== null ? String(value) : "-"}
                 </TableCell>
               );

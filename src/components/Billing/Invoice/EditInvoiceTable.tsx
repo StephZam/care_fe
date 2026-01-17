@@ -143,6 +143,22 @@ export function EditInvoiceTable({
     }));
   };
 
+  const handleApplyPerformerToAll = (user: UserReadMinimal | undefined) => {
+    const newPerformers: Record<string, UserReadMinimal | undefined> = {};
+    chargeItems.forEach((item) => {
+      newPerformers[item.id] = user;
+    });
+    setPerformers(newPerformers);
+  };
+
+  const handleClearAllPerformers = () => {
+    const newPerformers: Record<string, UserReadMinimal | undefined> = {};
+    chargeItems.forEach((item) => {
+      newPerformers[item.id] = undefined;
+    });
+    setPerformers(newPerformers);
+  };
+
   const getDiscountComponentKey = (
     component: MonetaryComponent | undefined,
   ) => {
@@ -387,7 +403,31 @@ export function EditInvoiceTable({
               <TableRow className="divide-x font-semibold">
                 <TableHead className="w-12">#</TableHead>
                 <TableHead>{t("item")}</TableHead>
-                <TableHead>{t("performer")}</TableHead>
+                <TableHead>
+                  <div className="flex items-center justify-center gap-2">
+                    {t("performer")}
+                    {chargeItems.length > 1 && (
+                      <UserSelector
+                        selected={undefined}
+                        onChange={handleApplyPerformerToAll}
+                        facilityId={facilityId}
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                          >
+                            {t("apply_to_all")}
+                            <ChevronDown className="h-3 w-3 ml-1" />
+                          </Button>
+                        }
+                        contentAlign="center"
+                        contentClassName="w-80"
+                        onClear={handleClearAllPerformers}
+                      />
+                    )}
+                  </div>
+                </TableHead>
                 <TableHead className="min-w-[150px]">
                   {t("unit_price")} ({getCurrencySymbol()})
                 </TableHead>

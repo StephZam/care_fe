@@ -36,6 +36,7 @@ import {
 import ConfirmActionDialog from "@/components/Common/ConfirmActionDialog";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
 import { formatDoseRange, formatTotalUnits } from "@/components/Medicine/utils";
+import { PatientHeader } from "@/components/Patient/PatientHeader";
 
 import query from "@/Utils/request/query";
 import useCurrentLocation from "@/pages/Facility/locations/utils/useCurrentLocation";
@@ -47,6 +48,7 @@ import {
 } from "@/types/emr/medicationRequest/medicationRequest";
 import prescriptionApi from "@/types/emr/prescription/prescriptionApi";
 
+import { round } from "@/Utils/decimal";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import mutate from "@/Utils/request/mutate";
 import { formatDateTime, formatName } from "@/Utils/utils";
@@ -137,7 +139,7 @@ function MedicationTable({
                 </TableCell>
                 <TableCell className="text-gray-950 font-medium">
                   {dosage
-                    ? `${dosage.value} ${dosage.unit.display}`
+                    ? `${round(dosage.value)} ${dosage.unit.display}`
                     : formatDoseRange(instruction?.dose_and_rate?.dose_range)}
                 </TableCell>
                 <TableCell className="text-gray-950 font-medium">
@@ -244,7 +246,7 @@ export default function MedicationDispenseList({
     onSuccess: () => {
       toast.success(t("medication_request_status_updated_successfully"));
       queryClient.invalidateQueries({
-        queryKey: ["medication_requests", patientId],
+        queryKey: ["prescription", patientId, prescriptionId],
       });
     },
     onError: () => {
@@ -330,7 +332,14 @@ export default function MedicationDispenseList({
 
   return (
     <div>
-      <div className="mb-4 flex flex-col gap-4">
+      {prescription.encounter.patient && (
+        <PatientHeader
+          patient={prescription.encounter.patient}
+          facilityId={facilityId}
+          className="p-2 rounded-none shadow-none bg-gray-100"
+        />
+      )}
+      <div className="my-4 flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex flex-col lg:flex-row items-stretch gap-2 w-full">
             <div className="w-full lg:w-64">
@@ -373,7 +382,7 @@ export default function MedicationDispenseList({
               className="w-full sm:w-auto border-gray-400 font-semibold"
             >
               <Link
-                href={`/facility/${facilityId}/locations/${locationId}/medication_dispense/patient/${patientId}/preparation`}
+                href={`/facility/${facilityId}/locations/${locationId}/medication_dispense/?patientId=${patientId}&patient_name=${encodeURIComponent(prescription.encounter.patient.name || "")}`}
                 basePath="/"
               >
                 {t("dispenses")}
@@ -397,7 +406,7 @@ export default function MedicationDispenseList({
             <Button
               onClick={() =>
                 navigate(
-                  `/facility/${facilityId}/locations/${locationId}/medication_requests/patient/${patientId}/bill`,
+                  `/facility/${facilityId}/locations/${locationId}/medication_requests/patient/${patientId}/prescription/${prescriptionId}/bill`,
                 )
               }
               className="w-full sm:w-auto"
@@ -515,15 +524,9 @@ export default function MedicationDispenseList({
                       </div>
                       <MedicationTable
                         medications={groupedByDispense[key]}
-                        setDispensedMedicationId={
-                          prescription.status === PrescriptionStatus.active
-                            ? setDispensedMedicationId
-                            : undefined
-                        }
+                        setDispensedMedicationId={setDispensedMedicationId}
                         setMedicationToMarkComplete={
-                          prescription.status === PrescriptionStatus.active
-                            ? setMedicationToMarkComplete
-                            : undefined
+                          setMedicationToMarkComplete
                         }
                       />
                     </div>
@@ -549,16 +552,8 @@ export default function MedicationDispenseList({
                 </h2>
                 <MedicationTable
                   medications={filteredMedications}
-                  setDispensedMedicationId={
-                    prescription.status === PrescriptionStatus.active
-                      ? setDispensedMedicationId
-                      : undefined
-                  }
-                  setMedicationToMarkComplete={
-                    prescription.status === PrescriptionStatus.active
-                      ? setMedicationToMarkComplete
-                      : undefined
-                  }
+                  setDispensedMedicationId={setDispensedMedicationId}
+                  setMedicationToMarkComplete={setMedicationToMarkComplete}
                 />
                 {filteredMedications.length === 0 && (
                   <EmptyState

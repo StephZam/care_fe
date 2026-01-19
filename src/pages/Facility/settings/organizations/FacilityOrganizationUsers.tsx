@@ -34,12 +34,15 @@ interface Props {
   id: string;
   facilityId: string;
   permissions: string[];
+
+  isServiceAccount?: boolean;
 }
 
 export default function FacilityOrganizationUsers({
   id,
   facilityId,
   permissions,
+  isServiceAccount = false,
 }: Props) {
   const [sheetState, setSheetState] = useState<{
     sheet: string;
@@ -60,13 +63,20 @@ export default function FacilityOrganizationUsers({
   const openLinkUserSheet = sheetState.sheet === "link";
 
   const { data: users, isLoading: isLoadingUsers } = useQuery({
-    queryKey: ["facilityOrganizationUsers", facilityId, id, qParams],
+    queryKey: [
+      "facilityOrganizationUsers",
+      facilityId,
+      id,
+      qParams,
+      isServiceAccount,
+    ],
     queryFn: query.debounced(facilityOrganizationApi.listUsers, {
       pathParams: { facilityId, organizationId: id },
       queryParams: {
         search_text: qParams.search || undefined,
         limit: resultsPerPage,
         offset: ((qParams.page || 1) - 1) * resultsPerPage,
+        is_service_account: isServiceAccount,
       },
     }),
     enabled: !!id,
@@ -78,10 +88,11 @@ export default function FacilityOrganizationUsers({
     return null;
   }
 
-  const { canManageFacilityOrganizationUsers, canCreateUser } = getPermissions(
-    hasPermission,
-    permissions,
-  );
+  const {
+    canManageFacilityOrganizationUsers,
+    canCreateUser,
+    canCreateServiceAccount,
+  } = getPermissions(hasPermission, permissions);
 
   const { isGeoAdmin } = getPermissions(
     hasPermission,
@@ -106,7 +117,7 @@ export default function FacilityOrganizationUsers({
           />
         </div>
         <div className="flex gap-2 flex-shrink-0 justify-end ml-auto">
-          {(isGeoAdmin || canCreateUser) && (
+          {(isGeoAdmin || canCreateUser || canCreateServiceAccount) && (
             <AddUserSheet
               open={openAddUserSheet}
               setOpen={(open) => {
@@ -115,6 +126,7 @@ export default function FacilityOrganizationUsers({
               onUserCreated={(user) => {
                 setSheetState({ sheet: "link", username: user.username });
               }}
+              isServiceAccount={isServiceAccount}
             />
           )}
           {(isGeoAdmin || canManageFacilityOrganizationUsers) && (
@@ -129,6 +141,7 @@ export default function FacilityOrganizationUsers({
                 });
               }}
               preSelectedUsername={sheetState.username}
+              isServiceAccount={isServiceAccount}
             />
           )}
         </div>
@@ -154,20 +167,25 @@ export default function FacilityOrganizationUsers({
                     user={userRole.user}
                     roleName={userRole.role.name}
                     facility={facilityId}
-                    actions={
+                    editRoleAction={
                       (isGeoAdmin || canManageFacilityOrganizationUsers) && (
                         <EditFacilityUserRoleSheet
                           facilityId={facilityId}
                           organizationId={id}
                           userRole={userRole}
                           trigger={
-                            <Button variant="outline" size="sm">
-                              <span>{t("edit_role")}</span>
+                            <Button
+                              variant="link"
+                              size="sm"
+                              className="underline text-gray-500"
+                            >
+                              <span>{t("edit")}</span>
                             </Button>
                           }
                         />
                       )
                     }
+                    isServiceAccount={isServiceAccount}
                   />
                 ))
               )}

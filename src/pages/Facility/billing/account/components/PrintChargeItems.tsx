@@ -108,6 +108,7 @@ export const PrintChargeItems = (props: {
       pathParams: { facilityId },
       queryParams: {
         account: accountId,
+        status: "billable,billed,paid",
       },
       pageSize: 100,
     }),

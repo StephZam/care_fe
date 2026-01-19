@@ -333,11 +333,38 @@ export default function MedicationDispenseList({
   return (
     <div>
       {prescription.encounter.patient && (
-        <PatientHeader
-          patient={prescription.encounter.patient}
-          facilityId={facilityId}
-          className="p-2 rounded-none shadow-none bg-gray-100"
-        />
+        <div className="rounded-none shadow-none bg-gray-100 p-4">
+          <PatientHeader
+            patient={prescription.encounter.patient}
+            facilityId={facilityId}
+          />
+          <div className="flex flex-wrap gap-4 mt-2 text-sm">
+            {prescription.encounter.current_location && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-gray-500">{t("location")}:</span>
+                <span className="font-medium">
+                  {prescription.encounter.current_location.name}
+                </span>
+              </div>
+            )}
+            {prescription.encounter.organizations &&
+              prescription.encounter.organizations.length > 0 && (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-gray-500">
+                    {t("departments", {
+                      count: prescription.encounter.organizations.length,
+                    })}
+                    :
+                  </span>
+                  <span className="font-medium">
+                    {prescription.encounter.organizations
+                      .map((org) => org.name)
+                      .join(", ")}
+                  </span>
+                </div>
+              )}
+          </div>
+        </div>
       )}
       <div className="my-4 flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">

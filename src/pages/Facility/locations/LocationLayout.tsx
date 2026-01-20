@@ -35,6 +35,7 @@ import { PrintMedicationReturn } from "@/pages/Facility/services/pharmacy/PrintM
 import { PrintPharmacyPrescription } from "@/pages/Facility/services/pharmacy/PrintPharmacyPrescription";
 import ServiceRequestList from "@/pages/Facility/services/serviceRequests/ServiceRequestList";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
+import AllMedicationBillForm from "@/src/pages/Facility/services/pharmacy/AllMedicationBillForm";
 import { SchedulableResourceType } from "@/types/scheduling/schedule";
 
 interface LocationLayoutProps {
@@ -70,6 +71,11 @@ const getRoutes = (facilityId: string, locationId: string) => ({
   }) => (
     <PrintPharmacyPrescription facilityId={facilityId} patientId={patientId} />
   ),
+  "/medication_requests/patient/:patientId/bill": ({
+    patientId,
+  }: {
+    patientId: string;
+  }) => <AllMedicationBillForm patientId={patientId} />,
   "/medication_requests/patient/:patientId/prescription/:prescriptionId/bill":
     ({
       patientId,

@@ -21,6 +21,7 @@ import { DeliveryOrderList } from "@/pages/Facility/services/inventory/externalS
 import { DeliveryOrderShow } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/DeliveryOrderShow";
 import { ToDispatch } from "@/pages/Facility/services/inventory/ToDispatch";
 import { ToReceive } from "@/pages/Facility/services/inventory/ToReceive";
+import AllMedicationBillForm from "@/pages/Facility/services/pharmacy/AllMedicationBillForm";
 import DispensesView from "@/pages/Facility/services/pharmacy/DispensesView";
 import MedicationBillForm from "@/pages/Facility/services/pharmacy/MedicationBillForm";
 import MedicationDispenseHistory from "@/pages/Facility/services/pharmacy/MedicationDispenseHistory";
@@ -35,7 +36,6 @@ import { PrintMedicationReturn } from "@/pages/Facility/services/pharmacy/PrintM
 import { PrintPharmacyPrescription } from "@/pages/Facility/services/pharmacy/PrintPharmacyPrescription";
 import ServiceRequestList from "@/pages/Facility/services/serviceRequests/ServiceRequestList";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
-import AllMedicationBillForm from "@/src/pages/Facility/services/pharmacy/AllMedicationBillForm";
 import { SchedulableResourceType } from "@/types/scheduling/schedule";
 
 interface LocationLayoutProps {

@@ -14,6 +14,7 @@ import { VitalsList } from "@/components/Patient/vitals/list";
 import { ObservationPlotConfig } from "@/types/emr/observation/observation";
 
 import { ClinicalHistoryOverview } from "@/pages/Encounters/tabs/overview/clinical-history-overview";
+import { FormSubmissionDrafts } from "@/pages/Encounters/tabs/overview/FormSubmissionDrafts";
 import { QuickActions } from "@/pages/Encounters/tabs/overview/quick-actions";
 import { SummaryPanel } from "@/pages/Encounters/tabs/overview/summary-panel";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
@@ -55,6 +56,13 @@ export const EncounterOverviewTab = () => {
                 {/* Show preview of devices associated with the encounter */}
                 {encounter && (
                   <EncounterOverviewDevices encounter={encounter} />
+                )}
+                {encounter && (
+                  <FormSubmissionDrafts
+                    facilityId={encounter.facility.id}
+                    patientId={patientId}
+                    encounterId={encounterId}
+                  />
                 )}
                 {/* Clinical informations */}
                 <AllergyList

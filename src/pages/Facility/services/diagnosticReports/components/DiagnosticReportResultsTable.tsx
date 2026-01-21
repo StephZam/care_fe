@@ -45,11 +45,17 @@ export function DiagnosticReportResultsTable({
       }
     }
     if (!range) return "-";
+    let innerContent = "";
+    if (range.min && range.max) {
+      innerContent = `${range.min} - ${range.max}`;
+    } else if (range.min) {
+      innerContent = `> ${range.min}`;
+    } else if (range.max) {
+      innerContent = `< ${range.max}`;
+    }
     return (
       <div className="flex items-center gap-1 text-gray-500">
-        <span>
-          {range.min} - {range.max}
-        </span>
+        <span>{innerContent}</span>
       </div>
     );
   };
@@ -113,7 +119,7 @@ export function DiagnosticReportResultsTable({
             <span>{component.value.value}</span>
             {component.value.unit && (
               <span className="text-gray-500 ml-1">
-                {component.value.unit.display}
+                {component.value.unit.code || component.value.unit.display}
               </span>
             )}
           </div>
@@ -153,7 +159,8 @@ export function DiagnosticReportResultsTable({
                 <span>{observation.value.value}</span>
                 {observation.value.unit && (
                   <span className="text-gray-500 ml-1">
-                    {observation.value.unit.display}
+                    {observation.value.unit.code ||
+                      observation.value.unit.display}
                   </span>
                 )}
               </div>

@@ -85,7 +85,10 @@ import useCurrentLocation from "@/pages/Facility/locations/utils/useCurrentLocat
 import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import batchApi from "@/types/base/batch/batchApi";
 import { Code } from "@/types/base/code/code";
-import { MonetaryComponentType } from "@/types/base/monetaryComponent/monetaryComponent";
+import {
+  calculateTotalPriceWithQuantity,
+  MonetaryComponentType,
+} from "@/types/base/monetaryComponent/monetaryComponent";
 import {
   AccountBillingStatus,
   AccountStatus,
@@ -101,6 +104,10 @@ import {
   extractDispenseOrderFromBatchResponse,
 } from "@/types/emr/dispenseOrder/dispenseOrder";
 import {
+  getSubstitutionReasonDescription,
+  getSubstitutionReasonDisplay,
+  getSubstitutionTypeDescription,
+  getSubstitutionTypeDisplay,
   MEDICATION_DISPENSE_STATUS_COLORS,
   MedicationDispenseCategory,
   MedicationDispenseCreate,
@@ -108,10 +115,6 @@ import {
   MedicationDispenseStatus,
   SubstitutionReason,
   SubstitutionType,
-  getSubstitutionReasonDescription,
-  getSubstitutionReasonDisplay,
-  getSubstitutionTypeDescription,
-  getSubstitutionTypeDisplay,
 } from "@/types/emr/medicationDispense/medicationDispense";
 import medicationDispenseApi from "@/types/emr/medicationDispense/medicationDispenseApi";
 import {
@@ -132,7 +135,6 @@ import {
   add,
   divide,
   isGreaterThan,
-  isLessThanOrEqual,
   isZero,
   multiply,
   round,
@@ -155,23 +157,6 @@ interface Props {
   patientId: string;
 }
 
-function convertDurationToDays(value: string, unit: string) {
-  switch (unit) {
-    case "h":
-      return divide(value, 24).round();
-    case "d":
-      return new Decimal(value);
-    case "wk":
-      return multiply(value, 7);
-    case "mo":
-      return multiply(value, 30); // approximating month as 30 days
-    case "a":
-      return multiply(value, 365); // approximating year as 365 days
-    default:
-      return new Decimal(value);
-  }
-}
-
 const formSchema = z.object({
   items: z.array(
     z.object({
@@ -179,7 +164,6 @@ const formSchema = z.object({
       medication: z.any(),
       productKnowledge: z.any(),
       isSelected: z.boolean(),
-      daysSupply: zodDecimal({ min: 1 }),
       fully_dispensed: z.boolean(),
       dosageInstructions: z.any().optional(),
       lots: z
@@ -911,6 +895,43 @@ export default function AllMedicationBillForm({ patientId }: Props) {
     }, {} as GroupedPrescription);
   }, [medications]);
 
+  // Watch form items to calculate grand total
+  const watchedItems = form.watch("items");
+
+  // Calculate grand total for all selected items
+  const grandTotal = useMemo(() => {
+    let total = new Decimal(0);
+
+    watchedItems?.forEach((item) => {
+      if (!item.isSelected) return;
+
+      const productKnowledge = item.productKnowledge as ProductKnowledgeBase;
+      const effectiveProductKnowledge =
+        item.substitution?.substitutedProductKnowledge || productKnowledge;
+
+      const inventoryList =
+        productKnowledgeInventoriesMap[effectiveProductKnowledge?.id] || [];
+
+      item.lots.forEach((lot) => {
+        if (!lot.selectedInventoryId || !lot.quantity) return;
+
+        const inventory = inventoryList.find(
+          (inv) => inv.id === lot.selectedInventoryId,
+        );
+
+        if (inventory?.product.charge_item_definition?.price_components) {
+          const itemTotal = calculateTotalPriceWithQuantity(
+            inventory.product.charge_item_definition.price_components,
+            lot.quantity,
+          );
+          total = total.plus(itemTotal);
+        }
+      });
+    });
+
+    return round(total);
+  }, [watchedItems, productKnowledgeInventoriesMap]);
+
   useEffect(() => {
     form.reset({ items: [] }); // Reset form with empty items array
 
@@ -932,14 +953,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
             productKnowledge: medication.requested_product,
             medication,
             isSelected: true,
-            daysSupply: round(
-              convertDurationToDays(
-                medication.dosage_instruction[0]?.timing?.repeat
-                  ?.bounds_duration?.value || "0",
-                medication.dosage_instruction[0]?.timing?.repeat
-                  ?.bounds_duration?.unit || "",
-              ),
-            ),
             fully_dispensed: true,
             dosageInstructions: medication.dosage_instruction,
             lots: [
@@ -1146,21 +1159,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
       return;
     }
 
-    const medsWithInvalidDaysSupply = selectedItems.filter((item) =>
-      isLessThanOrEqual(item.daysSupply, 0),
-    );
-
-    if (medsWithInvalidDaysSupply.length > 0) {
-      toast.error(
-        t("please_enter_valid_days_supply_for_medications", {
-          medications: medsWithInvalidDaysSupply
-            .map((item) => item.productKnowledge.name)
-            .join(", "),
-        }),
-      );
-      return;
-    }
-
     const medsWithoutInventory = selectedItems.filter((item) => {
       return !item.lots.some((lot) => lot.selectedInventoryId);
     });
@@ -1258,7 +1256,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
           authorizing_request: medication?.id ?? null,
           item: selectedInventory.id,
           quantity: lot.quantity,
-          days_supply: item.daysSupply,
           fully_dispensed: item.fully_dispensed,
           create_dispense_order: {
             alternate_identifier: alternateIdentifier,
@@ -1422,17 +1419,8 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                     <TableHead className={tableHeaderClass}>
                       {t("quantity")}
                     </TableHead>
-                    <TableHead className={cn(tableHeaderClass)}>
-                      {t("days_supply")}
-                    </TableHead>
                     <TableHead className={tableHeaderClass}>
-                      {t("expiry")}
-                    </TableHead>
-                    <TableHead className={tableHeaderClass}>
-                      {t("unit_price")}
-                    </TableHead>
-                    <TableHead className={tableHeaderClass}>
-                      {t("discount")}
+                      {t("price")}
                     </TableHead>
                     <TableHead className={tableHeaderClass}>
                       {t("all_given")}?
@@ -1505,7 +1493,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                             {/* Group Header Row */}
                             <TableRow className="bg-gray-50">
                               <TableCell
-                                colSpan={10}
+                                colSpan={7}
                                 className="py-2 px-4 font-semibold text-gray-800 border-b"
                               >
                                 <div className="flex items-center justify-between">
@@ -1915,7 +1903,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                                             ]
                                           }
                                           multiSelect
-                                          showexpiry={false}
+                                          showexpiry={true}
                                         />
                                       </div>
                                     ) : (
@@ -1980,64 +1968,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                                     </div>
                                   </TableCell>
                                   <TableCell className={tableCellClass}>
-                                    <FormField
-                                      control={form.control}
-                                      name={`items.${index}.daysSupply`}
-                                      render={({ field: formField }) => (
-                                        <FormItem>
-                                          <FormControl>
-                                            <Input
-                                              type="number"
-                                              min={1}
-                                              {...formField}
-                                              className="border-gray-300 border rounded-none w-24"
-                                            />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                  </TableCell>
-                                  <TableCell className={tableCellClass}>
-                                    {form
-                                      .watch(`items.${index}.lots`)
-                                      .filter((lot) => lot.selectedInventoryId)
-                                      .map((lot) => {
-                                        const selectedInventory =
-                                          productKnowledgeInventoriesMap[
-                                            effectiveProductKnowledge.id
-                                          ]?.find(
-                                            (inv) =>
-                                              inv.id ===
-                                              lot.selectedInventoryId,
-                                          );
-
-                                        return (
-                                          <div
-                                            key={lot.selectedInventoryId}
-                                            className="py-2.5 text-gray-950 font-normal text-base"
-                                          >
-                                            {selectedInventory?.product
-                                              .expiration_date
-                                              ? formatDate(
-                                                  selectedInventory?.product
-                                                    .expiration_date,
-                                                  "MM/yyyy",
-                                                )
-                                              : "-"}
-                                          </div>
-                                        );
-                                      })}
-                                    {form
-                                      .watch(`items.${index}.lots`)
-                                      .filter((lot) => lot.selectedInventoryId)
-                                      .length === 0 && (
-                                      <div className="text-sm text-gray-500 py-2">
-                                        -
-                                      </div>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className={tableCellClass}>
                                     {form
                                       .watch(`items.${index}.lots`)
                                       .filter((lot) => lot.selectedInventoryId)
@@ -2052,15 +1982,38 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                                           );
                                         const prices =
                                           calculatePrices(selectedInventory);
+                                        const discountComponents =
+                                          selectedInventory?.product.charge_item_definition?.price_components.filter(
+                                            (c) =>
+                                              c.monetary_component_type ===
+                                              MonetaryComponentType.discount,
+                                          );
+                                        const hasDiscount =
+                                          discountComponents &&
+                                          discountComponents.length > 0;
 
                                         return (
                                           <div
                                             key={lot.selectedInventoryId}
-                                            className="py-2.5 text-gray-950 font-normal text-base"
+                                            className="py-1.5 text-gray-950 font-normal text-sm"
                                           >
                                             <MonetaryDisplay
                                               amount={prices.basePrice}
                                             />
+                                            {hasDiscount && (
+                                              <span className="text-xs text-gray-500 ml-1">
+                                                (
+                                                {discountComponents
+                                                  .map((component) =>
+                                                    component.factor
+                                                      ? `-${round(component.factor)}%`
+                                                      : "",
+                                                  )
+                                                  .filter(Boolean)
+                                                  .join(", ")}
+                                                )
+                                              </span>
+                                            )}
                                           </div>
                                         );
                                       })}
@@ -2068,56 +2021,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                                       .watch(`items.${index}.lots`)
                                       .filter((lot) => lot.selectedInventoryId)
                                       .length === 0 && (
-                                      <div className="text-sm py-2">-</div>
-                                    )}
-                                  </TableCell>
-                                  <TableCell className={tableCellClass}>
-                                    {form
-                                      .watch(`items.${index}.lots`)
-                                      .filter((lot) => lot.selectedInventoryId)
-                                      .map((lot) => {
-                                        const selectedInventory =
-                                          productKnowledgeInventoriesMap[
-                                            effectiveProductKnowledge.id
-                                          ]?.find(
-                                            (inv) =>
-                                              inv.id ===
-                                              lot.selectedInventoryId,
-                                          );
-
-                                        return selectedInventory ? (
-                                          <div
-                                            key={lot.selectedInventoryId}
-                                            className="py-2.5 text-gray-950 font-normal text-base"
-                                          >
-                                            {selectedInventory.product.charge_item_definition?.price_components
-                                              .filter(
-                                                (c) =>
-                                                  c.monetary_component_type ===
-                                                  MonetaryComponentType.discount,
-                                              )
-                                              .map((component) =>
-                                                component.factor
-                                                  ? `${round(component.factor)}%`
-                                                  : "--",
-                                              )}
-                                          </div>
-                                        ) : (
-                                          <div
-                                            key={lot.selectedInventoryId}
-                                            className="py-2.5"
-                                          >
-                                            --
-                                          </div>
-                                        );
-                                      })}
-                                    {form
-                                      .watch(`items.${index}.lots`)
-                                      .filter((lot) => lot.selectedInventoryId)
-                                      .length === 0 && (
-                                      <div className="text-sm text-gray-500 py-2">
-                                        -
-                                      </div>
+                                      <div className="text-sm py-1.5">-</div>
                                     )}
                                   </TableCell>
                                   <TableCell className={tableCellClass}>
@@ -2215,8 +2119,25 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                       },
                     );
                   })()}
+                  {/* Grand Total Row */}
+                  {fields.length > 0 && (
+                    <TableRow className="bg-gray-100 rounded-lg font-semibold">
+                      <TableCell
+                        colSpan={6}
+                        className="py-2 px-3 text-right text-gray-700 rounded-l-lg"
+                      >
+                        {t("total")}
+                      </TableCell>
+                      <TableCell
+                        colSpan={2}
+                        className="py-2 px-3 text-gray-950 text-base rounded-r-lg"
+                      >
+                        <MonetaryDisplay amount={grandTotal} />
+                      </TableCell>
+                    </TableRow>
+                  )}
                   <TableRow className="bg-white rounded-lg shadow-sm">
-                    <TableCell colSpan={12} className="p-0 rounded-lg">
+                    <TableCell colSpan={8} className="p-0 rounded-lg">
                       <ProductKnowledgeSelect
                         value={undefined}
                         onChange={(product) => {
@@ -2250,7 +2171,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                             reference_id: crypto.randomUUID(),
                             productKnowledge: product,
                             isSelected: true,
-                            daysSupply: "1",
                             fully_dispensed: true,
                             dosageInstructions: defaultDosageInstructions,
                             lots: [
@@ -2327,23 +2247,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                   );
 
                   if (dosageInstructions?.[0]) {
-                    const newDaysSupply = round(
-                      convertDurationToDays(
-                        dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                          ?.value || "0",
-                        dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                          ?.unit || "",
-                      ),
-                    );
-                    form.setValue(
-                      `items.${editingItemIndex}.daysSupply`,
-                      newDaysSupply,
-                      {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                      },
-                    );
-
                     const medicationDataForQuantity =
                       form.getValues(`items.${editingItemIndex}.medication`) ||
                       ({
@@ -2389,14 +2292,6 @@ export default function AllMedicationBillForm({ patientId }: Props) {
               reference_id: crypto.randomUUID(),
               productKnowledge: product,
               isSelected: true,
-              daysSupply: round(
-                convertDurationToDays(
-                  dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                    ?.value || "0",
-                  dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                    ?.unit || "",
-                ),
-              ),
               fully_dispensed: true,
               dosageInstructions,
               lots: [

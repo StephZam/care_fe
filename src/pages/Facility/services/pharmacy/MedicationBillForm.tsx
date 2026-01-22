@@ -141,7 +141,6 @@ import {
   add,
   divide,
   isGreaterThan,
-  isLessThanOrEqual,
   isZero,
   multiply,
   round,
@@ -159,23 +158,6 @@ interface Props {
   prescriptionId: string;
 }
 
-function convertDurationToDays(value: string, unit: string) {
-  switch (unit) {
-    case "h":
-      return divide(value, 24);
-    case "d":
-      return new Decimal(value);
-    case "wk":
-      return multiply(value, 7);
-    case "mo":
-      return multiply(value, 30); // approximating month as 30 days
-    case "a":
-      return multiply(value, 365); // approximating year as 365 days
-    default:
-      return new Decimal(value);
-  }
-}
-
 const formSchema = z.object({
   items: z.array(
     z.object({
@@ -183,7 +165,6 @@ const formSchema = z.object({
       medication: z.any(),
       productKnowledge: z.any(),
       isSelected: z.boolean(),
-      daysSupply: zodDecimal({ min: 1 }),
       fully_dispensed: z.boolean(),
       dosageInstructions: z.any().optional(),
       lots: z
@@ -738,8 +719,6 @@ export default function MedicationBillForm({
   const { locationId } = useCurrentLocation();
   const [{ encounterId }] = useQueryParams();
 
-  const isConsumable = (product?: ProductKnowledgeBase) =>
-    product?.product_type === "consumable";
   const [productKnowledgeInventoriesMap, setProductKnowledgeInventoriesMap] =
     useState<Record<string, InventoryRead[] | undefined>>({});
   const [isInvoiceSheetOpen, setIsInvoiceSheetOpen] = useState(false);
@@ -794,7 +773,7 @@ export default function MedicationBillForm({
 
   const tableHeaderClass =
     "px-4 py-3 border-r font-medium border-y-1 border-r-0 border-gray-200 rounded-b-none border-b-0";
-  const tableCellClass = "px-4 py-4 border-r";
+  const tableCellClass = "px-2 py-2 border-r";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -970,14 +949,6 @@ export default function MedicationBillForm({
         productKnowledge: medication.requested_product,
         medication,
         isSelected: true,
-        daysSupply: roundWhole(
-          convertDurationToDays(
-            medication.dosage_instruction[0]?.timing?.repeat?.bounds_duration
-              ?.value || "0",
-            medication.dosage_instruction[0]?.timing?.repeat?.bounds_duration
-              ?.unit || "",
-          ),
-        ),
         fully_dispensed: true,
         dosageInstructions: medication.dosage_instruction,
         lots: [
@@ -1181,24 +1152,6 @@ export default function MedicationBillForm({
       return;
     }
 
-    const medsWithInvalidDaysSupply = selectedItems.filter(
-      (item) =>
-        isLessThanOrEqual(item.daysSupply, 0) &&
-        !item.dosageInstructions?.[0]?.as_needed_boolean &&
-        !isConsumable(item.productKnowledge),
-    );
-
-    if (medsWithInvalidDaysSupply.length > 0) {
-      toast.error(
-        t("please_enter_valid_days_supply_for_medications", {
-          medications: medsWithInvalidDaysSupply
-            .map((item) => item.productKnowledge.name)
-            .join(", "),
-        }),
-      );
-      return;
-    }
-
     const medsWithoutInventory = selectedItems.filter((item) => {
       return !item.lots.some((lot) => lot.selectedInventoryId);
     });
@@ -1296,7 +1249,6 @@ export default function MedicationBillForm({
           authorizing_request: medication?.id ?? null,
           item: selectedInventory.id,
           quantity: lot.quantity,
-          days_supply: item.daysSupply,
           fully_dispensed: item.fully_dispensed,
           create_dispense_order: {
             alternate_identifier: alternateIdentifier,
@@ -1489,9 +1441,6 @@ export default function MedicationBillForm({
                     <TableHead className={tableHeaderClass}>
                       {t("quantity")}
                     </TableHead>
-                    <TableHead className={cn(tableHeaderClass)}>
-                      {t("days_supply")}
-                    </TableHead>
                     <TableHead className={tableHeaderClass}>
                       {t("price")}
                     </TableHead>
@@ -1508,7 +1457,7 @@ export default function MedicationBillForm({
                   {prescription && fields.length > 0 && (
                     <TableRow className="bg-gray-50">
                       <TableCell
-                        colSpan={8}
+                        colSpan={7}
                         className="py-2 px-4 font-semibold text-gray-800 border-b"
                       >
                         <div className="flex items-center justify-between">
@@ -1949,30 +1898,6 @@ export default function MedicationBillForm({
                           </div>
                         </TableCell>
                         <TableCell className={tableCellClass}>
-                          {isConsumable(effectiveProductKnowledge) ? (
-                            <div className="text-sm text-gray-500 py-2">-</div>
-                          ) : (
-                            <FormField
-                              control={form.control}
-                              name={`items.${index}.daysSupply`}
-                              render={({ field: formField }) => (
-                                <FormItem>
-                                  <FormControl>
-                                    <Input
-                                      type="number"
-                                      min={1}
-                                      {...formField}
-                                      className="border-gray-300 border rounded-md w-24"
-                                      disabled={!isChecked}
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell className={tableCellClass}>
                           {form
                             .watch(`items.${index}.lots`)
                             .filter((lot) => lot.selectedInventoryId)
@@ -2163,7 +2088,6 @@ export default function MedicationBillForm({
                             reference_id: crypto.randomUUID(),
                             productKnowledge: product,
                             isSelected: true,
-                            daysSupply: "1",
                             fully_dispensed: true,
                             dosageInstructions: defaultDosageInstructions,
                             lots: [
@@ -2240,23 +2164,6 @@ export default function MedicationBillForm({
                   );
 
                   if (dosageInstructions?.[0]) {
-                    const newDaysSupply = roundWhole(
-                      convertDurationToDays(
-                        dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                          ?.value || "0",
-                        dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                          ?.unit || "",
-                      ),
-                    );
-                    form.setValue(
-                      `items.${editingItemIndex}.daysSupply`,
-                      newDaysSupply,
-                      {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                      },
-                    );
-
                     const medicationDataForQuantity =
                       form.getValues(`items.${editingItemIndex}.medication`) ||
                       ({
@@ -2302,14 +2209,6 @@ export default function MedicationBillForm({
               reference_id: crypto.randomUUID(),
               productKnowledge: product,
               isSelected: true,
-              daysSupply: roundWhole(
-                convertDurationToDays(
-                  dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                    ?.value || "0",
-                  dosageInstructions[0]?.timing?.repeat?.bounds_duration
-                    ?.unit || "",
-                ),
-              ),
               fully_dispensed: true,
               dosageInstructions,
               lots: [

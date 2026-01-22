@@ -4059,6 +4059,7 @@
   "prescription_discontinued": "Prescription discontinued",
   "prescription_logs": "Prescription Logs",
   "prescription_marked_as_completed": "Prescription marked as completed successfully",
+  "prescription_marking_complete_failed": "Failed to mark prescription as completed",
   "prescription_medication": "Prescription Medication",
   "prescription_medications": "Prescription Medications",
   "prescription_not_found": "Prescription not found",

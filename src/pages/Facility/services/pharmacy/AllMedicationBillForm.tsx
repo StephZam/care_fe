@@ -138,6 +138,7 @@ import {
   round,
   zodDecimal,
 } from "@/Utils/decimal";
+import { isLotAllowedForDispensing } from "@/Utils/inventory";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import mutate from "@/Utils/request/mutate";
 import query from "@/Utils/request/query";
@@ -853,6 +854,42 @@ export default function AllMedicationBillForm({ patientId }: Props) {
 
     fetchMissingInventories();
   }, [productKnowledgeInventoriesMap, facilityId, locationId]);
+
+  // Auto-select first valid (non-expired) lot by default
+  useEffect(() => {
+    fields.forEach((field, index) => {
+      const productKnowledge = field.productKnowledge as ProductKnowledgeBase;
+      const substitution = form.watch(`items.${index}.substitution`);
+      const effectiveProductKnowledge =
+        substitution?.substitutedProductKnowledge || productKnowledge;
+
+      const inventories =
+        productKnowledgeInventoriesMap[effectiveProductKnowledge?.id];
+      const currentLots = form.getValues(`items.${index}.lots`);
+
+      if (
+        inventories !== undefined &&
+        inventories?.length &&
+        !currentLots.some((lot) => lot.selectedInventoryId)
+      ) {
+        const validLot = inventories.find((inv) =>
+          isLotAllowedForDispensing(inv.product.expiration_date),
+        );
+
+        if (validLot) {
+          const medication = form.getValues(`items.${index}.medication`);
+          form.setValue(`items.${index}.lots`, [
+            {
+              selectedInventoryId: validLot.id,
+              quantity: medication
+                ? computeInitialQuantity(medication)
+                : currentLots[0]?.quantity || "1",
+            },
+          ]);
+        }
+      }
+    });
+  }, [productKnowledgeInventoriesMap, fields, form]);
 
   const medications = useMemo(
     () => response?.results.filter((med) => med.requested_product) || [],
@@ -2183,8 +2220,53 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                       <ProductKnowledgeSelect
                         value={undefined}
                         onChange={(product) => {
-                          setSelectedProduct(product);
-                          setIsAddMedicationSheetOpen(true);
+                          if (!product) return;
+
+                          // Create default dosage instructions
+                          const defaultDosageInstructions: MedicationRequestDosageInstruction[] =
+                            [
+                              {
+                                dose_and_rate: product.base_unit
+                                  ? {
+                                      type: "ordered",
+                                      dose_quantity: {
+                                        value: "1",
+                                        unit: product.base_unit,
+                                      },
+                                    }
+                                  : undefined,
+                                timing: undefined,
+                                as_needed_boolean: true, // Default to PRN
+                                route: undefined,
+                                site: undefined,
+                                method: undefined,
+                                additional_instruction: undefined,
+                                as_needed_for: undefined,
+                              },
+                            ];
+
+                          // Directly add to the table with defaults
+                          append({
+                            reference_id: crypto.randomUUID(),
+                            productKnowledge: product,
+                            isSelected: true,
+                            daysSupply: "1",
+                            fully_dispensed: true,
+                            dosageInstructions: defaultDosageInstructions,
+                            lots: [
+                              {
+                                selectedInventoryId: "",
+                                quantity: "1",
+                              },
+                            ],
+                            prescriptionId: "no-prescription",
+                          });
+
+                          // Trigger inventory fetch for the new product
+                          setProductKnowledgeInventoriesMap((prev) => ({
+                            [product.id]: undefined,
+                            ...prev,
+                          }));
                         }}
                         placeholder={t("add_medication")}
                         className="w-full"

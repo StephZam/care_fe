@@ -2145,8 +2145,53 @@ export default function MedicationBillForm({
                       <ProductKnowledgeSelect
                         value={undefined}
                         onChange={(product) => {
-                          setSelectedProduct(product);
-                          setIsAddMedicationSheetOpen(true);
+                          if (!product) return;
+
+                          // Create default dosage instructions
+                          const defaultDosageInstructions: MedicationRequestDosageInstruction[] =
+                            [
+                              {
+                                dose_and_rate: product.base_unit
+                                  ? {
+                                      type: "ordered",
+                                      dose_quantity: {
+                                        value: "1",
+                                        unit: product.base_unit,
+                                      },
+                                    }
+                                  : undefined,
+                                timing: undefined,
+                                as_needed_boolean: true, // Default to PRN
+                                route: undefined,
+                                site: undefined,
+                                method: undefined,
+                                additional_instruction: undefined,
+                                as_needed_for: undefined,
+                              },
+                            ];
+
+                          // Directly add to the table with defaults
+                          append({
+                            reference_id: crypto.randomUUID(),
+                            productKnowledge: product,
+                            isSelected: true,
+                            daysSupply: "1",
+                            fully_dispensed: true,
+                            dosageInstructions: defaultDosageInstructions,
+                            lots: [
+                              {
+                                selectedInventoryId: "",
+                                quantity: "1",
+                              },
+                            ],
+                            prescriptionId: "no-prescription",
+                          });
+
+                          // Trigger inventory fetch for the new product
+                          setProductKnowledgeInventoriesMap((prev) => ({
+                            [product.id]: undefined,
+                            ...prev,
+                          }));
                         }}
                         placeholder={t("add_medication")}
                         className="w-full"

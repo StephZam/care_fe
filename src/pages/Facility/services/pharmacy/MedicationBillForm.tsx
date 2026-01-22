@@ -92,7 +92,10 @@ import useCurrentLocation from "@/pages/Facility/locations/utils/useCurrentLocat
 import useCurrentFacility from "@/pages/Facility/utils/useCurrentFacility";
 import batchApi from "@/types/base/batch/batchApi";
 import { Code } from "@/types/base/code/code";
-import { MonetaryComponentType } from "@/types/base/monetaryComponent/monetaryComponent";
+import {
+  calculateTotalPriceWithQuantity,
+  MonetaryComponentType,
+} from "@/types/base/monetaryComponent/monetaryComponent";
 import {
   AccountBillingStatus,
   AccountStatus,
@@ -108,6 +111,10 @@ import {
   extractDispenseOrderFromBatchResponse,
 } from "@/types/emr/dispenseOrder/dispenseOrder";
 import {
+  getSubstitutionReasonDescription,
+  getSubstitutionReasonDisplay,
+  getSubstitutionTypeDescription,
+  getSubstitutionTypeDisplay,
   MEDICATION_DISPENSE_STATUS_COLORS,
   MedicationDispenseCategory,
   MedicationDispenseCreate,
@@ -115,10 +122,6 @@ import {
   MedicationDispenseStatus,
   SubstitutionReason,
   SubstitutionType,
-  getSubstitutionReasonDescription,
-  getSubstitutionReasonDisplay,
-  getSubstitutionTypeDescription,
-  getSubstitutionTypeDisplay,
 } from "@/types/emr/medicationDispense/medicationDispense";
 import medicationDispenseApi from "@/types/emr/medicationDispense/medicationDispenseApi";
 import {
@@ -915,6 +918,43 @@ export default function MedicationBillForm({
     [prescription?.medications],
   );
 
+  // Watch form items to calculate grand total
+  const watchedItems = form.watch("items");
+
+  // Calculate grand total for all selected items
+  const grandTotal = useMemo(() => {
+    let total = new Decimal(0);
+
+    watchedItems?.forEach((item) => {
+      if (!item.isSelected) return;
+
+      const productKnowledge = item.productKnowledge as ProductKnowledgeBase;
+      const effectiveProductKnowledge =
+        item.substitution?.substitutedProductKnowledge || productKnowledge;
+
+      const inventoryList =
+        productKnowledgeInventoriesMap[effectiveProductKnowledge?.id] || [];
+
+      item.lots.forEach((lot) => {
+        if (!lot.selectedInventoryId || !lot.quantity) return;
+
+        const inventory = inventoryList.find(
+          (inv) => inv.id === lot.selectedInventoryId,
+        );
+
+        if (inventory?.product.charge_item_definition?.price_components) {
+          const itemTotal = calculateTotalPriceWithQuantity(
+            inventory.product.charge_item_definition.price_components,
+            lot.quantity,
+          );
+          total = total.plus(itemTotal);
+        }
+      });
+    });
+
+    return round(total);
+  }, [watchedItems, productKnowledgeInventoriesMap]);
+
   useEffect(() => {
     form.reset({ items: [] }); // Reset form with empty items array
 
@@ -1453,13 +1493,7 @@ export default function MedicationBillForm({
                       {t("days_supply")}
                     </TableHead>
                     <TableHead className={tableHeaderClass}>
-                      {t("expiry")}
-                    </TableHead>
-                    <TableHead className={tableHeaderClass}>
-                      {t("unit_price")}
-                    </TableHead>
-                    <TableHead className={tableHeaderClass}>
-                      {t("discount")}
+                      {t("price")}
                     </TableHead>
                     <TableHead className={tableHeaderClass}>
                       {t("all_given")}?
@@ -1474,7 +1508,7 @@ export default function MedicationBillForm({
                   {prescription && fields.length > 0 && (
                     <TableRow className="bg-gray-50">
                       <TableCell
-                        colSpan={10}
+                        colSpan={8}
                         className="py-2 px-4 font-semibold text-gray-800 border-b"
                       >
                         <div className="flex items-center justify-between">
@@ -1800,7 +1834,6 @@ export default function MedicationBillForm({
                                 }}
                               >
                                 <Shuffle className="size-5" />
-                                {t("substitute")}
                               </Button>
                             )}
                           </div>
@@ -1849,7 +1882,7 @@ export default function MedicationBillForm({
                                   ]
                                 }
                                 multiSelect
-                                showexpiry={false}
+                                showexpiry={true}
                                 disabled={!isChecked}
                                 showUnitPrice={false}
                               />
@@ -1950,109 +1983,47 @@ export default function MedicationBillForm({
                                 ]?.find(
                                   (inv) => inv.id === lot.selectedInventoryId,
                                 );
-
-                              return (
-                                <div
-                                  key={lot.selectedInventoryId}
-                                  className={cn(
-                                    "py-2.5 text-gray-950 font-normal text-base",
-                                    !isChecked && "opacity-60 text-gray-500",
-                                  )}
-                                >
-                                  {selectedInventory?.product.expiration_date
-                                    ? formatDate(
-                                        selectedInventory?.product
-                                          .expiration_date,
-                                        "MM/yyyy",
-                                      )
-                                    : "-"}
-                                </div>
-                              );
-                            })}
-                          {form
-                            .watch(`items.${index}.lots`)
-                            .filter((lot) => lot.selectedInventoryId).length ===
-                            0 && (
-                            <div className="text-sm text-gray-500 py-2">-</div>
-                          )}
-                        </TableCell>
-                        <TableCell className={tableCellClass}>
-                          {form
-                            .watch(`items.${index}.lots`)
-                            .filter((lot) => lot.selectedInventoryId)
-                            .map((lot) => {
-                              const selectedInventory =
-                                productKnowledgeInventoriesMap[
-                                  effectiveProductKnowledge.id
-                                ]?.find(
-                                  (inv) => inv.id === lot.selectedInventoryId,
-                                );
                               const prices = calculatePrices(selectedInventory);
+                              const discountComponents =
+                                selectedInventory?.product.charge_item_definition?.price_components.filter(
+                                  (c) =>
+                                    c.monetary_component_type ===
+                                    MonetaryComponentType.discount,
+                                );
+                              const hasDiscount =
+                                discountComponents &&
+                                discountComponents.length > 0;
 
                               return (
                                 <div
                                   key={lot.selectedInventoryId}
                                   className={cn(
-                                    "py-2.5 text-gray-950 font-normal text-base",
+                                    "py-1.5 text-gray-950 font-normal text-sm",
                                     !isChecked && "opacity-60 text-gray-500",
                                   )}
                                 >
                                   <MonetaryDisplay amount={prices.basePrice} />
-                                </div>
-                              );
-                            })}
-                          {form
-                            .watch(`items.${index}.lots`)
-                            .filter((lot) => lot.selectedInventoryId).length ===
-                            0 && <div className="text-sm py-2">-</div>}
-                        </TableCell>
-                        <TableCell className={tableCellClass}>
-                          {form
-                            .watch(`items.${index}.lots`)
-                            .filter((lot) => lot.selectedInventoryId)
-                            .map((lot) => {
-                              const selectedInventory =
-                                productKnowledgeInventoriesMap[
-                                  effectiveProductKnowledge.id
-                                ]?.find(
-                                  (inv) => inv.id === lot.selectedInventoryId,
-                                );
-
-                              return selectedInventory ? (
-                                <div
-                                  key={lot.selectedInventoryId}
-                                  className={cn(
-                                    "py-2.5 text-gray-950 font-normal text-base",
-                                    !isChecked && "opacity-60 text-gray-500",
+                                  {hasDiscount && (
+                                    <span className="text-xs text-gray-500 ml-1">
+                                      (
+                                      {discountComponents
+                                        .map((component) =>
+                                          component.factor
+                                            ? `-${round(component.factor)}%`
+                                            : "",
+                                        )
+                                        .filter(Boolean)
+                                        .join(", ")}
+                                      )
+                                    </span>
                                   )}
-                                >
-                                  {selectedInventory.product.charge_item_definition?.price_components
-                                    .filter(
-                                      (c) =>
-                                        c.monetary_component_type ===
-                                        MonetaryComponentType.discount,
-                                    )
-                                    .map((component) =>
-                                      component.factor
-                                        ? `${round(component.factor)}%`
-                                        : "--",
-                                    )}
-                                </div>
-                              ) : (
-                                <div
-                                  key={lot.selectedInventoryId}
-                                  className="py-2.5"
-                                >
-                                  --
                                 </div>
                               );
                             })}
                           {form
                             .watch(`items.${index}.lots`)
                             .filter((lot) => lot.selectedInventoryId).length ===
-                            0 && (
-                            <div className="text-sm text-gray-500 py-2">-</div>
-                          )}
+                            0 && <div className="text-sm py-1.5">-</div>}
                         </TableCell>
                         <TableCell className={tableCellClass}>
                           {field.medication ? (
@@ -2140,8 +2111,25 @@ export default function MedicationBillForm({
                       </TableRow>
                     );
                   })}
+                  {/* Grand Total Row */}
+                  {fields.length > 0 && (
+                    <TableRow className="bg-gray-100 rounded-lg font-semibold">
+                      <TableCell
+                        colSpan={6}
+                        className="py-2 px-3 text-right text-gray-700 rounded-l-lg"
+                      >
+                        {t("total")}
+                      </TableCell>
+                      <TableCell
+                        colSpan={2}
+                        className="py-2 px-3 text-gray-950 text-base rounded-r-lg"
+                      >
+                        <MonetaryDisplay amount={grandTotal} />
+                      </TableCell>
+                    </TableRow>
+                  )}
                   <TableRow className="bg-white rounded-lg shadow-sm">
-                    <TableCell colSpan={12} className="p-0 rounded-lg">
+                    <TableCell colSpan={8} className="p-0 rounded-lg">
                       <ProductKnowledgeSelect
                         value={undefined}
                         onChange={(product) => {

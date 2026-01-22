@@ -161,69 +161,71 @@ export default function StockLotSelector({
                 return (
                   <div
                     key={lot.selectedInventoryId}
-                    className="flex items-center justify-between w-full bg-gray-50 px-px py-0.5 border-gray-200 border rounded-sm text-gray-950 gap-1"
+                    className="flex flex-col w-full bg-gray-50 px-1 py-0.5 border-gray-200 border rounded-sm text-gray-950 gap-0.5"
                   >
-                    <span
-                      className={cn(
-                        "font-medium text-sm ml-1 truncate max-w-24",
-                        !selectedInventory?.product.batch?.lot_number &&
-                          "text-gray-500",
-                      )}
-                      title={
-                        selectedInventory?.product.batch?.lot_number ||
-                        t("unknown")
-                      }
-                    >
-                      {selectedInventory?.product.batch?.lot_number ||
-                        t("unknown")}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {showUnitPrice && (
-                        <Badge>
-                          <MonetaryDisplay
-                            amount={
-                              selectedInventory?.product.charge_item_definition?.price_components?.find(
-                                (c) =>
-                                  c.monetary_component_type ===
-                                  MonetaryComponentType.base,
-                              )?.amount
-                            }
-                          />
-                        </Badge>
-                      )}
-                      <Badge
-                        variant={
-                          selectedInventory?.status === "active" &&
-                          isPositive(selectedInventory?.net_content || 0)
-                            ? "primary"
-                            : "destructive"
-                        }
-                        className="border-none rounded-sm"
-                      >
-                        {selectedInventory && (
-                          <>{round(selectedInventory.net_content)} </>
+                    <div className="flex items-center justify-between gap-1">
+                      <span
+                        className={cn(
+                          "font-medium text-sm truncate max-w-24",
+                          !selectedInventory?.product.batch?.lot_number &&
+                            "text-gray-500",
                         )}
-                        {selectedInventory?.product.product_knowledge.base_unit
-                          .display || t("units")}
-                      </Badge>
-                      {showexpiry &&
-                        selectedInventory?.product.expiration_date && (
+                        title={
+                          selectedInventory?.product.batch?.lot_number ||
+                          t("unknown")
+                        }
+                      >
+                        {selectedInventory?.product.batch?.lot_number ||
+                          t("unknown")}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {showUnitPrice && (
+                          <Badge className="text-xs px-1 py-0">
+                            <MonetaryDisplay
+                              amount={
+                                selectedInventory?.product.charge_item_definition?.price_components?.find(
+                                  (c) =>
+                                    c.monetary_component_type ===
+                                    MonetaryComponentType.base,
+                                )?.amount
+                              }
+                            />
+                          </Badge>
+                        )}
+                        <Badge
+                          variant={
+                            selectedInventory?.status === "active" &&
+                            isPositive(selectedInventory?.net_content || 0)
+                              ? "primary"
+                              : "destructive"
+                          }
+                          className="border-none rounded-sm text-xs px-1 py-0"
+                        >
+                          {selectedInventory && (
+                            <>{round(selectedInventory.net_content)} </>
+                          )}
+                          {selectedInventory?.product.product_knowledge
+                            .base_unit.display || t("units")}
+                        </Badge>
+                      </div>
+                    </div>
+                    {showexpiry &&
+                      selectedInventory?.product.expiration_date && (
+                        <div className="flex items-center">
                           <Badge
                             variant={getExpiryBadgeVariant(
                               selectedInventory.product.expiration_date,
                             )}
-                            className="border-none rounded-sm"
+                            className="border-none rounded-sm text-xs px-1 py-0"
                           >
-                            {t("expiry")}:{" "}
-                            {selectedInventory.product.expiration_date
-                              ? formatDate(
-                                  selectedInventory.product.expiration_date,
-                                  "dd/MM/yyyy",
-                                )
-                              : "-"}
+                            {t("expiry_short")}:{" "}
+                            {formatDate(
+                              selectedInventory.product.expiration_date,
+                              "dd/MM/yyyy",
+                            )}
                           </Badge>
-                        )}
-                    </div>
+                        </div>
+                      )}
                   </div>
                 );
               })

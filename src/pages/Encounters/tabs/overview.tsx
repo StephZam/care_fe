@@ -19,6 +19,7 @@ import { QuickActions } from "@/pages/Encounters/tabs/overview/quick-actions";
 import { SummaryPanel } from "@/pages/Encounters/tabs/overview/summary-panel";
 import { useEncounter } from "@/pages/Encounters/utils/EncounterProvider";
 import EncounterOverviewDevices from "@/pages/Facility/settings/devices/components/EncounterOverviewDevices";
+import { inactiveEncounterStatus } from "@/types/emr/encounter/encounter";
 
 export const EncounterOverviewTab = () => {
   const { t } = useTranslation();
@@ -57,13 +58,14 @@ export const EncounterOverviewTab = () => {
                 {encounter && (
                   <EncounterOverviewDevices encounter={encounter} />
                 )}
-                {encounter && (
-                  <FormSubmissionDrafts
-                    facilityId={encounter.facility.id}
-                    patientId={patientId}
-                    encounterId={encounterId}
-                  />
-                )}
+                {encounter &&
+                  !inactiveEncounterStatus.includes(encounter.status) && (
+                    <FormSubmissionDrafts
+                      facilityId={encounter.facility.id}
+                      patientId={patientId}
+                      encounterId={encounterId}
+                    />
+                  )}
                 {/* Clinical informations */}
                 <AllergyList
                   patientId={patientId}

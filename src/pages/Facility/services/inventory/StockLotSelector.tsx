@@ -48,6 +48,7 @@ interface StockLotSelectorProps {
   dontRestrictExpired?: boolean;
   disabled?: boolean;
   showUnitPrice?: boolean;
+  net_content_gt?: number;
 }
 
 export default function StockLotSelector({
@@ -65,6 +66,7 @@ export default function StockLotSelector({
   dontRestrictExpired = false,
   disabled = false,
   showUnitPrice = true,
+  net_content_gt = 0,
 }: StockLotSelectorProps) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -74,7 +76,7 @@ export default function StockLotSelector({
     queryFn: query(inventoryApi.list, {
       pathParams: { facilityId: facilityId!, locationId: locationId! },
       queryParams: {
-        net_content_gt: 0,
+        net_content_gt: net_content_gt,
         product_knowledge: productKnowledge?.id || "",
         limit: 100,
       },

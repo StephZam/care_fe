@@ -2,6 +2,7 @@ import { MinusCircledIcon } from "@radix-ui/react-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { t } from "i18next";
 import {
+  AlertTriangle,
   ChevronsDownUp,
   ChevronsUpDown,
   FileTextIcon,
@@ -17,6 +18,7 @@ import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -259,6 +261,7 @@ export function MedicationRequestQuestion({
       pathParams: { patientId },
       queryParams: {
         encounter: encounterId,
+        ordering: "-modified_date",
         limit: 100,
         facility: facilityId,
       },
@@ -277,6 +280,7 @@ export function MedicationRequestQuestion({
               requested_product_internal: medication.requested_product,
               requested_product: medication.requested_product?.id,
               requester: medication.requester || currentUser,
+              dirty: false, // Existing medications are not dirty
             })),
           },
         ],
@@ -556,7 +560,7 @@ export function MedicationRequestQuestion({
   const addNewMedication = (medication: MedicationRequestCreate) => {
     const newMedications: MedicationRequestCreate[] = [
       ...medications,
-      medication,
+      { ...medication, dirty: true }, // Mark new medication as dirty
     ];
 
     updateQuestionnaireResponseCB(
@@ -592,6 +596,7 @@ export function MedicationRequestQuestion({
           requested_product_internal: requested_product,
           requester: currentUser,
           medication: requested_product?.id ? null : request.medication,
+          dirty: true, // Mark as dirty since it's being added as new
         } as MedicationRequestCreate;
       } else {
         const statement = record as MedicationStatementRead;
@@ -600,6 +605,7 @@ export function MedicationRequestQuestion({
           authored_on: new Date().toISOString(),
           note: statement.note,
           requester: currentUser,
+          dirty: true, // Mark as dirty since it's being added as new
         } as MedicationRequestCreate;
       }
     });
@@ -631,7 +637,7 @@ export function MedicationRequestQuestion({
       // For existing records, update status to entered_in_error
       const newMedications = medications.map((med, i) =>
         i === medicationToDelete
-          ? { ...med, status: "entered_in_error" as const }
+          ? { ...med, status: "entered_in_error" as const, dirty: true }
           : med,
       );
       updateQuestionnaireResponseCB(
@@ -656,7 +662,7 @@ export function MedicationRequestQuestion({
     updates: Partial<MedicationRequestCreate>,
   ) => {
     const newMedications = medications.map((medication, i) =>
-      i === index ? { ...medication, ...updates } : medication,
+      i === index ? { ...medication, ...updates, dirty: true } : medication,
     );
 
     updateQuestionnaireResponseCB(
@@ -703,6 +709,7 @@ export function MedicationRequestQuestion({
       requester: currentUser,
       requested_product: productId, // Use UUID
       requested_product_internal: productKnowledge,
+      dirty: true, // Mark as dirty since it's being added as new
     };
 
     const newMedications: MedicationRequestCreate[] = [
@@ -775,6 +782,7 @@ export function MedicationRequestQuestion({
             requester: currentUser,
             requested_product: productId, // Use UUID
             requested_product_internal: productKnowledge,
+            dirty: true, // Mark as dirty since it's being added as new
           };
         }),
       );
@@ -1273,6 +1281,17 @@ export function MedicationRequestQuestion({
           />
         )}
       </div>
+      {patientMedications?.count && patientMedications.count > 100 && (
+        <Alert className="bg-yellow-50 border-yellow-200">
+          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="text-yellow-800">
+            {t("medication_list_truncated_warning", {
+              shown: 100,
+              total: patientMedications.count,
+            })}
+          </AlertDescription>
+        </Alert>
+      )}
       {medications.length > 0 && (
         <div className="md:overflow-x-auto w-auto">
           <div className="min-w-fit">

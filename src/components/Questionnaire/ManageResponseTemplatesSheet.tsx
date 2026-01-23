@@ -81,19 +81,40 @@ function isProductSlug(value: string | undefined): boolean {
   return value.startsWith("f-") && value.includes("-");
 }
 
+// Extract readable name from a product slug
+// Slug format: f-{uuid}-{readable-part} -> extract last part and format
+function extractNameFromSlug(slug: string | undefined): string | null {
+  if (!slug || !isProductSlug(slug)) return null;
+  // Match pattern: f-{uuid}-{name} where uuid is 36 chars
+  const match = slug.match(/^f-[a-f0-9-]{36}-(.+)$/i);
+  if (match) {
+    // Convert slug part to readable: d5-09500-09ml -> D5 09500 09ML
+    return match[1].replace(/-/g, " ").toUpperCase();
+  }
+  return null;
+}
+
 // Component to display medication name, fetching from product knowledge if needed
 function MedicationName({
   medication,
   fallbackName,
 }: {
-  medication: MedicationRequestCreate & { display_name?: string };
+  medication: MedicationRequestCreate & {
+    display_name?: string;
+    requested_product_internal?: { name?: string; slug?: string };
+  };
   fallbackName: string;
 }) {
-  // Only fetch if we have a slug (not a UUID) and no display_name
+  // Get name from internal object first (this is set when applying templates)
+  const internalName = medication.requested_product_internal?.name;
+  const internalSlug = medication.requested_product_internal?.slug;
+
+  // Only fetch if we have a slug (not a UUID) and no other name source
   const canFetch =
     !!medication.requested_product &&
     isProductSlug(medication.requested_product) &&
     !medication.display_name &&
+    !internalName &&
     !medication.medication?.display;
 
   const { data: productKnowledge, isLoading } = useQuery({
@@ -105,11 +126,14 @@ function MedicationName({
     staleTime: Infinity, // Cache indefinitely since product names don't change
   });
 
-  // Priority: display_name > product knowledge > medication.display > fallback
+  // Priority: display_name > internal name > product knowledge > medication.display > extract from slug > fallback
   const name =
     medication.display_name ||
+    internalName ||
     productKnowledge?.name ||
     medication.medication?.display ||
+    extractNameFromSlug(internalSlug) ||
+    extractNameFromSlug(medication.requested_product) ||
     fallbackName;
 
   if (isLoading && canFetch) {
@@ -251,9 +275,17 @@ export default function ManageResponseTemplatesSheet({
             };
 
             // Use product ID (UUID) for the template, not the slug
+            // Fall back to med.requested_product which might already be a UUID
             const productId =
               medWithInternal.requested_product_internal?.id ||
               med.requested_product;
+
+            // Get the slug for display name extraction if needed
+            const productSlug =
+              medWithInternal.requested_product_internal?.slug ||
+              (isProductSlug(med.requested_product)
+                ? med.requested_product
+                : undefined);
 
             // If requested_product is present, don't include medication field
             // If no requested_product, we need medication with a valid code
@@ -265,12 +297,12 @@ export default function ManageResponseTemplatesSheet({
                 : undefined;
             }
 
-            // Get display name for the medication
+            // Get display name for the medication - ensure we always have a name
             const displayName =
               medWithInternal.requested_product_internal?.name ||
               med.medication?.display ||
-              medWithInternal.requested_product_internal?.slug ||
-              "";
+              extractNameFromSlug(productSlug) ||
+              "Medication";
 
             // Build template medication with display_name for UI rendering
             const templateMed = {

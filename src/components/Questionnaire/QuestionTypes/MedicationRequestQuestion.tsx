@@ -113,6 +113,23 @@ function formatDoseRange(range?: DoseRange): string {
   return `${round(range.low?.value)} → ${round(range.high?.value)} ${range.high?.unit?.display}`;
 }
 
+// Check if a string looks like a product slug (starts with 'f-' prefix)
+function isProductSlug(value: string | undefined): boolean {
+  if (!value) return false;
+  return value.startsWith("f-") && value.includes("-");
+}
+
+// Extract readable name from a product slug
+// Slug format: f-{uuid}-{readable-part} -> extract last part and format
+function extractNameFromSlug(slug: string | undefined): string | null {
+  if (!slug || !isProductSlug(slug)) return null;
+  const match = slug.match(/^f-[a-f0-9-]{36}-(.+)$/i);
+  if (match) {
+    return match[1].replace(/-/g, " ").toUpperCase();
+  }
+  return null;
+}
+
 interface MedicationRequestQuestionProps {
   patientId: string;
   questionnaireResponse: QuestionnaireResponse;
@@ -327,12 +344,19 @@ export function MedicationRequestQuestion({
       const productId =
         productInternal?.id || params.medication.requested_product;
 
-      // Get display name for the medication
+      // Get the slug for display name extraction if needed
+      const productSlug =
+        productInternal?.slug ||
+        (isProductSlug(params.medication.requested_product)
+          ? params.medication.requested_product
+          : undefined);
+
+      // Get display name for the medication - ensure we always have a name
       const displayName =
         productInternal?.name ||
         params.medication.medication?.display ||
-        productInternal?.slug ||
-        "";
+        extractNameFromSlug(productSlug) ||
+        "Medication";
 
       // Build template medication
       // If requested_product is present, don't include medication field
@@ -402,12 +426,19 @@ export function MedicationRequestQuestion({
       const productId =
         productInternal?.id || params.medication.requested_product;
 
-      // Get display name for the medication
+      // Get the slug for display name extraction if needed
+      const productSlug =
+        productInternal?.slug ||
+        (isProductSlug(params.medication.requested_product)
+          ? params.medication.requested_product
+          : undefined);
+
+      // Get display name for the medication - ensure we always have a name
       const displayName =
         productInternal?.name ||
         params.medication.medication?.display ||
-        productInternal?.slug ||
-        "";
+        extractNameFromSlug(productSlug) ||
+        "Medication";
 
       // Build template medication
       const medicationForTemplate: Record<string, unknown> = {

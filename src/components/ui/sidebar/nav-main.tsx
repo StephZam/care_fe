@@ -1,6 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { ActiveLink, useFullPath } from "raviger";
-import { Fragment, ReactNode, useMemo, useState } from "react";
+import { Fragment, ReactNode, useCallback, useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,31 @@ const isChildActive = (link: NavigationLink) => {
   if (!link.children) return false;
   const currentPath = window.location.pathname;
   return link.children.some((child) => currentPath.startsWith(child.url));
+};
+
+const STORAGE_KEY = "nav-expansion-state";
+
+const expansionStateCache = (() => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) : {};
+})();
+
+const useNavExpansionState = (linkName: string, link: NavigationLink) => {
+  const [isOpen, setIsOpen] = useState(() => {
+    const cached = expansionStateCache[linkName];
+    return cached !== undefined ? cached : isChildActive(link);
+  });
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsOpen(open);
+      expansionStateCache[linkName] = open;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(expansionStateCache));
+    },
+    [linkName],
+  );
+
+  return [isOpen, handleOpenChange] as const;
 };
 
 export interface NavigationLink {
@@ -71,73 +96,7 @@ export function NavMain({ links }: { links: NavigationLink[] }) {
                 isCollapsed ? (
                   <PopoverMenu link={link} />
                 ) : (
-                  <Collapsible
-                    asChild
-                    defaultOpen={isChildActive(link)}
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
-                        <SidebarMenuButton
-                          tooltip={link.name}
-                          className="cursor-pointer hover:bg-gray-200 hover:text-green-700"
-                        >
-                          {link.icon ? (
-                            link.icon
-                          ) : (
-                            <Avatar
-                              name={link.name}
-                              className="size-6 -m-1 rounded-sm"
-                            />
-                          )}
-                          <span className="group-data-[collapsible=icon]:hidden ml-1">
-                            {link.name}
-                          </span>
-                          <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub className="border-l border-gray-300">
-                          {link.children
-                            ?.filter((link) => link.visibility !== false)
-                            .map((subItem) => (
-                              <Fragment key={subItem.name}>
-                                {subItem.header && (
-                                  <div className="flex items-center gap-2 mt-2">
-                                    {subItem.headerIcon}
-                                    <span className="text-gray-400 uppercase text-xs font-bold">
-                                      {subItem.header}
-                                    </span>
-                                  </div>
-                                )}
-                                <SidebarMenuSubItem>
-                                  <SidebarMenuSubButton
-                                    asChild
-                                    className={
-                                      "text-gray-600 transition font-normal hover:bg-gray-200 hover:text-green-700"
-                                    }
-                                  >
-                                    <ActiveLink
-                                      href={subItem.url}
-                                      className="w-full"
-                                      activeClass={cn(
-                                        subItem.url
-                                          .split("/")
-                                          .every((part) => fullPathMap[part]) &&
-                                          "bg-white text-green-700 shadow",
-                                      )}
-                                      exactActiveClass="bg-white text-green-700 shadow"
-                                    >
-                                      {subItem.name}
-                                    </ActiveLink>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              </Fragment>
-                            ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
+                  <CollapsibleNavItem link={link} fullPathMap={fullPathMap} />
                 )
               ) : (
                 <SidebarMenuItem>
@@ -173,6 +132,84 @@ export function NavMain({ links }: { links: NavigationLink[] }) {
           ))}
       </SidebarMenu>
     </SidebarGroup>
+  );
+}
+
+function CollapsibleNavItem({
+  link,
+  fullPathMap,
+}: {
+  link: NavigationLink;
+  fullPathMap: Record<string, boolean>;
+}) {
+  const [isOpen, handleOpenChange] = useNavExpansionState(link.name, link);
+
+  return (
+    <Collapsible
+      asChild
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      className="group/collapsible"
+    >
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton
+            tooltip={link.name}
+            className="cursor-pointer hover:bg-gray-200 hover:text-green-700"
+          >
+            {link.icon ? (
+              link.icon
+            ) : (
+              <Avatar name={link.name} className="size-6 -m-1 rounded-sm" />
+            )}
+            <span className="group-data-[collapsible=icon]:hidden ml-1">
+              {link.name}
+            </span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub className="border-l border-gray-300">
+            {link.children
+              ?.filter((link) => link.visibility !== false)
+              .map((subItem) => (
+                <Fragment key={subItem.name}>
+                  {subItem.header && (
+                    <div className="flex items-center gap-2 mt-2">
+                      {subItem.headerIcon}
+                      <span className="text-gray-400 uppercase text-xs font-bold">
+                        {subItem.header}
+                      </span>
+                    </div>
+                  )}
+                  <SidebarMenuSubItem>
+                    <SidebarMenuSubButton
+                      asChild
+                      className={
+                        "text-gray-600 transition font-normal hover:bg-gray-200 hover:text-green-700"
+                      }
+                    >
+                      <ActiveLink
+                        href={subItem.url}
+                        className="w-full"
+                        activeClass={cn(
+                          subItem.url
+                            .split("/")
+                            .every((part) => fullPathMap[part]) &&
+                            "bg-white text-green-700 shadow",
+                        )}
+                        exactActiveClass="bg-white text-green-700 shadow"
+                      >
+                        {subItem.name}
+                      </ActiveLink>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                </Fragment>
+              ))}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   );
 }
 

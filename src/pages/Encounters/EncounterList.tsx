@@ -244,8 +244,13 @@ export function EncounterList({
   });
 
   useEffect(() => {
-    // Set default date range if no dates are present and no patient filter is active
-    if (!created_date_after && !created_date_before && !patient_filter) {
+    // Set default date range if no dates are present and no patient filter is active, and not an inpatient encounter
+    if (
+      !created_date_after &&
+      !created_date_before &&
+      !patient_filter &&
+      encounterClass !== "imp"
+    ) {
       const today = new Date();
       const defaultDays = careConfig.encounterDateFilter;
       if (defaultDays === 0) {
@@ -261,7 +266,13 @@ export function EncounterList({
         });
       }
     }
-  }, [created_date_after, created_date_before, patient_filter, updateQuery]);
+  }, [
+    created_date_after,
+    created_date_before,
+    patient_filter,
+    encounterClass,
+    updateQuery,
+  ]);
 
   const filters = [
     encounterStatusFilter("status"),
@@ -368,7 +379,9 @@ export function EncounterList({
   });
 
   const displaySelectedFilters =
-    patient_filter && !created_date_after && !created_date_before
+    (patient_filter || encounterClass === "imp") &&
+    !created_date_after &&
+    !created_date_before
       ? {
           ...selectedFilters,
           created_date: {

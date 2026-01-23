@@ -3230,6 +3230,7 @@
   "navigate": "Navigate",
   "navigation": "Navigation",
   "nearby_facilities": "Nearby Facilities",
+  "negative_price_for_discount_hint": "Use negative values for invoice-level discounts",
   "net_amount": "Net Amount",
   "net_content": "Net Content",
   "net_total": "Net Total",

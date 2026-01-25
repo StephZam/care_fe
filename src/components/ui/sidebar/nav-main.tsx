@@ -1,7 +1,9 @@
+import { useAtom } from "jotai";
 import { ChevronRight } from "lucide-react";
 import { ActiveLink, useFullPath } from "raviger";
-import { Fragment, ReactNode, useCallback, useMemo, useState } from "react";
+import { Fragment, ReactNode, useMemo, useState } from "react";
 
+import { navExpansionAtom } from "@/atoms/navExpansionAtom";
 import { cn } from "@/lib/utils";
 
 import {
@@ -33,29 +35,13 @@ const isChildActive = (link: NavigationLink) => {
   return link.children.some((child) => currentPath.startsWith(child.url));
 };
 
-const STORAGE_KEY = "nav-expansion-state";
-
-const expansionStateCache = (() => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  return stored ? JSON.parse(stored) : {};
-})();
-
 const useNavExpansionState = (linkName: string, link: NavigationLink) => {
-  const [isOpen, setIsOpen] = useState(() => {
-    const cached = expansionStateCache[linkName];
-    return cached !== undefined ? cached : isChildActive(link);
-  });
+  const [storedState, setStoredState] = useAtom(navExpansionAtom(linkName));
 
-  const handleOpenChange = useCallback(
-    (open: boolean) => {
-      setIsOpen(open);
-      expansionStateCache[linkName] = open;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(expansionStateCache));
-    },
-    [linkName],
-  );
+  // If no stored state, default to whether a child is active
+  const isOpen = storedState ?? isChildActive(link);
 
-  return [isOpen, handleOpenChange] as const;
+  return [isOpen, setStoredState] as const;
 };
 
 export interface NavigationLink {

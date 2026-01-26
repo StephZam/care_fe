@@ -328,6 +328,32 @@ export const PrintChargeItems = (props: {
                         }
                         width="w-24"
                       />
+                      {account?.primary_encounter && (
+                        <>
+                          <DetailRow
+                            label={t("start_date")}
+                            value={
+                              account?.primary_encounter &&
+                              account?.primary_encounter.period.start &&
+                              new Date(
+                                account?.primary_encounter.period.start,
+                              ).toLocaleDateString("en-IN")
+                            }
+                            width="w-24"
+                          />
+                          <DetailRow
+                            label={t("end_date")}
+                            value={
+                              account?.primary_encounter &&
+                              account?.primary_encounter.period.end &&
+                              new Date(
+                                account?.primary_encounter.period.end,
+                              ).toLocaleDateString("en-IN")
+                            }
+                            width="w-24"
+                          />
+                        </>
+                      )}
                     </div>
                   </div>
 

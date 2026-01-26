@@ -661,6 +661,7 @@ export function AccountShow({
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         facilityId={facilityId}
+        patientId={account.patient.id}
         initialValues={account}
         isEdit
       />

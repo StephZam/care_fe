@@ -135,6 +135,7 @@ export function PrintInvoice({ facilityId, invoiceId }: PrintInvoiceProps) {
     <PrintPreview
       title={`${t("invoice")} ${invoice.number}`}
       watermark={getWatermark()}
+      autoPrint={!isLoadingDispenses}
     >
       <DisablingCover
         disabled={isLoadingDispenses}

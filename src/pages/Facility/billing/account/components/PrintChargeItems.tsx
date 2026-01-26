@@ -300,6 +300,15 @@ export const PrintChargeItems = (props: {
                         value={account?.patient?.address}
                         width="w-16"
                       />
+                      {account?.primary_encounter?.current_location && (
+                        <DetailRow
+                          label={`${t("location")}`}
+                          value={
+                            account?.primary_encounter?.current_location?.name
+                          }
+                          width="w-16"
+                        />
+                      )}
                     </div>
                     <div className="space-y-1">
                       <DetailRow

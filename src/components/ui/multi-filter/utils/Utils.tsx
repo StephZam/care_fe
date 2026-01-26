@@ -7,6 +7,7 @@ import { GenericSelectedBadge } from "@/components/ui/multi-filter/genericFilter
 
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
+import { LocationRead } from "@/types/location/location";
 
 // Generic color palette for cycling through options
 export const COLOR_PALETTE = [
@@ -39,6 +40,7 @@ export type FilterValues =
   | TagConfig[]
   | FilterDateRange
   | FacilityOrganizationRead[]
+  | LocationRead[]
   | ActivityDefinitionFilterValue[];
 
 export type FilterMode = "single" | "multi";
@@ -53,6 +55,9 @@ export type DepartmentFilterMeta = {
   facilityId?: string;
 };
 
+export type LocationFilterMeta = {
+  facilityId?: string;
+};
 export type ActivityDefinitionFilterMeta = {
   facilityId?: string;
 };
@@ -95,6 +100,10 @@ export interface DepartmentFilterConfig extends BaseFilterConfig {
   meta: DepartmentFilterMeta;
 }
 
+export interface LocationFilterConfig extends BaseFilterConfig {
+  type: "location";
+  meta: LocationFilterMeta;
+}
 export interface ActivityDefinitionFilterConfig extends BaseFilterConfig {
   type: "activity_definition";
   meta: ActivityDefinitionFilterMeta;
@@ -105,6 +114,7 @@ export type FilterConfig =
   | TagFilterConfig
   | DateFilterConfig
   | DepartmentFilterConfig
+  | LocationFilterConfig
   | ActivityDefinitionFilterConfig;
 
 export interface OperationConfig {
@@ -155,7 +165,13 @@ function defaultGetOperations(_selected: FilterValues) {
 export function createFilterConfig(
   key: string,
   label: string,
-  type: "command" | "tag" | "date" | "department" | "activity_definition",
+  type:
+    | "command"
+    | "tag"
+    | "date"
+    | "department"
+    | "location"
+    | "activity_definition",
   options: FilterOption[],
   meta?: {
     resource?: TagResource;
@@ -220,6 +236,12 @@ export function createFilterConfig(
         type: "department",
         meta: {},
       } as DepartmentFilterConfig;
+    case "location":
+      return {
+        ...baseConfig,
+        type: "location",
+        meta: {},
+      } as LocationFilterConfig;
     case "activity_definition":
       return {
         ...baseConfig,

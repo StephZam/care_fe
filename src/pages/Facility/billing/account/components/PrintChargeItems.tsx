@@ -81,6 +81,7 @@ export const PrintChargeItems = (props: {
   const [preserveHeaderSpace, setPreserveHeaderSpace] = useState(true);
   const [sortByName, setSortByName] = useState(false);
   const [showCreatedBy, setShowCreatedBy] = useState(false);
+  const [groupByParentCategory, setGroupByParentCategory] = useState(false);
 
   const hideCategoryLabel = `${t("hide_category_grouping")}`;
   const hidePaymentTypeLabel = `${t("hide_payment_type_grouping")}`;
@@ -89,6 +90,7 @@ export const PrintChargeItems = (props: {
   const preserveHeaderSpaceLabel = `${t("preserve_header_space")}`;
   const sortByNameLabel = `${t("sort_by_name")}`;
   const showCreatedByLabel = `${t("show_created_by")}`;
+  const groupByParentCategoryLabel = `${t("group_by_parent_category")}`;
 
   const { data: account } = useQuery({
     queryKey: ["account", accountId],
@@ -193,6 +195,22 @@ export const PrintChargeItems = (props: {
                 {hideCategoryLabel}
               </label>
             </div>
+
+            {!hideCategories && (
+              <div className="gap-2 flex items-center">
+                <Switch
+                  id="group-by-parent-category"
+                  checked={groupByParentCategory}
+                  onCheckedChange={setGroupByParentCategory}
+                />
+                <label
+                  htmlFor="group-by-parent-category"
+                  className="cursor-pointer text-sm"
+                >
+                  {groupByParentCategoryLabel}
+                </label>
+              </div>
+            )}
 
             {payments.length > 0 && (
               <div className="gap-2 flex items-center">
@@ -422,14 +440,22 @@ export const PrintChargeItems = (props: {
                                   ChargeItemStatus.entered_in_error,
                               );
 
+                              // In summary mode, default to grouping by parent category
+                              const useParentCategory =
+                                groupByParentCategory || summaryMode;
+
                               const groups = validItems.reduce(
                                 (
                                   acc: Record<string, ChargeItemRead[]>,
                                   item: ChargeItemRead,
                                 ) => {
-                                  const categoryTitle =
-                                    item.charge_item_definition?.category
-                                      ?.title || t("uncategorized");
+                                  const category =
+                                    item.charge_item_definition?.category;
+                                  const categoryTitle = useParentCategory
+                                    ? category?.parent?.title ||
+                                      category?.title ||
+                                      t("uncategorized")
+                                    : category?.title || t("uncategorized");
                                   const list = acc[categoryTitle] ?? [];
                                   list.push(item);
                                   acc[categoryTitle] = list;

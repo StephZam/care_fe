@@ -193,6 +193,7 @@ async function fetchProductAndBuildMedication(
     requester: currentUser,
     requested_product: productId,
     requested_product_internal: productKnowledge,
+    dirty: true, // Mark as dirty so it gets sent to the API
   };
 }
 

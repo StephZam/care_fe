@@ -777,7 +777,12 @@ export const PrintChargeItems = (props: {
                                 const paymentsOfType: PaymentReconciliationRead[] =
                                   paymentGroups[paymentType] ?? [];
                                 const typeTotal = add(
-                                  ...paymentsOfType.map((p) => p.amount || 0),
+                                  ...paymentsOfType.map((p) =>
+                                    multiply(
+                                      p.amount || 0,
+                                      p.is_credit_note ? -1 : 1,
+                                    ),
+                                  ),
                                 );
 
                                 if (summaryMode) {
@@ -881,8 +886,11 @@ export const PrintChargeItems = (props: {
                                   <TableCell className="text-right">
                                     <MonetaryDisplay
                                       amount={add(
-                                        ...validPayments.map(
-                                          (p) => p.amount || 0,
+                                        ...validPayments.map((p) =>
+                                          multiply(
+                                            p.amount || 0,
+                                            p.is_credit_note ? -1 : 1,
+                                          ),
                                         ),
                                       )}
                                     />

@@ -88,6 +88,7 @@ export const PrintChargeItems = (props: {
   const [preserveHeaderSpace, setPreserveHeaderSpace] = useState(true);
   const [sortByName, setSortByName] = useState(false);
   const [showCreatedBy, setShowCreatedBy] = useState(false);
+  const [showStatus, setShowStatus] = useState(false);
   const [groupByParentCategory, setGroupByParentCategory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -98,6 +99,7 @@ export const PrintChargeItems = (props: {
   const preserveHeaderSpaceLabel = `${t("preserve_header_space")}`;
   const sortByNameLabel = `${t("sort_by_name")}`;
   const showCreatedByLabel = `${t("show_created_by")}`;
+  const showStatusLabel = `${t("show_status")}`;
   const groupByParentCategoryLabel = `${t("group_by_parent_category")}`;
 
   const { data: account } = useQuery({
@@ -258,6 +260,17 @@ export const PrintChargeItems = (props: {
                 className="cursor-pointer text-sm"
               >
                 {showCreatedByLabel}
+              </label>
+            </div>
+
+            <div className="gap-2 flex items-center">
+              <Switch
+                id="show-status"
+                checked={showStatus}
+                onCheckedChange={setShowStatus}
+              />
+              <label htmlFor="show-status" className="cursor-pointer text-sm">
+                {showStatusLabel}
               </label>
             </div>
           </>
@@ -475,9 +488,11 @@ export const PrintChargeItems = (props: {
                                   <TableHead className="font-bold w-24">
                                     {t("title")}
                                   </TableHead>
-                                  <TableHead className="font-bold text-center w-8">
-                                    {t("status")}
-                                  </TableHead>
+                                  {showStatus && (
+                                    <TableHead className="font-bold text-center w-8">
+                                      {t("status")}
+                                    </TableHead>
+                                  )}
                                   {showCreatedBy && (
                                     <TableHead className="font-bold w-16">
                                       {t("created_by")}
@@ -593,7 +608,11 @@ export const PrintChargeItems = (props: {
                                         className="font-bold hover:bg-transparent"
                                       >
                                         <TableCell
-                                          colSpan={showCreatedBy ? 6 : 5}
+                                          colSpan={
+                                            5 +
+                                            (showStatus ? 1 : 0) +
+                                            (showCreatedBy ? 1 : 0)
+                                          }
                                           className="capitalize"
                                         >
                                           {categoryTitle}
@@ -637,11 +656,13 @@ export const PrintChargeItems = (props: {
                                               </span>
                                             </div>
                                           </TableCell>
-                                          <TableCell className="text-center w-8">
-                                            <span className="text-xs">
-                                              {t(chargeItem.status)}
-                                            </span>
-                                          </TableCell>
+                                          {showStatus && (
+                                            <TableCell className="text-center w-8">
+                                              <span className="text-xs">
+                                                {t(chargeItem.status)}
+                                              </span>
+                                            </TableCell>
+                                          )}
                                           {showCreatedBy && (
                                             <TableCell className="w-16">
                                               {
@@ -677,7 +698,11 @@ export const PrintChargeItems = (props: {
                                   className="bg-muted/30 font-semibold"
                                 >
                                   <TableCell
-                                    colSpan={showCreatedBy ? 6 : 5}
+                                    colSpan={
+                                      5 +
+                                      (showStatus ? 1 : 0) +
+                                      (showCreatedBy ? 1 : 0)
+                                    }
                                     className="text-right pr-2"
                                   >
                                     {t("net_total")}
@@ -701,7 +726,7 @@ export const PrintChargeItems = (props: {
                     </div>
                   )}
 
-                  {payments.length > 0 && (
+                  {payments.length > 0 && !selectedCategory && (
                     <div className="mt-4">
                       <hr className="border-gray-300 py-2" />
                       <h2 className="text-sm font-semibold mb-1">

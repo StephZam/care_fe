@@ -2867,6 +2867,7 @@
   "language_selection": "Language Selection",
   "languages": "Languages",
   "last_administered": "Last administered",
+  "last_calculated_at": "Last calculated {{time}}",
   "last_count_days": "last {{count}} days",
   "last_count_months": "Last {{count}} months",
   "last_count_weeks": "Last {{count}} weeks",

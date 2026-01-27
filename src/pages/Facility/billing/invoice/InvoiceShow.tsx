@@ -495,7 +495,7 @@ export function InvoiceShow({
           </div>
         </div>
 
-        <div className="md:col-span-2 overflow-x-auto max-w-4xl mx-auto">
+        <div className="md:col-span-2 overflow-x-auto max-w-5xl mx-auto">
           <div className="bg-gray-50 border border-gray-200 rounded-md p-3 mb-3">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-2">
@@ -830,7 +830,10 @@ export function InvoiceShow({
                               {index + 1}
                             </TableCell>
                             <TableCell
-                              className={cn(tableCellClass, "font-medium")}
+                              className={cn(
+                                tableCellClass,
+                                "font-medium whitespace-pre-wrap",
+                              )}
                             >
                               <InvoiceChargeItemTitle
                                 item={item}

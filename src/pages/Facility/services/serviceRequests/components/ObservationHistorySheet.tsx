@@ -94,8 +94,8 @@ export function ObservationHistorySheet({
                         <p>
                           {observation.effective_datetime
                             ? new Date(
-                              observation.effective_datetime,
-                            ).toLocaleString()
+                                observation.effective_datetime,
+                              ).toLocaleString()
                             : "-"}
                         </p>
                       </div>
@@ -133,8 +133,9 @@ export function ObservationHistorySheet({
                                 </p>
                                 <p>
                                   {comp.value?.value
-                                    ? `${comp.value.value} ${comp.value.unit?.code || ""
-                                    }`
+                                    ? `${comp.value.value} ${
+                                        comp.value.unit?.code || ""
+                                      }`
                                     : "-"}
                                 </p>
                               </div>

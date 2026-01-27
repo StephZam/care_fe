@@ -387,6 +387,7 @@ export function MedicationRequestQuestion({
         questionnaire: filterStructuredQuestionnaireSlugs(questionnaireSlug),
         key_filter: "medication_request",
         name: templateSearchQuery || undefined,
+        facility: facilityId,
         limit: 20,
       },
     }),

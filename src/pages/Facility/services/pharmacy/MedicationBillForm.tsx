@@ -140,6 +140,7 @@ import {
   add,
   divide,
   isGreaterThan,
+  isGreaterThanOrEqual,
   isZero,
   multiply,
   round,
@@ -838,18 +839,28 @@ export default function MedicationBillForm({
         inventories?.length &&
         !currentLots.some((lot) => lot.selectedInventoryId)
       ) {
-        const validLot = inventories.find((inv) =>
-          isLotAllowedForDispensing(inv.product.expiration_date),
+        const medication = form.getValues(`items.${index}.medication`);
+        const requiredQuantity = medication
+          ? computeInitialQuantity(medication)
+          : currentLots[0]?.quantity || "1";
+
+        let selectedLot = inventories.find(
+          (inv) =>
+            isLotAllowedForDispensing(inv.product.expiration_date) &&
+            isGreaterThanOrEqual(inv.net_content, requiredQuantity),
         );
 
-        if (validLot) {
-          const medication = form.getValues(`items.${index}.medication`);
+        if (!selectedLot) {
+          selectedLot = inventories.find((inv) =>
+            isLotAllowedForDispensing(inv.product.expiration_date),
+          );
+        }
+
+        if (selectedLot) {
           form.setValue(`items.${index}.lots`, [
             {
-              selectedInventoryId: validLot.id,
-              quantity: medication
-                ? computeInitialQuantity(medication)
-                : currentLots[0]?.quantity || "1",
+              selectedInventoryId: selectedLot.id,
+              quantity: requiredQuantity,
             },
           ]);
         }

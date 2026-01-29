@@ -796,7 +796,7 @@ export default function MedicationBillForm({
     enabled: !!prescriptionId,
   });
 
-  const fetchInventoryForProduct = async (productKnowledgeId: string) => {
+  const fetchInventory = async (productKnowledgeId: string) => {
     const inventoriesResponse = await query(inventoryApi.list, {
       pathParams: { facilityId, locationId },
       queryParams: {
@@ -823,7 +823,7 @@ export default function MedicationBillForm({
         productKnowledgeInventoriesMap,
       )) {
         if (inventories) continue;
-        await fetchInventoryForProduct(productKnowledgeId);
+        await fetchInventory(productKnowledgeId);
       }
     };
 
@@ -839,9 +839,7 @@ export default function MedicationBillForm({
       const effectiveProductKnowledge =
         substitution?.substitutedProductKnowledge || productKnowledge;
 
-      const inventories = await fetchInventoryForProduct(
-        effectiveProductKnowledge?.id,
-      );
+      const inventories = await fetchInventory(effectiveProductKnowledge?.id);
 
       const currentLots = form.getValues(`items.${index}.lots`);
 

@@ -832,7 +832,11 @@ export default function MedicationBillForm({
     fetchMissingInventories();
   }, [productKnowledgeInventoriesMap, facilityId, locationId]);
 
-  const { mutate: reCalc, isPending: isRecalculating } = useMutation({
+  const {
+    mutate: reCalc,
+    isPending: isRecalculating,
+    variables: recalculatingIndex,
+  } = useMutation({
     mutationFn: async (index: number) => {
       const field = fields[index];
 
@@ -877,6 +881,9 @@ export default function MedicationBillForm({
         let remainingQuantity = new Decimal(requiredQuantity);
 
         for (const inventory of validInventories) {
+          if (remainingQuantity.lessThanOrEqualTo(0)) {
+            break;
+          }
           const allocatedQuantity = isGreaterThan(
             remainingQuantity,
             inventory.net_content,
@@ -1916,7 +1923,11 @@ export default function MedicationBillForm({
                                     }
                                     multiSelect
                                     showexpiry={true}
-                                    disabled={!isChecked || isRecalculating}
+                                    disabled={
+                                      !isChecked ||
+                                      (isRecalculating &&
+                                        recalculatingIndex === index)
+                                    }
                                     showUnitPrice={false}
                                   />
                                 </div>
@@ -1926,12 +1937,17 @@ export default function MedicationBillForm({
                                   size="sm"
                                   onClick={() => reCalc(index)}
                                   className="underline align-middle"
-                                  disabled={isRecalculating}
+                                  disabled={
+                                    isRecalculating &&
+                                    recalculatingIndex === index
+                                  }
                                 >
                                   <RefreshCcwDotIcon
                                     className={cn(
                                       "size-8",
-                                      isRecalculating && "animate-spin",
+                                      isRecalculating &&
+                                        recalculatingIndex === index &&
+                                        "animate-spin",
                                     )}
                                   />
                                 </Button>

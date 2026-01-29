@@ -7,6 +7,7 @@ import {
   Info,
   LoaderCircle,
   MoreVertical,
+  RefreshCcwDotIcon,
   Shuffle,
 } from "lucide-react";
 import { navigate, useQueryParams } from "raviger";
@@ -795,75 +796,115 @@ export default function MedicationBillForm({
     enabled: !!prescriptionId,
   });
 
+  const fetchInventoryForProduct = async (productKnowledgeId: string) => {
+    const inventoriesResponse = await query(inventoryApi.list, {
+      pathParams: { facilityId, locationId },
+      queryParams: {
+        limit: 100,
+        product_knowledge: productKnowledgeId,
+        net_content_gt: 0,
+        include_children: true,
+      },
+    })({ signal: new AbortController().signal });
+
+    const inventories = inventoriesResponse.results || [];
+
+    setProductKnowledgeInventoriesMap((prev) => ({
+      ...prev,
+      [productKnowledgeId]: inventories,
+    }));
+
+    return inventories;
+  };
+
   useEffect(() => {
     const fetchMissingInventories = async () => {
       for (const [productKnowledgeId, inventories] of Object.entries(
         productKnowledgeInventoriesMap,
       )) {
         if (inventories) continue;
-
-        const inventoriesResponse = await query(inventoryApi.list, {
-          pathParams: { facilityId, locationId },
-          queryParams: {
-            limit: 100,
-            product_knowledge: productKnowledgeId,
-            net_content_gt: 0,
-            include_children: true,
-          },
-        })({ signal: new AbortController().signal });
-
-        setProductKnowledgeInventoriesMap((prev) => ({
-          ...prev,
-          [productKnowledgeId]: inventoriesResponse.results || [],
-        }));
+        await fetchInventoryForProduct(productKnowledgeId);
       }
     };
 
     fetchMissingInventories();
   }, [productKnowledgeInventoriesMap, facilityId, locationId]);
 
-  // Auto-select first valid (non-expired) lot by default
-  useEffect(() => {
-    fields.forEach((field, index) => {
+  const { mutate: reCalc, isPending: isRecalculating } = useMutation({
+    mutationFn: async (index: number) => {
+      const field = fields[index];
+
       const productKnowledge = field.productKnowledge as ProductKnowledgeBase;
       const substitution = form.watch(`items.${index}.substitution`);
       const effectiveProductKnowledge =
         substitution?.substitutedProductKnowledge || productKnowledge;
 
-      const inventories =
-        productKnowledgeInventoriesMap[effectiveProductKnowledge?.id];
+      const inventories = await fetchInventoryForProduct(
+        effectiveProductKnowledge?.id,
+      );
+
       const currentLots = form.getValues(`items.${index}.lots`);
 
-      if (
-        inventories !== undefined &&
-        inventories?.length &&
-        !currentLots.some((lot) => lot.selectedInventoryId)
-      ) {
+      if (inventories.length) {
+        const currentQuantity = currentLots[0]?.quantity;
         const medication = form.getValues(`items.${index}.medication`);
-        const requiredQuantity = medication
-          ? computeInitialQuantity(medication)
-          : currentLots[0]?.quantity || "1";
+        const requiredQuantity =
+          currentQuantity && currentQuantity !== "0"
+            ? currentQuantity
+            : medication
+              ? computeInitialQuantity(medication)
+              : "1";
 
-        let selectedLot = inventories.find(
-          (inv) =>
-            isLotAllowedForDispensing(inv.product.expiration_date) &&
-            isGreaterThanOrEqual(inv.net_content, requiredQuantity),
+        const validInventories = inventories.filter((inv) =>
+          isLotAllowedForDispensing(inv.product.expiration_date),
         );
 
-        if (!selectedLot) {
-          selectedLot = inventories.find((inv) =>
-            isLotAllowedForDispensing(inv.product.expiration_date),
-          );
-        }
+        const singleLot = validInventories.find((inv) =>
+          isGreaterThanOrEqual(inv.net_content, requiredQuantity),
+        );
 
-        if (selectedLot) {
+        if (singleLot) {
           form.setValue(`items.${index}.lots`, [
             {
-              selectedInventoryId: selectedLot.id,
+              selectedInventoryId: singleLot.id,
               quantity: requiredQuantity,
             },
           ]);
+          return;
         }
+
+        const selectedLots = [];
+        let remainingQuantity = new Decimal(requiredQuantity);
+
+        for (const inventory of validInventories) {
+          const allocatedQuantity = isGreaterThan(
+            remainingQuantity,
+            inventory.net_content,
+          )
+            ? inventory.net_content
+            : remainingQuantity;
+
+          selectedLots.push({
+            selectedInventoryId: inventory.id,
+            quantity: round(allocatedQuantity),
+          });
+
+          remainingQuantity = remainingQuantity.minus(allocatedQuantity);
+        }
+
+        if (selectedLots.length) {
+          form.setValue(`items.${index}.lots`, selectedLots);
+        }
+      }
+    },
+  });
+
+  // Auto-select first valid (non-expired) lot by default
+  useEffect(() => {
+    fields.forEach((field, index) => {
+      const currentLots = form.getValues(`items.${index}.lots`);
+      if (!currentLots.some((lot) => lot.selectedInventoryId)) {
+        reCalc(index);
       }
     });
   }, [productKnowledgeInventoriesMap, fields, form]);
@@ -1821,42 +1862,68 @@ export default function MedicationBillForm({
                               effectiveProductKnowledge.id
                             ]?.length ? (
                             <div className="space-y-2">
-                              <StockLotSelector
-                                selectedLots={form.watch(`items.${index}.lots`)}
-                                onLotSelectionChange={(lots) => {
-                                  const existingLotIds = form
-                                    .getValues(`items.${index}.lots`)
-                                    .map((lot) => lot.selectedInventoryId);
-                                  const newLots = lots.map((lot) => {
-                                    if (
-                                      !existingLotIds.includes(
-                                        lot.selectedInventoryId,
-                                      )
-                                    ) {
-                                      const medication = form.getValues(
-                                        `items.${index}.medication`,
+                              <div className="flex items-center gap-2">
+                                <div className="flex-1">
+                                  <StockLotSelector
+                                    selectedLots={form.watch(
+                                      `items.${index}.lots`,
+                                    )}
+                                    onLotSelectionChange={(lots) => {
+                                      const existingLotIds = form
+                                        .getValues(`items.${index}.lots`)
+                                        .map((lot) => lot.selectedInventoryId);
+                                      const newLots = lots.map((lot) => {
+                                        if (
+                                          !existingLotIds.includes(
+                                            lot.selectedInventoryId,
+                                          )
+                                        ) {
+                                          const medication = form.getValues(
+                                            `items.${index}.medication`,
+                                          );
+                                          return {
+                                            ...lot,
+                                            quantity: medication
+                                              ? computeInitialQuantity(
+                                                  medication,
+                                                )
+                                              : lot.quantity,
+                                          };
+                                        }
+                                        return lot;
+                                      });
+                                      form.setValue(
+                                        `items.${index}.lots`,
+                                        newLots,
                                       );
-                                      return {
-                                        ...lot,
-                                        quantity: medication
-                                          ? computeInitialQuantity(medication)
-                                          : lot.quantity,
-                                      };
+                                    }}
+                                    availableInventories={
+                                      productKnowledgeInventoriesMap[
+                                        effectiveProductKnowledge.id
+                                      ]
                                     }
-                                    return lot;
-                                  });
-                                  form.setValue(`items.${index}.lots`, newLots);
-                                }}
-                                availableInventories={
-                                  productKnowledgeInventoriesMap[
-                                    effectiveProductKnowledge.id
-                                  ]
-                                }
-                                multiSelect
-                                showexpiry={true}
-                                disabled={!isChecked}
-                                showUnitPrice={false}
-                              />
+                                    multiSelect
+                                    showexpiry={true}
+                                    disabled={!isChecked || isRecalculating}
+                                    showUnitPrice={false}
+                                  />
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="link"
+                                  size="sm"
+                                  onClick={() => reCalc(index)}
+                                  className="underline align-middle"
+                                  disabled={isRecalculating}
+                                >
+                                  <RefreshCcwDotIcon
+                                    className={cn(
+                                      "size-8",
+                                      isRecalculating && "animate-spin",
+                                    )}
+                                  />
+                                </Button>
+                              </div>
                             </div>
                           ) : (
                             <Badge

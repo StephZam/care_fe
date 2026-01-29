@@ -942,9 +942,9 @@ export default function MedicationBillForm({
     }
 
     const unitCode = instruction.dose_and_rate?.dose_quantity?.unit?.code;
-    const volumetricUnitCodes = ["g", "mg", "ug", "mL", "[drp]"];
+    const nonVolumetric = ["{tbl}", "{count}"];
 
-    if (unitCode && volumetricUnitCodes.includes(unitCode)) {
+    if (unitCode && !nonVolumetric.includes(unitCode)) {
       return "";
     }
 

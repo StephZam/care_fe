@@ -845,7 +845,7 @@ export function displayMedicationName(
   );
 }
 
-export function computeInitialQuantity(
+export function computeMedicationDispenseQuantity(
   medication: MedicationRequestRead,
 ): string {
   const instruction = medication.dosage_instruction[0];

@@ -125,7 +125,7 @@ import {
 } from "@/types/emr/medicationDispense/medicationDispense";
 import medicationDispenseApi from "@/types/emr/medicationDispense/medicationDispenseApi";
 import {
-  computeInitialQuantity,
+  computeMedicationDispenseQuantity,
   DoseRange,
   MedicationRequestDispenseStatus,
   MedicationRequestDosageInstruction,
@@ -846,7 +846,7 @@ export default function MedicationBillForm({
             {
               selectedInventoryId: validLot.id,
               quantity: medication
-                ? computeInitialQuantity(medication)
+                ? computeMedicationDispenseQuantity(medication)
                 : currentLots[0]?.quantity || "1",
             },
           ]);
@@ -920,7 +920,7 @@ export default function MedicationBillForm({
           {
             selectedInventoryId:
               (medication.inventory_items_internal?.[0]?.id as string) || "",
-            quantity: computeInitialQuantity(medication),
+            quantity: computeMedicationDispenseQuantity(medication),
           },
         ],
         prescriptionId,
@@ -1751,7 +1751,9 @@ export default function MedicationBillForm({
                                       return {
                                         ...lot,
                                         quantity: medication
-                                          ? computeInitialQuantity(medication)
+                                          ? computeMedicationDispenseQuantity(
+                                              medication,
+                                            )
                                           : lot.quantity,
                                       };
                                     }
@@ -2092,7 +2094,7 @@ export default function MedicationBillForm({
                         dosageInstructions;
                     }
 
-                    const newQuantity = computeInitialQuantity(
+                    const newQuantity = computeMedicationDispenseQuantity(
                       medicationDataForQuantity,
                     );
 
@@ -2116,7 +2118,7 @@ export default function MedicationBillForm({
               : undefined
           }
           onAdd={(product, dosageInstructions) => {
-            const newQuantity = computeInitialQuantity({
+            const newQuantity = computeMedicationDispenseQuantity({
               dosage_instruction: dosageInstructions,
             } as MedicationRequestRead);
 
@@ -2193,7 +2195,7 @@ export default function MedicationBillForm({
                   | MedicationRequestRead
                   | undefined;
                 const initialQuantity = originalMedication
-                  ? computeInitialQuantity(originalMedication)
+                  ? computeMedicationDispenseQuantity(originalMedication)
                   : "0";
                 form.setValue(
                   `items.${substitutingItemIndex}.lots`,

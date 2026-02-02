@@ -126,7 +126,6 @@ import {
 } from "@/types/emr/medicationDispense/medicationDispense";
 import medicationDispenseApi from "@/types/emr/medicationDispense/medicationDispenseApi";
 import {
-  ACTIVE_MEDICATION_STATUSES,
   computeMedicationDispenseQuantity,
   DoseRange,
   MedicationRequestDispenseStatus,
@@ -135,10 +134,7 @@ import {
   UCUM_TIME_UNITS,
 } from "@/types/emr/medicationRequest/medicationRequest";
 import medicationRequestApi from "@/types/emr/medicationRequest/medicationRequestApi";
-import {
-  PrescriptionRead,
-  PrescriptionStatus,
-} from "@/types/emr/prescription/prescription";
+import { PrescriptionRead } from "@/types/emr/prescription/prescription";
 import prescriptionApi from "@/types/emr/prescription/prescriptionApi";
 import { InventoryRead } from "@/types/inventory/product/inventory";
 import inventoryApi from "@/types/inventory/product/inventoryApi";
@@ -747,7 +743,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
         queryParams: {
           facility: facilityId,
           limit: 100,
-          status: ACTIVE_MEDICATION_STATUSES.join(","),
+          status: "active,on_hold,draft,unknown,ended,completed,cancelled",
           exclude_dispense_status: "complete,incomplete",
         },
       })({ signal });
@@ -1238,7 +1234,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
         body: {
           datapoints: Array.from(prescriptionIds).map((prescriptionId) => ({
             id: prescriptionId,
-            status: PrescriptionStatus.completed,
+            status: "completed",
           })),
         },
       });
@@ -1410,6 +1406,7 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                           label: prescriptionLabel,
                           fields: groupFields,
                           date: date,
+                          prescription,
                         };
                       })
                       .sort((a, b) => {
@@ -1452,9 +1449,11 @@ export default function AllMedicationBillForm({ patientId }: Props) {
                                 className="py-2 px-4 font-semibold text-gray-800 border-b"
                               >
                                 <div className="flex items-center justify-between">
-                                  <div>
-                                    {label} ({groupFields.length}{" "}
-                                    {t("medications")})
+                                  <div className="flex flex-col gap-1">
+                                    <span>
+                                      {label} ({groupFields.length}{" "}
+                                      {t("medications")})
+                                    </span>
                                   </div>
                                   {key !== "no-prescription" && (
                                     <div className="flex items-center gap-2">

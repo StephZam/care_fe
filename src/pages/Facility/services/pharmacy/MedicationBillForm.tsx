@@ -848,14 +848,17 @@ export default function MedicationBillForm({
       const currentLots = form.getValues(`items.${index}.lots`);
 
       if (inventories.length) {
-        const currentQuantity = currentLots[0]?.quantity;
+        const totalCurrentQuantity = currentLots.reduce(
+          (sum, lot) => sum.plus(new Decimal(lot.quantity || 0)),
+          new Decimal(0),
+        );
+
         const medication = form.getValues(`items.${index}.medication`);
-        const requiredQuantity =
-          currentQuantity && currentQuantity !== "0"
-            ? currentQuantity
-            : medication
-              ? computeMedicationDispenseQuantity(medication)
-              : "1";
+        const requiredQuantity = totalCurrentQuantity.greaterThan(0)
+          ? round(totalCurrentQuantity)
+          : medication
+            ? computeMedicationDispenseQuantity(medication)
+            : "1";
 
         const validInventories = inventories.filter((inv) =>
           isLotAllowedForDispensing(inv.product.expiration_date),
@@ -869,9 +872,7 @@ export default function MedicationBillForm({
           form.setValue(`items.${index}.lots`, [
             {
               selectedInventoryId: singleLot.id,
-              quantity: medication
-                ? computeMedicationDispenseQuantity(medication)
-                : currentLots[0]?.quantity || "1",
+              quantity: requiredQuantity,
             },
           ]);
           return;
@@ -910,11 +911,27 @@ export default function MedicationBillForm({
   useEffect(() => {
     fields.forEach((field, index) => {
       const currentLots = form.getValues(`items.${index}.lots`);
-      if (!currentLots.some((lot) => lot.selectedInventoryId)) {
-        reCalc(index);
+      const productKnowledge = field.productKnowledge as ProductKnowledgeBase;
+      const substitution = form.watch(`items.${index}.substitution`);
+      const effectiveProductKnowledge =
+        substitution?.substitutedProductKnowledge || productKnowledge;
+      const inventories =
+        productKnowledgeInventoriesMap[effectiveProductKnowledge?.id];
+
+      if (
+        !currentLots.some((lot) => lot.selectedInventoryId) &&
+        inventories !== undefined
+      ) {
+        const hasValidInventory = inventories.some((inv) =>
+          isLotAllowedForDispensing(inv.product.expiration_date),
+        );
+
+        if (hasValidInventory) {
+          reCalc(index);
+        }
       }
     });
-  }, [productKnowledgeInventoriesMap, fields, form]);
+  }, [productKnowledgeInventoriesMap, fields, form, reCalc]);
 
   const medications = useMemo(
     () =>

@@ -582,6 +582,16 @@ export function MedicationRequestQuestion({
       requester: currentUser,
     };
 
+    if (productKnowledge.product_type === "consumable") {
+      initialDetails.dosage_instruction = [
+        {
+          ...initialDetails.dosage_instruction[0],
+          as_needed_boolean: true,
+          timing: undefined,
+        },
+      ];
+    }
+
     if (desktopLayout) {
       addNewMedication(initialDetails);
     } else {

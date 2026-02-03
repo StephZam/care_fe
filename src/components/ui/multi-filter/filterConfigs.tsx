@@ -7,6 +7,7 @@ import {
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
 import { LocationRead } from "@/types/location/location";
+import { UserReadMinimal } from "@/types/user/user";
 import {
   Beaker,
   Building,
@@ -14,6 +15,7 @@ import {
   CircleDashed,
   MapPin,
   Tag,
+  Users,
 } from "lucide-react";
 
 import { t } from "i18next";
@@ -21,6 +23,7 @@ import {
   ActivityDefinitionFilterValue,
   SelectedActivityDefinitionBadge,
 } from "./activityDefinitionFilter";
+import { SelectedCareTeamBadge } from "./careTeamFilter";
 import { SelectedDateBadge, getDateOperations } from "./dateFilter";
 import { SelectedDepartmentBadge } from "./departmentFilter";
 import { GenericSelectedBadge } from "./genericFilter";
@@ -522,3 +525,17 @@ export const activityDefinitionFilter = (
       icon: <Beaker className="size-4" />,
     },
   );
+
+export const careTeamFilter = (
+  key: string = "care_team",
+  mode: FilterMode = "single",
+  label?: string,
+) =>
+  createFilterConfig(key, label ? t(label) : t("care_team"), "care_team", [], {
+    renderSelected: (selected: FilterValues) => {
+      return <SelectedCareTeamBadge selected={selected as UserReadMinimal[]} />;
+    },
+    getOperations: () => [{ label: "is" }],
+    mode,
+    icon: <Users className="size-4" />,
+  });

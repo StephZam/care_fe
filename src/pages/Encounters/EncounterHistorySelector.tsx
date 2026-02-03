@@ -12,6 +12,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import {
+  careTeamFilter,
   dateFilter,
   departmentFilter,
   encounterStatusFilter,
@@ -33,6 +34,7 @@ import {
 } from "@/types/emr/encounter/encounter";
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
 import { FacilityOrganizationRead } from "@/types/facilityOrganization/facilityOrganization";
+import { UserReadMinimal } from "@/types/user/user";
 import {
   Building2,
   Calendar,
@@ -237,6 +239,9 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
           tags: selectedTags.length > 0 ? selectedTags : undefined,
           tags_behavior: parsed.tagsBehavior || "any",
           organization: parsed.selectedOrg ? [parsed.selectedOrg] : undefined,
+          care_team: parsed.selectedCareTeamMember
+            ? [parsed.selectedCareTeamMember]
+            : undefined,
           created_date:
             parsed.dateFrom && parsed.dateTo
               ? { from: new Date(parsed.dateFrom), to: new Date(parsed.dateTo) }
@@ -287,6 +292,7 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
       filters.selectedTags,
       filters.tagsBehavior,
       filters.selectedOrg?.id,
+      filters.selectedCareTeamMember?.username,
       filters.dateFrom,
       filters.dateTo,
     ],
@@ -307,6 +313,9 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
           }),
           ...(filters.selectedOrg && {
             organization: filters.selectedOrg.id,
+          }),
+          ...(filters.selectedCareTeamMember && {
+            care_team_user: filters.selectedCareTeamMember.username,
           }),
           ...(dateFrom && {
             created_date_after: dateTimeQueryString(dateFrom),
@@ -346,6 +355,7 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
           | string
           | TagConfig[]
           | FacilityOrganizationRead
+          | UserReadMinimal
           | { from: Date; to: Date }
           | null
           | undefined;
@@ -363,6 +373,12 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
             updates.selectedOrg =
               (filterValue as FacilityOrganizationRead) || undefined;
             break;
+          case "care_team": {
+            // filterValue is a single UserReadMinimal (mode is "single")
+            updates.selectedCareTeamMember =
+              (filterValue as UserReadMinimal) || undefined;
+            break;
+          }
           case "created_date":
             if (
               filterValue &&
@@ -387,6 +403,7 @@ const EncounterHistoryList = ({ onSelect }: Props) => {
     encounterStatusFilter("status"),
     tagFilter("tags", TagResource.ENCOUNTER),
     departmentFilter("organization"),
+    careTeamFilter("care_team"),
     dateFilter("created_date"),
   ];
   const {

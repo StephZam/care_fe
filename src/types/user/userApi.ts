@@ -7,10 +7,6 @@ import {
   UserReadMinimal,
   UserUpdate,
 } from "@/types/user/user";
-import {
-  UserPreference,
-  UserPreferenceRequest,
-} from "@/types/user/userPreferences";
 
 export default {
   list: {
@@ -72,11 +68,5 @@ export default {
     path: "/api/v1/users/{username}/revoke_service_account_token/",
     method: HttpMethod.DELETE,
     TRes: Type<void>(),
-  },
-  setPreferences: {
-    path: "/api/v1/users/set_preferences/",
-    method: HttpMethod.POST,
-    TRes: Type<CurrentUserRead>(),
-    TBody: Type<UserPreferenceRequest<keyof UserPreference>>(),
   },
 } as const;

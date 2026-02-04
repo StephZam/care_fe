@@ -895,8 +895,7 @@ export default function QuestionnaireEditor({
     setSelectedTags((current) => [...current, tag]);
   };
 
-  const handleAddQuestion = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleAddQuestionAtIndex = (index: number) => {
     const newQuestion: Question = {
       id: crypto.randomUUID(),
       link_id: `Q-${Date.now()}`,
@@ -904,11 +903,21 @@ export default function QuestionnaireEditor({
       type: "string",
       questions: [],
     };
-    updateQuestions([...rootQuestions, newQuestion]);
+    const newQuestions = [
+      ...rootQuestions.slice(0, index),
+      newQuestion,
+      ...rootQuestions.slice(index),
+    ];
+    updateQuestions(newQuestions);
     setExpandedQuestions((prev) => new Set([...prev, newQuestion.link_id]));
     setTimeout(() => {
       scrollToQuestion(newQuestion.link_id);
     }, 100);
+  };
+
+  const handleAddQuestion = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleAddQuestionAtIndex(rootQuestions.length);
   };
 
   return (
@@ -1192,80 +1201,93 @@ export default function QuestionnaireEditor({
                     <CardContent className="p-0">
                       <div className="space-y-6">
                         {rootQuestions.map((question, index) => (
-                          <div
-                            key={question.id}
-                            id={`question-${question.link_id}`}
-                            ref={(el) => {
-                              questionRefs.current[question.link_id] = el;
-                            }}
-                            className="relative bg-white rounded-lg shadow-md"
-                          >
-                            <QuestionEditor
-                              name={`questions.${index}`}
-                              index={index}
-                              key={question.link_id}
-                              question={question}
-                              selectedQuestions={selectedQuestions}
-                              onToggleSelection={handleToggleSelection}
-                              form={form}
-                              onChange={(updatedQuestion) => {
-                                const newQuestions = rootQuestions.map(
-                                  (q, i) => (i === index ? updatedQuestion : q),
-                                );
-                                updateQuestions(newQuestions);
+                          <div key={question.id}>
+                            <div className="group relative h-1 mb-6 grid place-items-center">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 bg-white border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:border-primary"
+                                onClick={() => handleAddQuestionAtIndex(index)}
+                              >
+                                <CareIcon icon="l-plus" className="size-4" />
+                              </Button>
+                            </div>
+                            <div
+                              id={`question-${question.link_id}`}
+                              ref={(el) => {
+                                questionRefs.current[question.link_id] = el;
                               }}
-                              onDelete={() => {
-                                const newQuestions = rootQuestions.filter(
-                                  (_, i) => i !== index,
-                                );
-                                updateQuestions(newQuestions);
-                              }}
-                              isExpanded={expandedQuestions.has(
-                                question.link_id,
-                              )}
-                              onToggleExpand={() =>
-                                toggleQuestionExpanded(question.link_id)
-                              }
-                              depth={0}
-                              onMoveUp={() => {
-                                if (index > 0) {
-                                  const newQuestions = swapElements(
-                                    rootQuestions,
-                                    index,
-                                    index - 1,
+                              className="relative bg-white rounded-lg shadow-md"
+                            >
+                              <QuestionEditor
+                                name={`questions.${index}`}
+                                index={index}
+                                key={question.link_id}
+                                question={question}
+                                selectedQuestions={selectedQuestions}
+                                onToggleSelection={handleToggleSelection}
+                                form={form}
+                                onChange={(updatedQuestion) => {
+                                  const newQuestions = rootQuestions.map(
+                                    (q, i) =>
+                                      i === index ? updatedQuestion : q,
                                   );
                                   updateQuestions(newQuestions);
-                                }
-                              }}
-                              onMoveDown={() => {
-                                if (index < rootQuestions.length - 1) {
-                                  const newQuestions = swapElements(
-                                    rootQuestions,
-                                    index,
-                                    index + 1,
+                                }}
+                                onDelete={() => {
+                                  const newQuestions = rootQuestions.filter(
+                                    (_, i) => i !== index,
                                   );
                                   updateQuestions(newQuestions);
+                                }}
+                                isExpanded={expandedQuestions.has(
+                                  question.link_id,
+                                )}
+                                onToggleExpand={() =>
+                                  toggleQuestionExpanded(question.link_id)
                                 }
-                              }}
-                              isFirst={index === 0}
-                              isLast={index === rootQuestions.length - 1}
-                              structuredTypeError={
-                                structuredTypeErrors[question.id]
-                              }
-                              setStructuredTypeError={(error) => {
-                                setStructuredTypeErrors((prev) => ({
-                                  ...prev,
-                                  [question.id]: error,
-                                }));
-                              }}
-                              enableWhenDependencies={enableWhenDependencies}
-                              handleEnableWhenDependentClick={
-                                handleEnableWhenDependentClick
-                              }
-                              expandPath={expandPath}
-                              questionRefs={questionRefs}
-                              totalSiblings={rootQuestions.length}
-                            />
+                                depth={0}
+                                onMoveUp={() => {
+                                  if (index > 0) {
+                                    const newQuestions = swapElements(
+                                      rootQuestions,
+                                      index,
+                                      index - 1,
+                                    );
+                                    updateQuestions(newQuestions);
+                                  }
+                                }}
+                                onMoveDown={() => {
+                                  if (index < rootQuestions.length - 1) {
+                                    const newQuestions = swapElements(
+                                      rootQuestions,
+                                      index,
+                                      index + 1,
+                                    );
+                                    updateQuestions(newQuestions);
+                                  }
+                                }}
+                                isFirst={index === 0}
+                                isLast={index === rootQuestions.length - 1}
+                                structuredTypeError={
+                                  structuredTypeErrors[question.id]
+                                }
+                                setStructuredTypeError={(error) => {
+                                  setStructuredTypeErrors((prev) => ({
+                                    ...prev,
+                                    [question.id]: error,
+                                  }));
+                                }}
+                                enableWhenDependencies={enableWhenDependencies}
+                                handleEnableWhenDependentClick={
+                                  handleEnableWhenDependentClick
+                                }
+                                expandPath={expandPath}
+                                questionRefs={questionRefs}
+                                totalSiblings={rootQuestions.length}
+                              />
+                            </div>
                           </div>
                         ))}
                       </div>

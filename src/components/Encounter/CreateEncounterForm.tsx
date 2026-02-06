@@ -69,8 +69,9 @@ interface Props {
   patientName: string;
   appointment?: string;
   trigger?: React.ReactNode;
-  onSuccess?: () => void;
+  onSuccess?: (encounter: EncounterRead) => void;
   disableRedirectOnSuccess?: boolean;
+  defaultOpen?: boolean;
   defaultStatus?:
     | EncounterStatus.PLANNED
     | EncounterStatus.IN_PROGRESS
@@ -85,9 +86,10 @@ export default function CreateEncounterForm({
   trigger,
   onSuccess,
   disableRedirectOnSuccess = false,
+  defaultOpen = false,
   defaultStatus = EncounterStatus.PLANNED,
 }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   useShortcutSubContext();
@@ -132,7 +134,7 @@ export default function CreateEncounterForm({
       setIsOpen(false);
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["encounters", patientId] });
-      onSuccess?.();
+      onSuccess?.(data);
       if (!disableRedirectOnSuccess) {
         navigate(
           `/facility/${facilityId}/patient/${patientId}/encounter/${data.id}/updates`,

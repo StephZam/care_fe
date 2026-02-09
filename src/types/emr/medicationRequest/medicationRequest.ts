@@ -443,25 +443,6 @@ export const MEDICATION_REQUEST_TIMING_OPTIONS: Record<
       },
     },
   },
-  TID_MORNING_NOON_NIGHT: {
-    display: "TID (1-1-1)",
-    timing: {
-      repeat: {
-        frequency: 3,
-        period: "1",
-        period_unit: "d",
-        bounds_duration: {
-          value: "1",
-          unit: "d",
-        },
-      },
-      code: {
-        code: "TID",
-        display: "Morning, noon and night",
-        system: "http://terminology.hl7.org/CodeSystem/v3-GTSAbbreviation",
-      },
-    },
-  },
   QD: {
     display: "QD (Once a day)",
     timing: {

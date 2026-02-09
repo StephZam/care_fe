@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 
 import { Markdown } from "@/components/ui/markdown";
 import medicationRequestApi from "@/types/emr/medicationRequest/medicationRequestApi";
-import { PrescriptionRead } from "@/types/emr/prescription/prescription";
 import prescriptionApi from "@/types/emr/prescription/prescriptionApi";
 import query from "@/Utils/request/query";
 import { formatDateTime, formatName } from "@/Utils/utils";
@@ -36,17 +35,11 @@ export default function PrescriptionView({
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const { data: prescription, isLoading } = useQuery({
-    queryKey: ["prescription", patientId, prescriptionId, encounterId],
+    queryKey: ["prescription", patientId, prescriptionId],
     queryFn: query(prescriptionApi.get, {
       pathParams: { patientId, id: prescriptionId! },
       queryParams: { facility: facilityId },
     }),
-    select: (data: PrescriptionRead) => {
-      if (data.encounter?.id !== encounterId) {
-        return null;
-      }
-      return data;
-    },
     enabled: !!patientId && !!prescriptionId,
   });
 
@@ -62,7 +55,7 @@ export default function PrescriptionView({
         },
         pageSize: 100,
       }),
-      enabled: !!patientId && !!encounterId && !!facilityId && !prescription,
+      enabled: !!patientId && !!encounterId && !!facilityId && !prescriptionId,
     });
 
   if (isLoading || medicationRequestsLoading) {

@@ -203,11 +203,13 @@ const RequestOrderPreview = ({
 interface PrintRequestOrderProps {
   facilityId: string;
   requestOrderId: string;
+  locationId?: string;
 }
 
 export const PrintRequestOrder = ({
   facilityId,
   requestOrderId,
+  locationId,
 }: PrintRequestOrderProps) => {
   const { t } = useTranslation();
 
@@ -241,7 +243,7 @@ export const PrintRequestOrder = ({
           request_order: requestOrderId,
         },
       }),
-      enabled: !!requestOrderId,
+      enabled: !!requestOrderId && !!locationId,
     });
 
   // Calculate dispatched quantities per product

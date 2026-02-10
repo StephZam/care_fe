@@ -20,6 +20,7 @@ import DeliveryOrderForm from "@/pages/Facility/services/inventory/externalSuppl
 import { DeliveryOrderList } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/DeliveryOrderList";
 import { DeliveryOrderShow } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/DeliveryOrderShow";
 import { PrintDeliveryOrder } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/PrintDeliveryOrder";
+import { PrintRequestOrder } from "@/pages/Facility/services/inventory/externalSupply/requestOrder/printRequestOrder";
 import { ToDispatch } from "@/pages/Facility/services/inventory/ToDispatch";
 import { ToReceive } from "@/pages/Facility/services/inventory/ToReceive";
 import AllMedicationBillForm from "@/pages/Facility/services/pharmacy/AllMedicationBillForm";
@@ -36,7 +37,6 @@ import { PrintDispenseOrder } from "@/pages/Facility/services/pharmacy/PrintDisp
 import { PrintMedicationReturn } from "@/pages/Facility/services/pharmacy/PrintMedicationReturn";
 import ServiceRequestList from "@/pages/Facility/services/serviceRequests/ServiceRequestList";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
-import { PrintRequestOrder } from "@/src/pages/Facility/services/inventory/externalSupply/requestOrder/printRequestOrder";
 import { SchedulableResourceType } from "@/types/scheduling/schedule";
 
 interface LocationLayoutProps {
@@ -192,7 +192,6 @@ const getRoutes = (facilityId: string, locationId: string) => ({
       facilityId={facilityId}
       locationId={locationId}
       requestOrderId={id}
-      internal={true}
     />
   ),
   // Create Delivery

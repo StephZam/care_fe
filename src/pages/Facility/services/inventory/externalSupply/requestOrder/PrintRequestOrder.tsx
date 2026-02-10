@@ -204,12 +204,14 @@ interface PrintRequestOrderProps {
   facilityId: string;
   requestOrderId: string;
   locationId?: string;
+  internal: boolean;
 }
 
 export const PrintRequestOrder = ({
   facilityId,
   requestOrderId,
   locationId,
+  internal,
 }: PrintRequestOrderProps) => {
   const { t } = useTranslation();
 
@@ -250,8 +252,9 @@ export const PrintRequestOrder = ({
   const dispatchedQuantities =
     allSupplyDeliveries?.results?.reduce(
       (acc, delivery) => {
-        const productId =
-          delivery.supplied_inventory_item?.product?.product_knowledge?.id;
+        const productId = internal
+          ? delivery.supplied_inventory_item?.product?.product_knowledge?.id
+          : delivery.supplied_item?.product_knowledge?.id;
         if (productId) {
           acc[productId] = add(
             acc[productId] || 0,

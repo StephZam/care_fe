@@ -20,7 +20,7 @@ import DeliveryOrderForm from "@/pages/Facility/services/inventory/externalSuppl
 import { DeliveryOrderList } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/DeliveryOrderList";
 import { DeliveryOrderShow } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/DeliveryOrderShow";
 import { PrintDeliveryOrder } from "@/pages/Facility/services/inventory/externalSupply/deliveryOrder/PrintDeliveryOrder";
-import { PrintRequestOrder } from "@/pages/Facility/services/inventory/externalSupply/requestOrder/printRequestOrder";
+import { PrintRequestOrder } from "@/pages/Facility/services/inventory/externalSupply/requestOrder/PrintRequestOrder";
 import { ToDispatch } from "@/pages/Facility/services/inventory/ToDispatch";
 import { ToReceive } from "@/pages/Facility/services/inventory/ToReceive";
 import AllMedicationBillForm from "@/pages/Facility/services/pharmacy/AllMedicationBillForm";
@@ -192,6 +192,7 @@ const getRoutes = (facilityId: string, locationId: string) => ({
       facilityId={facilityId}
       locationId={locationId}
       requestOrderId={id}
+      internal={true}
     />
   ),
   // Create Delivery
@@ -293,6 +294,15 @@ const getRoutes = (facilityId: string, locationId: string) => ({
   // Edit External Order
   "/inventory/external/orders/:tab/:id/edit": ({ id }: { id: string }) => (
     <RequestOrderForm
+      facilityId={facilityId}
+      locationId={locationId}
+      requestOrderId={id}
+      internal={false}
+    />
+  ),
+  // Print External Order
+  "/inventory/external/orders/:tab/:id/print": ({ id }: { id: string }) => (
+    <PrintRequestOrder
       facilityId={facilityId}
       locationId={locationId}
       requestOrderId={id}

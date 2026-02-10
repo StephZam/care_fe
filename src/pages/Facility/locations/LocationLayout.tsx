@@ -36,6 +36,7 @@ import { PrintDispenseOrder } from "@/pages/Facility/services/pharmacy/PrintDisp
 import { PrintMedicationReturn } from "@/pages/Facility/services/pharmacy/PrintMedicationReturn";
 import ServiceRequestList from "@/pages/Facility/services/serviceRequests/ServiceRequestList";
 import ServiceRequestShow from "@/pages/Facility/services/serviceRequests/ServiceRequestShow";
+import { PrintRequestOrder } from "@/src/pages/Facility/services/inventory/externalSupply/requestOrder/printRequestOrder";
 import { SchedulableResourceType } from "@/types/scheduling/schedule";
 
 interface LocationLayoutProps {
@@ -179,6 +180,15 @@ const getRoutes = (facilityId: string, locationId: string) => ({
   // Edit Internal Order
   "/inventory/internal/:type/orders/:id/edit": ({ id }: { id: string }) => (
     <RequestOrderForm
+      facilityId={facilityId}
+      locationId={locationId}
+      requestOrderId={id}
+      internal={true}
+    />
+  ),
+  //Print Internal Order
+  "/inventory/internal/:type/orders/:id/print": ({ id }: { id: string }) => (
+    <PrintRequestOrder
       facilityId={facilityId}
       locationId={locationId}
       requestOrderId={id}

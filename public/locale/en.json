@@ -1502,6 +1502,7 @@
   "create_order": "Create Order",
   "create_organization": "Create Organization",
   "create_payment": "Create payment",
+  "create_planned_encounter": "Create Planned Encounter",
   "create_position_preset": "Create a new position preset",
   "create_position_preset_description": "Creates a new position preset in Care from the current position of the camera for the given name",
   "create_prescription": "Create Prescription",

@@ -85,6 +85,7 @@ export interface RequestOrderRetrieve extends RequestOrder {
   id: string;
   created_date: string;
   created_by: UserReadMinimal;
+  modified_date: string;
   origin?: LocationDetail;
   destination: LocationDetail;
   supplier?: Organization;

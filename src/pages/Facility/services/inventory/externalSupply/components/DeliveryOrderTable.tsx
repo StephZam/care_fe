@@ -22,6 +22,7 @@ import {
   DELIVERY_ORDER_STATUS_COLORS,
   DeliveryOrderRetrieve,
 } from "@/types/inventory/deliveryOrder/deliveryOrder";
+import { formatDateTime, formatName } from "@/Utils/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
@@ -66,8 +67,9 @@ export default function DeliveryOrderTable({
           <TableHead>{internal ? t("origin") : t("supplier")}</TableHead>
           <TableHead>{t("deliver_to")}</TableHead>
           <TableHead>{t("status")}</TableHead>
-          <TableHead>{t("tags", { count: 2 })}</TableHead>
-          <TableHead className="w-28">{t("actions")}</TableHead>
+          <TableHead className="w-45">{t("tags", { count: 2 })}</TableHead>
+          <TableHead className="w-48">{t("created_by")}</TableHead>
+          <TableHead className="w-36">{t("actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -83,7 +85,7 @@ export default function DeliveryOrderTable({
                 {t(delivery.status)}
               </Badge>
             </TableCell>
-            <TableCell className="sm:w-60 md:w-80">
+            <TableCell className="w-40">
               <div className="flex flex-wrap gap-1">
                 <TagAssignmentSheet
                   entityType="delivery_order"
@@ -117,7 +119,17 @@ export default function DeliveryOrderTable({
                 ))}
               </div>
             </TableCell>
-            <TableCell>
+            <TableCell className="w-48">
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {formatName(delivery.created_by)}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {formatDateTime(delivery.created_date)}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell className="w-36">
               <Button
                 variant="outline"
                 onClick={() =>

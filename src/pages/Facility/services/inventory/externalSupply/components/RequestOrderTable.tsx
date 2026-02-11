@@ -3,6 +3,8 @@ import { Eye } from "lucide-react";
 import { navigate } from "raviger";
 import { useTranslation } from "react-i18next";
 
+import { formatDateTime, formatName } from "@/Utils/utils";
+
 import {
   Table,
   TableBody,
@@ -70,7 +72,8 @@ export default function RequestOrderTable({
           <TableHead>{t("deliver_to")}</TableHead>
           <TableHead>{t("status")}</TableHead>
           <TableHead>{t("priority")}</TableHead>
-          <TableHead>{t("tags", { count: 2 })}</TableHead>
+          <TableHead className="w-40">{t("tags", { count: 2 })}</TableHead>
+          <TableHead className="w-48">{t("created_by")}</TableHead>
           <TableHead className="w-28">{t("actions")}</TableHead>
         </TableRow>
       </TableHeader>
@@ -92,7 +95,7 @@ export default function RequestOrderTable({
                 {t(request.priority)}
               </Badge>
             </TableCell>
-            <TableCell className="sm:w-60 md:w-80">
+            <TableCell className="w-40">
               <div className="flex flex-wrap gap-1">
                 <TagAssignmentSheet
                   entityType="request_order"
@@ -121,6 +124,16 @@ export default function RequestOrderTable({
                     {tag.display}
                   </Badge>
                 ))}
+              </div>
+            </TableCell>
+            <TableCell>
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {formatName(request.created_by)}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {formatDateTime(request.created_date)}
+                </span>
               </div>
             </TableCell>
             <TableCell>

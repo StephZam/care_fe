@@ -1,5 +1,5 @@
 import { navigate } from "raviger";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LocationRead as LocationListType } from "@/types/location/location";
 
@@ -33,8 +33,26 @@ export function useLocationState(
     currentPage: 1,
   });
 
+  const isInternalNav = useRef(false);
+
+  useEffect(() => {
+    if (
+      !isInternalNav.current &&
+      initialLocationId !== state.selectedLocationId
+    ) {
+      setState((prev) => ({
+        ...prev,
+        selectedLocationId: initialLocationId || null,
+        selectedLocation: null,
+      }));
+    }
+    isInternalNav.current = false;
+  }, [initialLocationId]);
+
   const handleLocationSelect = useCallback(
     (location: LocationListType) => {
+      isInternalNav.current = true;
+
       if (!location.id) {
         // Navigate to the base locations URL when deselecting
         navigate(
@@ -63,7 +81,7 @@ export function useLocationState(
         searchQuery: "",
       }));
     },
-    [basePath],
+    [basePath, pathType],
   );
 
   const handleToggleExpand = useCallback((locationId: string) => {

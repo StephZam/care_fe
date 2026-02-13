@@ -34,25 +34,21 @@ export default function BedsList({
     enabled: !!locationId,
   });
 
-  // Update selected location when locationDetail is fetched
-  React.useEffect(() => {
-    if (locationDetail) {
-      // Transform LocationDetail to LocationList
-      const locationList: LocationListType = {
-        ...locationDetail,
-        has_children: false, // Since this is a detail view, we assume no children initially
-        current_encounter: undefined, // LocationDetail doesn't have this field
-      };
-      handleLocationSelect(locationList);
-    }
-  }, [locationDetail, handleLocationSelect]);
+  const displayLocation = React.useMemo(() => {
+    if (!locationDetail) return selectedLocation;
+    return {
+      ...locationDetail,
+      has_children: false,
+      current_encounter: undefined,
+    } as LocationListType;
+  }, [locationDetail, selectedLocation]);
 
   return (
     <div className="flex px-4 space-x-4 min-h-[calc(100vh-10rem)]">
       <LocationContent
         facilityId={facilityId}
         selectedLocationId={selectedLocationId}
-        selectedLocation={selectedLocation}
+        selectedLocation={displayLocation}
         searchQuery={searchQuery}
         currentPage={currentPage}
         onLocationSelect={handleLocationSelect}

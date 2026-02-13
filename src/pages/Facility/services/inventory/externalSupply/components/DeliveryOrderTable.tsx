@@ -1,4 +1,4 @@
-import { Box, Eye, Hash } from "lucide-react";
+import { Box, Eye } from "lucide-react";
 import { navigate } from "raviger";
 import { useTranslation } from "react-i18next";
 
@@ -85,39 +85,23 @@ export default function DeliveryOrderTable({
                 {t(delivery.status)}
               </Badge>
             </TableCell>
-            <TableCell className="w-40">
-              <div className="flex flex-wrap gap-1">
-                <TagAssignmentSheet
-                  entityType="delivery_order"
-                  entityId={delivery.id}
-                  facilityId={facilityId}
-                  currentTags={delivery.tags ?? []}
-                  onUpdate={() => {
-                    queryClient.invalidateQueries({
-                      queryKey: [
-                        "deliveryOrders",
-                        locationId,
-                        internal,
-                        ...(isRequester ? [isRequester] : []),
-                      ],
-                    });
-                  }}
-                  trigger={
-                    delivery.tags && delivery.tags.length > 0 ? (
-                      <Button variant="outline" size="xs">
-                        <Hash className="size-3" /> {t("tags")}
-                      </Button>
-                    ) : (
-                      <Button variant="outline" size="xs">
-                        <Hash className="size-3" /> {t("add_tags")}
-                      </Button>
-                    )
-                  }
-                />
-                {delivery.tags.map((tag) => (
-                  <Badge key={tag.id}>{tag.display}</Badge>
-                ))}
-              </div>
+            <TableCell className="sm:w-60 md:w-80">
+              <TagAssignmentSheet
+                entityType="delivery_order"
+                entityId={delivery.id}
+                facilityId={facilityId}
+                currentTags={delivery.tags ?? []}
+                onUpdate={() => {
+                  queryClient.invalidateQueries({
+                    queryKey: [
+                      "deliveryOrders",
+                      locationId,
+                      internal,
+                      ...(isRequester ? [isRequester] : []),
+                    ],
+                  });
+                }}
+              />
             </TableCell>
             <TableCell className="w-48">
               <div className="flex flex-col">

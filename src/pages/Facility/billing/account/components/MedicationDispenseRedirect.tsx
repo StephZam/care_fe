@@ -6,19 +6,19 @@ import { Redirect } from "raviger";
 
 interface MedicationDispenseRedirectProps {
   facilityId: string;
-  service_resource_id: string;
+  serviceResourceId: string;
 }
 
 const MedicationDispenseRedirect = ({
   facilityId,
-  service_resource_id,
+  serviceResourceId,
 }: MedicationDispenseRedirectProps) => {
   const { data, isLoading } = useQuery({
-    queryKey: ["medication_dispense", service_resource_id],
+    queryKey: ["medication_dispense", serviceResourceId],
     queryFn: query(medicationDispenseApi.get, {
-      pathParams: { id: service_resource_id },
+      pathParams: { id: serviceResourceId },
     }),
-    enabled: !!service_resource_id,
+    enabled: !!serviceResourceId,
   });
 
   if (isLoading) {

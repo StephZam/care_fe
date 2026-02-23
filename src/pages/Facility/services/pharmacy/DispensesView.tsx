@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 
 import Page from "@/components/Common/Page";
 import { TableSkeleton } from "@/components/Common/SkeletonLoading";
+import ErrorPage from "@/components/ErrorPages/DefaultErrorPage";
 
 import useFilters from "@/hooks/useFilters";
 import useCurrentLocation from "@/pages/Facility/locations/utils/useCurrentLocation";
@@ -45,7 +46,11 @@ export default function DispensesView({ facilityId, dispenseOrderId }: Props) {
 
   const medicationDispenseStatus = qParams.status as MedicationDispenseStatus;
 
-  const { data: dispenseOrder, isLoading: isLoadingOrder } = useQuery({
+  const {
+    data: dispenseOrder,
+    isLoading: isLoadingOrder,
+    isError,
+  } = useQuery({
     queryKey: ["dispenseOrder", facilityId, dispenseOrderId],
     queryFn: query(dispenseOrderApi.get, {
       pathParams: { facilityId, id: dispenseOrderId },
@@ -83,8 +88,8 @@ export default function DispensesView({ facilityId, dispenseOrderId }: Props) {
     return <TableSkeleton count={5} />;
   }
 
-  if (!dispenseOrder) {
-    return null;
+  if (isError || !dispenseOrder) {
+    return <ErrorPage />;
   }
 
   // Filter medications by current status

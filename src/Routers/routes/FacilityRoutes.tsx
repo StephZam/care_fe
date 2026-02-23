@@ -191,13 +191,13 @@ const FacilityRoutes: AppRoutes = {
   "/facility/:facilityId/template/builder/:slug": ({ facilityId, slug }) => (
     <TemplateBuilder facilityId={facilityId} slug={slug} />
   ),
-  "/facility/:facilityId/medication_dispense/redirect/:serviceResourceId": ({
+  "/facility/:facilityId/medication_dispense/redirect/:medicationDispenseId": ({
     facilityId,
-    serviceResourceId,
+    medicationDispenseId,
   }) => (
     <MedicationDispenseRedirect
       facilityId={facilityId}
-      serviceResourceId={serviceResourceId}
+      medicationDispenseId={medicationDispenseId}
     />
   ),
 };

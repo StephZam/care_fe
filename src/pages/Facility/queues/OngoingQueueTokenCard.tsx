@@ -105,7 +105,7 @@ export function OngoingQueueTokenCard({
             )}
             {/* TODO: do we show tags here? or something else? */}
           </div>
-          <div className="flex items-center gap-3 md:gap-1 mt-2">
+          <div className="flex w-full md:w-auto items-center gap-3 md:gap-1 mt-2">
             {token ? (
               <>
                 <Button variant="outline" asChild>
@@ -116,7 +116,7 @@ export function OngoingQueueTokenCard({
                     {t("encounter")}
                   </Link>
                 </Button>
-                <div className="flex gap-2 items-center justify-center p-2 bg-gray-100 border border-gray-200 rounded-lg">
+                <div className="flex gap-2 items-center justify-center p-1 bg-gray-100 border border-gray-200 rounded-lg">
                   <span className="text-lg font-bold text-black">
                     {renderTokenNumber(token)}
                   </span>
@@ -153,7 +153,7 @@ export function OngoingQueueTokenCard({
       </ContextMenuTrigger>
       {token && (
         <>
-          <ContextMenuContent>
+          <ContextMenuContent collisionPadding={8} avoidCollisions={true}>
             {token.status === TokenStatus.CREATED && token.sub_queue && (
               <>
                 <ContextMenuItem

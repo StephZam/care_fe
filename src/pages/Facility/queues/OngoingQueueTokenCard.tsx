@@ -105,7 +105,7 @@ export function OngoingQueueTokenCard({
             )}
             {/* TODO: do we show tags here? or something else? */}
           </div>
-          <div className="flex w-full md:w-auto items-center gap-3 md:gap-1 mt-2">
+          <div className="flex w-full md:w-auto items-center gap-3 mt-1">
             {token ? (
               <>
                 <Button variant="outline" asChild>

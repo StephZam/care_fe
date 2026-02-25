@@ -18,7 +18,6 @@ const MedicationDispenseRedirect = ({
     queryFn: query(medicationDispenseApi.get, {
       pathParams: { id: medicationDispenseId },
     }),
-    enabled: !!medicationDispenseId,
   });
 
   if (isLoading) {
@@ -33,7 +32,7 @@ const MedicationDispenseRedirect = ({
       />
     );
   }
-  return <Loading />;
+  return <></>;
 };
 
 export default MedicationDispenseRedirect;

@@ -13,7 +13,7 @@ import Page from "@/components/Common/Page";
 import useFilters from "@/hooks/useFilters";
 
 import query from "@/Utils/request/query";
-import { dateQueryString } from "@/Utils/utils";
+import { dateQueryString, dateTimeQueryString } from "@/Utils/utils";
 
 import {
   dateFilter,
@@ -32,6 +32,7 @@ import RequestOrderTable from "@/pages/Facility/services/inventory/externalSuppl
 import deliveryOrderApi from "@/types/inventory/deliveryOrder/deliveryOrderApi";
 import requestOrderApi from "@/types/inventory/requestOrder/requestOrderApi";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
+
 interface Props {
   facilityId: string;
   locationId: string;
@@ -162,7 +163,7 @@ function OutgoingOrdersTab({
   const filterConfigs = useMemo(
     () => [
       inventoryPriorityFilter(),
-      dateFilter("created_date", t("date"), longDateRangeOptions),
+      dateFilter("date", t("date"), longDateRangeOptions),
     ],
     [t],
   );
@@ -170,16 +171,16 @@ function OutgoingOrdersTab({
   const onFilterUpdate = (query: Record<string, unknown>) => {
     for (const [key, value] of Object.entries(query)) {
       switch (key) {
-        case "created_date":
+        case "date":
           {
             const dateRange = value as FilterDateRange;
             query = {
               ...query,
-              created_date: undefined,
-              created_date_after: dateRange?.from
+              date: undefined,
+              date_after: dateRange?.from
                 ? dateQueryString(dateRange?.from as Date)
                 : undefined,
-              created_date_before: dateRange?.to
+              date_before: dateRange?.to
                 ? dateQueryString(dateRange?.to as Date)
                 : undefined,
             };
@@ -198,15 +199,11 @@ function OutgoingOrdersTab({
     handleClearFilter,
   } = useMultiFilterState(filterConfigs, onFilterUpdate, {
     ...qParams,
-    created_date:
-      qParams.created_date_after || qParams.created_date_before
+    date:
+      qParams.date_after || qParams.date_before
         ? {
-            from: qParams.created_date_after
-              ? new Date(qParams.created_date_after)
-              : undefined,
-            to: qParams.created_date_before
-              ? new Date(qParams.created_date_before)
-              : undefined,
+            from: qParams.date_after ? new Date(qParams.date_after) : undefined,
+            to: qParams.date_before ? new Date(qParams.date_before) : undefined,
           }
         : undefined,
   });
@@ -228,8 +225,12 @@ function OutgoingOrdersTab({
         status: qParams.status,
         origin_isnull: !internal,
         priority: qParams.priority,
-        created_date_after: qParams.created_date_after,
-        created_date_before: qParams.created_date_before,
+        date_after: qParams.date_after
+          ? dateTimeQueryString(new Date(qParams.date_after))
+          : undefined,
+        date_before: qParams.date_before
+          ? dateTimeQueryString(new Date(qParams.date_before), true)
+          : undefined,
       },
     }),
   });

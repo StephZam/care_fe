@@ -444,7 +444,13 @@ const DrugChartTable = ({
               ? t("as_needed")
               : formatFrequency(dosage);
             const methodText = dosage?.method?.display;
-            const noteText = latestRequest.note;
+            const noteText = [
+              ...new Set(
+                group.requests
+                  .map((request) => request.note?.trim())
+                  .filter(Boolean),
+              ),
+            ].join(", ");
 
             return (
               <tr

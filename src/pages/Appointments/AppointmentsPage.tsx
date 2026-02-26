@@ -742,7 +742,7 @@ function AppointmentCard({
           </p>
         </div>
         <div className="flex flex-col gap-2">
-          {appointment.patient.deceased_datetime && (
+          {patient.deceased_datetime && (
             <Badge variant="destructive" className="h-5 justify-center text-xs">
               {t("deceased")}
             </Badge>
@@ -964,7 +964,7 @@ function AppointmentRowItem({ appointment }: { appointment: Appointment }) {
             </span>
           </span>
         </span>
-        {appointment.patient.deceased_datetime && (
+        {patient.deceased_datetime && (
           <Badge
             variant="destructive"
             className="h-6 justify-center text-xs mt-1"

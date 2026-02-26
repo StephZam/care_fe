@@ -443,20 +443,30 @@ const DrugChartTable = ({
             const frequencyText = isPRN
               ? t("as_needed")
               : formatFrequency(dosage);
+            const methodText = dosage?.method?.display;
+            const noteText = latestRequest.note;
 
             return (
-              <tr key={group.productId} className={cn(isPRN && "bg-pink-50")}>
-                <td className="border-r-2 border-b border-gray-400 p-1.5 align-top">
+              <tr
+                key={group.productId}
+                className={cn("h-16", isPRN && "bg-pink-50")}
+              >
+                <td className="border-r-2 border-b border-gray-400 p-1 align-top">
                   <div className="font-bold text-[11px] leading-tight">
                     {group.productName}
                   </div>
-                  <div className="text-[9px] text-gray-600 mt-0.5 leading-snug">
-                    {[doseText, routeText, frequencyText]
+                  <div className="text-[9px] text-gray-600 leading-snug">
+                    {[doseText, routeText, frequencyText, methodText]
                       .filter(Boolean)
                       .join(" · ")}
                   </div>
+                  {noteText && (
+                    <div className="text-[9px] text-gray-500 italic">
+                      {noteText}
+                    </div>
+                  )}
                   {group.requests.length > 1 && (
-                    <div className="text-[8px] text-gray-400 mt-0.5">
+                    <div className="text-[9px] text-gray-400">
                       ({group.requests.length} {t("orders")})
                     </div>
                   )}

@@ -450,7 +450,7 @@ const DrugChartTable = ({
                   .map((request) => request.note?.trim())
                   .filter(Boolean),
               ),
-            ].join(", ");
+            ].join(" · ");
 
             return (
               <tr

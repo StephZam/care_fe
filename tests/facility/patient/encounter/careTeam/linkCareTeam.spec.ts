@@ -77,7 +77,7 @@ test.describe("Manage care team for an encounter", () => {
         await expect(
           page.getByRole("combobox").filter({ hasText: "Select Department" }),
         ).toBeVisible();
-        await expect(page.getByText("Administration")).toBeVisible();
+        await expect(page.getByText("Administration").first()).toBeVisible();
       });
 
       await test.step("Select member", async () => {
@@ -160,7 +160,7 @@ test.describe("Manage care team for an encounter", () => {
   }) => {
     await test.step("Open care team sheet", async () => {
       await openCareTeamDialog(page);
-      await expect(page.getByText("Administration")).toBeVisible();
+      await expect(page.getByText("Administration").first()).toBeVisible();
     });
 
     await test.step("Verify Add button is disabled", async () => {
@@ -173,7 +173,7 @@ test.describe("Manage care team for an encounter", () => {
   }) => {
     await test.step("Open care team sheet", async () => {
       await openCareTeamDialog(page);
-      await expect(page.getByText("Administration")).toBeVisible();
+      await expect(page.getByText("Administration").first()).toBeVisible();
     });
 
     await test.step("Select member and role without adding", async () => {

@@ -1,18 +1,5 @@
-import careConfig from "@careConfig";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Stethoscope } from "lucide-react";
-import { navigate } from "raviger";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Trans, useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import * as z from "zod";
 
-import { cn } from "@/lib/utils";
-
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,
   FormControl,
@@ -21,8 +8,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -39,11 +24,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-import { TagSelectorPopover } from "@/components/Tags/TagAssignmentSheet";
-
-import { useShortcutSubContext } from "@/context/ShortcutContext";
-import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
 import {
   ENCOUNTER_CLASS_ICONS,
   ENCOUNTER_PRIORITY,
@@ -51,11 +31,29 @@ import {
   EncounterRead,
   EncounterStatus,
 } from "@/types/emr/encounter/encounter";
-import encounterApi from "@/types/emr/encounter/encounterApi";
 import { TagConfig, TagResource } from "@/types/emr/tagConfig/tagConfig";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trans, useTranslation } from "react-i18next";
+
+import { TagSelectorPopover } from "@/components/Tags/TagAssignmentSheet";
+import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useShortcutSubContext } from "@/context/ShortcutContext";
+import { cn } from "@/lib/utils";
+import FacilityOrganizationSelector from "@/pages/Facility/settings/organizations/components/FacilityOrganizationSelector";
+import encounterApi from "@/types/emr/encounter/encounterApi";
 import useTagConfigs from "@/types/emr/tagConfig/useTagConfig";
 import { ShortcutBadge } from "@/Utils/keyboardShortcutComponents";
 import mutate from "@/Utils/request/mutate";
+import careConfig from "@careConfig";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Stethoscope } from "lucide-react";
+import { navigate } from "raviger";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const ENCOUNTER_STATUS_OPTIONS = [
   { value: EncounterStatus.PLANNED, label: "planned" },
@@ -159,7 +157,13 @@ export default function CreateEncounterForm({
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={() => {
+        setIsOpen(!isOpen);
+        form.reset();
+      }}
+    >
       <SheetTrigger asChild>
         {trigger || (
           <Button
@@ -206,6 +210,7 @@ export default function CreateEncounterForm({
                             form.setValue("organizations", value);
                           }
                         }}
+                        favoriteList="encounter_departments"
                       />
                       <FormMessage />
                     </FormItem>

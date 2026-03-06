@@ -8,6 +8,7 @@ import {
   DoorOpen,
   FileQuestion,
   Home,
+  HouseHeart,
   LoaderCircle,
   LucideIcon,
   MonitorSmartphone,
@@ -146,7 +147,7 @@ export const ENCOUNTER_CLASS_ICONS = {
   obsenc: Stethoscope,
   emer: Siren,
   vr: MonitorSmartphone,
-  hh: Home,
+  hh: HouseHeart,
 } as const satisfies Record<EncounterClass, LucideIcon>;
 
 export const ENCOUNTER_STATUS_ICONS = {

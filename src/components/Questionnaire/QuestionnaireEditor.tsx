@@ -1202,17 +1202,6 @@ export default function QuestionnaireEditor({
                       <div className="space-y-6">
                         {rootQuestions.map((question, index) => (
                           <div key={question.id}>
-                            <div className="group relative h-1 mb-6 grid place-items-center">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 bg-white border shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:border-primary"
-                                onClick={() => handleAddQuestionAtIndex(index)}
-                              >
-                                <CareIcon icon="l-plus" className="size-4" />
-                              </Button>
-                            </div>
                             <div
                               id={`question-${question.link_id}`}
                               ref={(el) => {
@@ -1241,6 +1230,9 @@ export default function QuestionnaireEditor({
                                   );
                                   updateQuestions(newQuestions);
                                 }}
+                                addQuestion={() =>
+                                  handleAddQuestionAtIndex(index + 1)
+                                }
                                 isExpanded={expandedQuestions.has(
                                   question.link_id,
                                 )}
@@ -1776,6 +1768,7 @@ interface QuestionEditorProps {
   question: Question;
   onChange: (updated: Question) => void;
   onDelete: () => void;
+  addQuestion?: () => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
   depth: number;
@@ -1804,6 +1797,7 @@ function QuestionEditor({
   question,
   onChange,
   onDelete,
+  addQuestion,
   isExpanded,
   onToggleExpand,
   depth,
@@ -3289,6 +3283,21 @@ function QuestionEditor({
               >
                 <CareIcon icon="l-plus" className="mr-2 size-4" />
                 {t("add_template")}
+              </Button>
+            </div>
+          )}
+          {addQuestion && (
+            <div className="group relative mt-3 grid place-items-center">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 bg-white border border-gray-500 shadow-sm"
+                onClick={() => {
+                  addQuestion();
+                }}
+              >
+                <CareIcon icon="l-plus" className="size-4" />
               </Button>
             </div>
           )}

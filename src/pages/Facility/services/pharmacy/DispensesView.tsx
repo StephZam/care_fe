@@ -46,11 +46,7 @@ export default function DispensesView({ facilityId, dispenseOrderId }: Props) {
 
   const medicationDispenseStatus = qParams.status as MedicationDispenseStatus;
 
-  const {
-    data: dispenseOrder,
-    isLoading: isLoadingOrder,
-    isError,
-  } = useQuery({
+  const { data: dispenseOrder, isLoading: isLoadingOrder } = useQuery({
     queryKey: ["dispenseOrder", facilityId, dispenseOrderId],
     queryFn: query(dispenseOrderApi.get, {
       pathParams: { facilityId, id: dispenseOrderId },
@@ -88,7 +84,7 @@ export default function DispensesView({ facilityId, dispenseOrderId }: Props) {
     return <TableSkeleton count={5} />;
   }
 
-  if (isError || !dispenseOrder) {
+  if (!dispenseOrder) {
     return <ErrorPage />;
   }
 

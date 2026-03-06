@@ -1,5 +1,6 @@
 import query from "@/Utils/request/query";
 import Loading from "@/components/Common/Loading";
+import ErrorPage from "@/components/ErrorPages/DefaultErrorPage";
 import medicationDispenseApi from "@/types/emr/medicationDispense/medicationDispenseApi";
 import { useQuery } from "@tanstack/react-query";
 import { Redirect } from "raviger";
@@ -32,7 +33,7 @@ const MedicationDispenseRedirect = ({
       />
     );
   }
-  return <></>;
+  return <ErrorPage />;
 };
 
 export default MedicationDispenseRedirect;

@@ -28,7 +28,6 @@ import {
 } from "@tanstack/react-query";
 import {
   ArrowRight,
-  Building,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -659,46 +658,75 @@ export default function FacilityOrganizationSelector(
           <span className="font-semibold text-sm text-gray-950 mt-3">
             {t("selected_department")}
           </span>
-          {selectedOrganizations.map((org, index) => (
-            <div
-              key={index}
-              className="relative flex justify-between items-center rounded-md border border-sky-300 bg-sky-50 px-2 py-1 mt-2"
-            >
-              <div className="flex flex-wrap items-center gap-1 text-base text-gray-900 ml-1 flex-1">
-                {org.fullPath && org.fullPath.length > 0 ? (
-                  org.fullPath.map((name, idx) => (
-                    <span key={idx} className="flex items-center">
-                      <span
-                        className={
-                          idx === org.fullPath.length - 1
-                            ? "font-semibold"
-                            : "text-gray-950"
-                        }
-                      >
-                        {name}
-                      </span>
-                      {idx < org.fullPath.length - 1 && (
-                        <ArrowRight className="mx-1 size-3 sm:size-3 text-gray-950 shrink-0" />
-                      )}
-                    </span>
-                  ))
-                ) : (
-                  <span className="font-medium text-sm text-gray-900">
-                    {org.name}
-                  </span>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                className="text-gray-900 text-sm sm:text-sm -mr-2"
-                onClick={() => handleRemoveOrganization(index)}
+          {selectedOrganizations.map((org, index) => {
+            const isPreferred = preferredOrgIds.includes(org.id);
+            return (
+              <div
+                key={index}
+                className="relative flex justify-between items-center rounded-md border border-sky-300 bg-sky-50 px-2 py-1 mt-2"
               >
-                <X className="size-5" />
-              </Button>
-            </div>
-          ))}
+                <div className="flex flex-wrap items-center gap-1 text-base text-gray-900 ml-1 flex-1">
+                  {org.fullPath && org.fullPath.length > 0 ? (
+                    org.fullPath.map((name, idx) => (
+                      <span key={idx} className="flex items-center">
+                        <span
+                          className={
+                            idx === org.fullPath.length - 1
+                              ? "font-semibold"
+                              : "text-gray-950"
+                          }
+                        >
+                          {name}
+                        </span>
+                        {idx < org.fullPath.length - 1 && (
+                          <ArrowRight className="mx-1 size-3 sm:size-3 text-gray-950 shrink-0" />
+                        )}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="font-medium text-sm text-gray-900">
+                      {org.name}
+                    </span>
+                  )}
+                </div>
+                {favoriteList && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      isPreferred
+                        ? "text-yellow-500 hover:text-yellow-600"
+                        : "text-gray-400 hover:text-yellow-500",
+                    )}
+                    type="button"
+                    onClick={(e) => handleTogglePreferred(e, org)}
+                    disabled={
+                      addFavoriteMutation.isPending ||
+                      removeFavoriteMutation.isPending
+                    }
+                  >
+                    <Star
+                      className={cn("size-4", isPreferred && "fill-current")}
+                    />
+                    <span className="sr-only">
+                      {isPreferred
+                        ? t("remove_from_preferred")
+                        : t("mark_as_preferred")}
+                    </span>
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  className="text-gray-900"
+                  onClick={() => handleRemoveOrganization(index)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            );
+          })}
         </>
       )}
       <div className="mt-1">
@@ -771,59 +799,6 @@ export default function FacilityOrganizationSelector(
                 </PopoverContent>
               </Popover>
             )}
-            {selectedOrganizations.map((org, index) => {
-              const isPreferred = preferredOrgIds.includes(org.id);
-              return (
-                <div
-                  key={index}
-                  className="flex-1 flex items-center gap-3 rounded-md border border-sky-100 bg-sky-50/50 p-2.5"
-                >
-                  <Building className="size-4 text-sky-600 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-sky-900 truncate">
-                      {org.name}
-                    </p>
-                  </div>
-                  {favoriteList && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn(
-                        "size-8 p-0",
-                        isPreferred
-                          ? "text-yellow-500 hover:text-yellow-600"
-                          : "text-gray-400 hover:text-yellow-500",
-                      )}
-                      type="button"
-                      onClick={(e) => handleTogglePreferred(e, org)}
-                      disabled={
-                        addFavoriteMutation.isPending ||
-                        removeFavoriteMutation.isPending
-                      }
-                    >
-                      <Star
-                        className={cn("size-4", isPreferred && "fill-current")}
-                      />
-                      <span className="sr-only">
-                        {isPreferred
-                          ? t("remove_from_preferred")
-                          : t("mark_as_preferred")}
-                      </span>
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="size-8 p-0 text-gray-500 hover:text-gray-900"
-                    type="button"
-                    onClick={() => handleRemoveOrganization(index)}
-                  >
-                    <X className="size-4" />
-                    <span className="sr-only">{t("remove_organization")}</span>
-                  </Button>
-                </div>
-              );
-            })}
           </div>
         </div>
       </div>

@@ -2414,6 +2414,7 @@
   "external_prescriptions": "External prescriptions",
   "external_supply": "External Supply",
   "extra_details": "Extra Details",
+  "extra_supplied_quantity": "{{quantity}} extra supplied",
   "facilities": "Facilities",
   "facility": "Facility",
   "facility_actions": "Facility Actions",

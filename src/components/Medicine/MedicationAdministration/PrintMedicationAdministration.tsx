@@ -435,39 +435,58 @@ const DrugChartTable = ({
         </thead>
         <tbody>
           {groups.map((group) => {
-            // Get the latest active request for display
-            const latestRequest = group.requests[0];
-            const dosage = latestRequest.dosage_instruction[0];
-            const doseText = formatDosage(dosage);
-            const routeText = dosage?.route?.display;
-            const frequencyText = isPRN
-              ? t("as_needed")
-              : formatFrequency(dosage);
-            const methodText = dosage?.method?.display;
-            const noteText = [
-              ...new Set(
-                group.requests
-                  .map((request) => request.note?.trim())
-                  .filter(Boolean),
-              ),
-            ].join(" · ");
-
             return (
               <tr key={group.productId} className={cn(isPRN && "bg-pink-50")}>
                 <td className="border-r-2 border-b border-gray-400 p-1.5 align-top">
                   <div className="font-bold text-[11px] leading-tight text-wrap break-all">
                     {group.productName}
                   </div>
-                  <div className="text-[9px] text-gray-600 leading-snug">
-                    {[doseText, routeText, frequencyText, methodText]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </div>
-                  {noteText && (
-                    <div className="text-[9px] text-gray-500 italic">
-                      {noteText}
-                    </div>
-                  )}
+                  {group.requests.map((request, reqIdx) => {
+                    const instructions = request.dosage_instruction;
+                    const hasTitration = instructions.length > 1;
+                    const note = request.note?.trim();
+                    return (
+                      <div key={reqIdx}>
+                        {instructions.map((di, diIdx) => {
+                          const doseText = formatDosage(di);
+                          const routeText = di.route?.display;
+                          const frequencyText = isPRN
+                            ? t("as_needed")
+                            : formatFrequency(di);
+                          const methodText = di.method?.display;
+                          const summary = [
+                            doseText,
+                            routeText,
+                            frequencyText,
+                            methodText,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ");
+                          const isFirst = reqIdx === 0 && diIdx === 0;
+                          return summary ? (
+                            <div
+                              key={diIdx}
+                              className={cn(
+                                "text-[9px] text-gray-600 leading-snug",
+                                isFirst && "mt-0.5",
+                                !isFirst && "mt-0.5",
+                                hasTitration &&
+                                  diIdx > 0 &&
+                                  "pt-0.5 border-t border-dashed border-gray-300",
+                              )}
+                            >
+                              {summary}
+                            </div>
+                          ) : null;
+                        })}
+                        {note && (
+                          <div className="text-[9px] text-gray-500 italic">
+                            - {note.endsWith(".") ? note : `${note}.`}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                   {group.requests.length > 1 && (
                     <div className="text-[9px] text-gray-400">
                       ({group.requests.length} {t("orders")})

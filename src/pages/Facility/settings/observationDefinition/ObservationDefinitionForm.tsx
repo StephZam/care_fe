@@ -623,6 +623,7 @@ function ObservationDefinitionFormContent({
                 const ranges = form.getValues("qualified_ranges") || [];
                 qualifiedRangesRef.current = JSON.parse(JSON.stringify(ranges));
               }}
+              facilityId={facilityId}
             />
 
             {/* Additional Details Section */}
@@ -924,6 +925,7 @@ function ObservationDefinitionFormContent({
                                 JSON.stringify(ranges),
                               );
                             }}
+                            facilityId={facilityId}
                           />
                         </div>
                       </div>

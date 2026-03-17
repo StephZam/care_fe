@@ -214,7 +214,7 @@ function IncomingOrdersTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-row flex-wrap gap-2 items-start justify-between">
+      <div className="flex flex-wrap gap-2">
         <Tabs value={qParams.status}>
           <TabsList>
             {EFFECTIVE_STATUSES.map((status) => (
@@ -235,8 +235,8 @@ function IncomingOrdersTab({
           onClearAll={handleClearAll}
           onClearFilter={handleClearFilter}
           placeholder={t("filter")}
-          triggerButtonClassName="h-9"
-          className="flex-row flex-wrap"
+          triggerButtonClassName="self-start sm:self-center"
+          className="flex flex-wrap sm:flex-row sm:items-center"
           facilityId={facilityId}
         />
       </div>

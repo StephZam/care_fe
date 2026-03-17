@@ -19,7 +19,11 @@ import {
 
 import Loading from "@/components/Common/Loading";
 import PrintFooter from "@/components/Common/PrintFooter";
-import { formatDosage, formatFrequency } from "@/components/Medicine/utils";
+import {
+  formatDosage,
+  formatFrequency,
+  formatSig,
+} from "@/components/Medicine/utils";
 
 import encounterApi from "@/types/emr/encounter/encounterApi";
 import { MedicationAdministrationRead } from "@/types/emr/medicationAdministration/medicationAdministration";
@@ -447,43 +451,43 @@ const DrugChartTable = ({
                     const note = request.note?.trim();
                     return (
                       <div key={reqIdx}>
-                        {instructions.map((di, diIdx) => {
-                          const doseText = formatDosage(di);
-                          const routeText = di.route?.display;
+                        {instructions.map((instruction, instructionIdx) => {
+                          const dosageText = formatDosage(instruction);
                           const frequencyText = isPRN
                             ? t("as_needed")
-                            : formatFrequency(di);
-                          const methodText = di.method?.display;
-                          const summary = [
-                            doseText,
-                            routeText,
-                            frequencyText,
-                            methodText,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ");
-                          const isFirst = reqIdx === 0 && diIdx === 0;
-                          return summary ? (
+                            : formatFrequency(instruction);
+                          const dosageInstructions = formatSig(instruction);
+                          const isFirst = reqIdx === 0 && instructionIdx === 0;
+                          return (
                             <div
-                              key={diIdx}
+                              key={instructionIdx}
                               className={cn(
                                 "text-[9px] text-gray-600 leading-snug",
                                 isFirst && "mt-0.5",
                                 !isFirst && "mt-0.5",
                                 hasTitration &&
-                                  diIdx > 0 &&
+                                  instructionIdx > 0 &&
                                   "pt-0.5 border-t border-dashed border-gray-300",
                               )}
                             >
-                              {summary}
+                              <div>
+                                {[dosageText, frequencyText]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </div>
+                              {dosageInstructions && (
+                                <div className="text-gray-500 italic">
+                                  {dosageInstructions}
+                                </div>
+                              )}
+                              {note && (
+                                <div className="text-gray-500 italic">
+                                  {note}
+                                </div>
+                              )}
                             </div>
-                          ) : null;
+                          );
                         })}
-                        {note && (
-                          <div className="text-[9px] text-gray-500 italic">
-                            - {note.endsWith(".") ? note : `${note}.`}
-                          </div>
-                        )}
                       </div>
                     );
                   })}

@@ -457,14 +457,11 @@ const DrugChartTable = ({
                             ? t("as_needed")
                             : formatFrequency(instruction);
                           const dosageInstructions = formatSig(instruction);
-                          const isFirst = reqIdx === 0 && instructionIdx === 0;
                           return (
                             <div
                               key={instructionIdx}
                               className={cn(
-                                "text-[9px] text-gray-600 leading-snug",
-                                isFirst && "mt-0.5",
-                                !isFirst && "mt-0.5",
+                                "text-[9px] text-gray-600 leading-snug mt-0.5",
                                 hasTitration &&
                                   instructionIdx > 0 &&
                                   "pt-0.5 border-t border-dashed border-gray-300",

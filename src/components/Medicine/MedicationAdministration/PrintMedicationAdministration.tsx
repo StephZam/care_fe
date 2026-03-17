@@ -477,19 +477,19 @@ const DrugChartTable = ({
                                   {dosageInstructions}
                                 </div>
                               )}
-                              {note && (
-                                <div className="text-gray-500 italic">
-                                  {note}
-                                </div>
-                              )}
                             </div>
                           );
                         })}
+                        {note && (
+                          <div className="text-[9px] text-gray-500 italic mt-0.5">
+                            {note}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
                   {group.requests.length > 1 && (
-                    <div className="text-[9px] text-gray-400">
+                    <div className="text-[9px] text-gray-400 mt-0.5">
                       ({group.requests.length} {t("orders")})
                     </div>
                   )}

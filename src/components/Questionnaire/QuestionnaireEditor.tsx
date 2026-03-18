@@ -2154,7 +2154,17 @@ function QuestionEditor({
                   {t("move_down")}
                 </DropdownMenuItem>
               )}
-
+              {addQuestion && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addQuestion();
+                  }}
+                >
+                  <CareIcon icon="l-plus" className="mr-2 size-4" />
+                  {t("add_question_below")}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={(e) => {
@@ -3283,21 +3293,6 @@ function QuestionEditor({
               >
                 <CareIcon icon="l-plus" className="mr-2 size-4" />
                 {t("add_template")}
-              </Button>
-            </div>
-          )}
-          {addQuestion && (
-            <div className="group relative mt-3 grid place-items-center">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 bg-white border border-gray-500 shadow-sm"
-                onClick={() => {
-                  addQuestion();
-                }}
-              >
-                <CareIcon icon="l-plus" className="size-4" />
               </Button>
             </div>
           )}

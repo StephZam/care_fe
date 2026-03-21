@@ -263,7 +263,7 @@ export default function FacilityOrganizationList({
             defaultSize={15}
             minSize={10}
             maxSize={20}
-            className="overflow-hidden"
+            className="overflow-hidden md:max-lg:min-w-56"
           >
             <LeftPanel title={t("departments_or_teams")}>
               <FacilityOrganizationNavbar
@@ -281,11 +281,13 @@ export default function FacilityOrganizationList({
           />
           <ResizablePanel
             defaultSize={80}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col min-w-0 md:max-lg:overflow-x-auto"
           >
-            <RightPanel>
-              {renderHeader()}
-              {renderContent()}
+            <RightPanel className="md:max-lg:overflow-x-auto">
+              <div className="flex h-full w-full min-w-fit flex-col">
+                {renderHeader()}
+                {renderContent()}
+              </div>
             </RightPanel>
           </ResizablePanel>
         </ResizablePanelGroup>

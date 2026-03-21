@@ -152,12 +152,12 @@ export default function LocationNavbar({
   }
 
   return (
-    <div className="w-64 shadow-lg bg-white rounded-lg hidden md:block overflow-x-auto">
-      <div className="p-4 min-w-max">
+    <div className="hidden md:block w-64 md:max-lg:w-72 md:max-lg:min-w-72 md:max-lg:shrink-0 shadow-lg bg-white rounded-lg">
+      <div className="p-4">
         <h2 className="text-lg font-semibold">{t("locations")}</h2>
       </div>
-      <div className="overflow-x-auto">
-        <div className="p-2 min-w-max">
+      <div className="overflow-y-auto">
+        <div className="p-2">
           {isLoadingLocations ? (
             <div className="p-4">
               <CardGridSkeleton count={3} />

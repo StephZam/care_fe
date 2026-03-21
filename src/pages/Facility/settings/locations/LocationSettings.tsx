@@ -282,7 +282,7 @@ export default function LocationSettings({
             defaultSize={15}
             minSize={10}
             maxSize={20}
-            className="overflow-hidden"
+            className="overflow-hidden md:max-lg:min-w-56"
           >
             <LeftPanel title={t("locations")} className="w-full">
               <div className="p-4">
@@ -312,7 +312,7 @@ export default function LocationSettings({
           />
           <ResizablePanel
             defaultSize={80}
-            className="flex flex-col overflow-hidden"
+            className="flex flex-col min-w-0 md:max-lg:overflow-x-auto"
           >
             {locationId ? (
               <LocationView
@@ -325,27 +325,29 @@ export default function LocationSettings({
                 onSelectLocation={handleLocationSelect}
               />
             ) : (
-              <RightPanel className="flex flex-col h-full">
-                <RightPanelHeader className="shrink-0">
-                  {headerContent}
-                </RightPanelHeader>
-                <RightPanelContent className="flex-1 overflow-auto">
-                  {mainContent}
-                </RightPanelContent>
-                <RightPanelFooter>
-                  {activeTab === "list" &&
-                    childLocations &&
-                    childLocations.count > ITEMS_PER_PAGE && (
-                      <div className="flex justify-center">
-                        <Pagination
-                          data={{ totalCount: childLocations.count }}
-                          onChange={setCurrentPage}
-                          defaultPerPage={ITEMS_PER_PAGE}
-                          cPage={currentPage}
-                        />
-                      </div>
-                    )}
-                </RightPanelFooter>
+              <RightPanel className="flex flex-col h-full md:max-lg:overflow-x-auto">
+                <div className="flex h-full w-full min-w-fit flex-col">
+                  <RightPanelHeader className="shrink-0">
+                    {headerContent}
+                  </RightPanelHeader>
+                  <RightPanelContent className="flex-1 overflow-auto">
+                    {mainContent}
+                  </RightPanelContent>
+                  <RightPanelFooter>
+                    {activeTab === "list" &&
+                      childLocations &&
+                      childLocations.count > ITEMS_PER_PAGE && (
+                        <div className="flex justify-center">
+                          <Pagination
+                            data={{ totalCount: childLocations.count }}
+                            onChange={setCurrentPage}
+                            defaultPerPage={ITEMS_PER_PAGE}
+                            cPage={currentPage}
+                          />
+                        </div>
+                      )}
+                  </RightPanelFooter>
+                </div>
               </RightPanel>
             )}
           </ResizablePanel>

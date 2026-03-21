@@ -63,16 +63,18 @@ export default function LocationList({
         onLocationSelect={handleLocationSelect}
         onToggleExpand={handleToggleExpand}
       />
-      <LocationContent
-        facilityId={facilityId}
-        selectedLocationId={selectedLocationId}
-        selectedLocation={selectedLocation}
-        searchQuery={searchQuery}
-        currentPage={currentPage}
-        onLocationSelect={handleLocationSelect}
-        onSearchChange={handleSearchChange}
-        onPageChange={handlePageChange}
-      />
+      <div className="flex-1 min-w-0 md:max-lg:overflow-x-auto">
+        <LocationContent
+          facilityId={facilityId}
+          selectedLocationId={selectedLocationId}
+          selectedLocation={selectedLocation}
+          searchQuery={searchQuery}
+          currentPage={currentPage}
+          onLocationSelect={handleLocationSelect}
+          onSearchChange={handleSearchChange}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 }

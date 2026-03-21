@@ -1,7 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useInView } from "react-intersection-observer";
 
+import { RESULTS_PER_PAGE_LIMIT } from "@/common/constants";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +14,8 @@ import { CardGridSkeleton } from "@/components/Common/SkeletonLoading";
 import query from "@/Utils/request/query";
 import { LocationRead, LocationTypeIcons } from "@/types/location/location";
 import locationApi from "@/types/location/locationApi";
+
+const LOCATION_NAV_PAGE_SIZE = RESULTS_PER_PAGE_LIMIT;
 
 interface LocationTreeNodeProps {
   location: LocationRead;
@@ -33,24 +38,46 @@ export function LocationTreeNode({
 }: LocationTreeNodeProps) {
   const isExpanded = expandedLocations.has(location.id);
   const isSelected = location.id === selectedLocationId;
+  const hasChildren = location.has_children;
+  const { ref, inView } = useInView();
   const Icon =
     LocationTypeIcons[location.form as keyof typeof LocationTypeIcons];
 
-  // Query for this node's children
-  const { data: children, isLoading } = useQuery({
+  const {
+    data: childrenData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["locations", facilityId, "children", location.id, "kind"],
-    queryFn: query(locationApi.list, {
-      pathParams: { facility_id: facilityId },
-      queryParams: {
-        parent: location.id,
-        mode: "kind",
-        limit: 100,
-      },
-    }),
-    enabled: true,
+    queryFn: async ({ pageParam = 0, signal }) => {
+      const response = await query(locationApi.list, {
+        pathParams: { facility_id: facilityId },
+        queryParams: {
+          parent: location.id,
+          mode: "kind",
+          limit: LOCATION_NAV_PAGE_SIZE,
+          offset: pageParam,
+        },
+      })({ signal });
+      return response;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const currentOffset = allPages.length * LOCATION_NAV_PAGE_SIZE;
+      return currentOffset < lastPage.count ? currentOffset : null;
+    },
+    enabled: isExpanded && hasChildren,
   });
 
-  const hasChildren = children?.results && children.results.length > 0;
+  const children = childrenData?.pages.flatMap((page) => page.results) ?? [];
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && isExpanded) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isExpanded]);
 
   return (
     <div className="space-y-1">
@@ -96,9 +123,9 @@ export function LocationTreeNode({
           <span className="whitespace-nowrap">{location.name}</span>
         </div>
       </div>
-      {isExpanded && children?.results && children.results.length > 0 && (
+      {isExpanded && children.length > 0 && (
         <div className="pl-2">
-          {children.results.map((child) => (
+          {children.map((child) => (
             <LocationTreeNode
               key={child.id}
               location={child}
@@ -110,6 +137,12 @@ export function LocationTreeNode({
               facilityId={facilityId}
             />
           ))}
+          {hasNextPage && <div ref={ref} className="h-2" />}
+          {isFetchingNextPage && (
+            <div className="flex justify-center py-1">
+              <div className="size-3 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -132,22 +165,45 @@ export default function LocationNavbar({
   onToggleExpand,
 }: LocationNavbarProps) {
   const { t } = useTranslation();
+  const { ref, inView } = useInView();
 
-  const { data: allLocations, isLoading: isLoadingLocations } = useQuery({
+  const {
+    data: allLocations,
+    isLoading: isLoadingLocations,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ["locations", facilityId, "mine", "kind"],
-    queryFn: query.paginated(locationApi.list, {
-      pathParams: { facility_id: facilityId },
-      queryParams: {
-        mine: true,
-        mode: "kind",
-      },
-      pageSize: 100,
-    }),
+    queryFn: async ({ pageParam = 0, signal }) => {
+      const response = await query(locationApi.list, {
+        pathParams: { facility_id: facilityId },
+        queryParams: {
+          mine: true,
+          mode: "kind",
+          limit: LOCATION_NAV_PAGE_SIZE,
+          offset: pageParam,
+        },
+      })({ signal });
+      return response;
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      const currentOffset = allPages.length * LOCATION_NAV_PAGE_SIZE;
+      return currentOffset < lastPage.count ? currentOffset : null;
+    },
   });
 
-  const topLevelLocations = allLocations?.results || [];
+  const topLevelLocations =
+    allLocations?.pages.flatMap((page) => page.results) || [];
 
-  if (topLevelLocations.length === 0) {
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  if (!isLoadingLocations && topLevelLocations.length === 0) {
     return null;
   }
 
@@ -174,6 +230,12 @@ export default function LocationNavbar({
                 facilityId={facilityId}
               />
             ))
+          )}
+          {hasNextPage && <div ref={ref} className="h-2" />}
+          {isFetchingNextPage && (
+            <div className="flex justify-center p-2">
+              <div className="size-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+            </div>
           )}
         </div>
       </div>

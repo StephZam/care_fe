@@ -67,7 +67,10 @@ import {
   ENCOUNTER_PRIORITY_FILTER_COLORS,
   ENCOUNTER_STATUS_FILTER_COLORS,
 } from "@/types/emr/encounter/encounter";
-import { RequestOrderPriority } from "@/types/inventory/requestOrder/requestOrder";
+import {
+  REQUEST_ORDER_PRIORITY_COLORS,
+  RequestOrderPriority,
+} from "@/types/inventory/requestOrder/requestOrder";
 import careConfig from "@careConfig";
 import { Zap } from "lucide-react";
 export const encounterStatusFilter = (
@@ -652,16 +655,20 @@ export const inventoryPriorityFilter = (
     Object.values(RequestOrderPriority).map((value) => ({
       value: value,
       label: t(value),
+      color: getVariantColorClasses(REQUEST_ORDER_PRIORITY_COLORS[value]),
     })),
     {
       renderSelected: (selected: FilterValues) => {
         const selectedPriority = selected as string[];
         if (typeof selectedPriority[0] === "string") {
           const option = selectedPriority[0];
+          const color =
+            REQUEST_ORDER_PRIORITY_COLORS[option as RequestOrderPriority];
           return (
             <GenericSelectedBadge
               selectedValue={option}
               selectedLength={selectedPriority.length}
+              variant={color}
             />
           );
         }

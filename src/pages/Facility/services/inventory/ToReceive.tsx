@@ -239,7 +239,7 @@ function OutgoingOrdersTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col md:flex-row items-start gap-2">
         <Tabs value={qParams.status}>
           <TabsList>
             {EFFECTIVE_STATUSES.map((status) => (
@@ -259,9 +259,10 @@ function OutgoingOrdersTab({
           onOperationChange={handleOperationChange}
           onClearAll={handleClearAll}
           onClearFilter={handleClearFilter}
-          placeholder={t("filter")}
+          placeholder={t("filters")}
+          className="flex sm:flex-row flex-wrap sm:items-center"
           triggerButtonClassName="self-start sm:self-center"
-          className="flex flex-wrap sm:flex-row sm:items-center"
+          clearAllButtonClassName="self-start"
           facilityId={facilityId}
         />
       </div>
@@ -302,6 +303,55 @@ function IncomingDeliveriesTab({
     { value: "completed", label: "completed" },
   ];
 
+  const filterConfigs = useMemo(
+    () => [dateFilter("date", t("date"), longDateRangeOptions)],
+    [t],
+  );
+
+  const onFilterUpdate = (query: Record<string, unknown>) => {
+    for (const [key, value] of Object.entries(query)) {
+      switch (key) {
+        case "date":
+          {
+            const dateRange = value as FilterDateRange;
+            query = {
+              ...query,
+              date: undefined,
+              created_date_after: dateRange?.from
+                ? dateQueryString(dateRange?.from as Date)
+                : undefined,
+              created_date_before: dateRange?.to
+                ? dateQueryString(dateRange?.to as Date)
+                : undefined,
+            };
+          }
+          break;
+      }
+    }
+    updateQuery(query);
+  };
+
+  const {
+    selectedFilters,
+    handleFilterChange,
+    handleOperationChange,
+    handleClearAll,
+    handleClearFilter,
+  } = useMultiFilterState(filterConfigs, onFilterUpdate, {
+    ...qParams,
+    date:
+      qParams.created_date_after || qParams.created_date_before
+        ? {
+            from: qParams.created_date_after
+              ? new Date(qParams.created_date_after)
+              : undefined,
+            to: qParams.created_date_before
+              ? new Date(qParams.created_date_before)
+              : undefined,
+          }
+        : undefined,
+  });
+
   useEffect(() => {
     if (!qParams.status) {
       updateQuery({ status: EFFECTIVE_STATUSES[0].value });
@@ -319,6 +369,12 @@ function IncomingDeliveriesTab({
         status: qParams.status,
         origin_isnull: !internal,
         priority: qParams.priority,
+        created_date_after: qParams.created_date_after
+          ? dateTimeQueryString(new Date(qParams.created_date_after))
+          : undefined,
+        created_date_before: qParams.created_date_before
+          ? dateTimeQueryString(new Date(qParams.created_date_before), true)
+          : undefined,
       },
     }),
   });
@@ -327,7 +383,7 @@ function IncomingDeliveriesTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row items-start gap-2">
         <Tabs value={qParams.status}>
           <TabsList>
             {EFFECTIVE_STATUSES.map((status) => (
@@ -341,6 +397,17 @@ function IncomingDeliveriesTab({
             ))}
           </TabsList>
         </Tabs>
+        <MultiFilter
+          selectedFilters={selectedFilters}
+          onFilterChange={handleFilterChange}
+          onOperationChange={handleOperationChange}
+          onClearAll={handleClearAll}
+          onClearFilter={handleClearFilter}
+          placeholder={t("filters")}
+          className="flex sm:flex-row flex-wrap sm:items-center"
+          triggerButtonClassName="self-start sm:self-center"
+          facilityId={facilityId}
+        />
       </div>
       <DeliveryOrderTable
         deliveries={orders}

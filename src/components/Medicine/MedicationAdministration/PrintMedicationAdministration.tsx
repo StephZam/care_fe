@@ -445,12 +445,12 @@ const DrugChartTable = ({
                   <div className="font-bold text-[11px] leading-tight text-wrap break-all">
                     {group.productName}
                   </div>
-                  {group.requests.map((request, reqIdx) => {
+                  {group.requests.map((request) => {
                     const instructions = request.dosage_instruction;
                     const hasTitration = instructions.length > 1;
                     const note = request.note?.trim();
                     return (
-                      <div key={reqIdx}>
+                      <div key={request.id}>
                         {instructions.map((instruction, instructionIdx) => {
                           const dosageText = formatDosage(instruction);
                           const frequencyText = isPRN
@@ -459,7 +459,16 @@ const DrugChartTable = ({
                           const dosageInstructions = formatSig(instruction);
                           return (
                             <div
-                              key={instructionIdx}
+                              key={
+                                request.id +
+                                " - " +
+                                (instruction.dose_and_rate?.dose_quantity
+                                  ?.value ||
+                                  instruction.dose_and_rate?.dose_range?.low
+                                    ?.value ||
+                                  instruction.dose_and_rate?.dose_range?.high
+                                    ?.value)
+                              }
                               className={cn(
                                 "text-[9px] text-gray-600 leading-snug mt-0.5",
                                 hasTitration &&

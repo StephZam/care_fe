@@ -459,16 +459,7 @@ const DrugChartTable = ({
                           const dosageInstructions = formatSig(instruction);
                           return (
                             <div
-                              key={
-                                request.id +
-                                " - " +
-                                (instruction.dose_and_rate?.dose_quantity
-                                  ?.value ||
-                                  instruction.dose_and_rate?.dose_range?.low
-                                    ?.value ||
-                                  instruction.dose_and_rate?.dose_range?.high
-                                    ?.value)
-                              }
+                              key={`${request.id}-${instructionIdx}`}
                               className={cn(
                                 "text-[9px] text-gray-600 leading-snug mt-0.5",
                                 hasTitration &&

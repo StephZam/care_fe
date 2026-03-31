@@ -2145,7 +2145,12 @@ function QuestionEditor({
         </CollapsibleTrigger>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              aria-label={t("question_actions")}
+            >
               <CareIcon icon="l-ellipsis-v" className="size-4" />
             </Button>
           </DropdownMenuTrigger>

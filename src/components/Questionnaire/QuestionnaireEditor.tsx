@@ -1230,9 +1230,7 @@ export default function QuestionnaireEditor({
                                   );
                                   updateQuestions(newQuestions);
                                 }}
-                                addQuestion={() =>
-                                  handleAddQuestionAtIndex(index + 1)
-                                }
+                                addQuestionAtIndex={handleAddQuestionAtIndex}
                                 isExpanded={expandedQuestions.has(
                                   question.link_id,
                                 )}
@@ -1768,7 +1766,7 @@ interface QuestionEditorProps {
   question: Question;
   onChange: (updated: Question) => void;
   onDelete: () => void;
-  addQuestion?: () => void;
+  addQuestionAtIndex?: (targetIndex: number) => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
   depth: number;
@@ -1797,7 +1795,7 @@ function QuestionEditor({
   question,
   onChange,
   onDelete,
-  addQuestion,
+  addQuestionAtIndex,
   isExpanded,
   onToggleExpand,
   depth,
@@ -2086,6 +2084,27 @@ function QuestionEditor({
   };
   const UNIT_TYPES = ["quantity", "choice", "decimal", "integer"];
 
+  const handleAddSubQuestionAtIndex = (targetIndex: number) => {
+    const newQuestion: Question = {
+      id: crypto.randomUUID(),
+      link_id: `Q-${Date.now()}`,
+      text: "New Sub-Question",
+      type: "string",
+      questions: [],
+    };
+    const subQuestions = questions || [];
+    const newQuestions = [
+      ...subQuestions.slice(0, targetIndex),
+      newQuestion,
+      ...subQuestions.slice(targetIndex),
+    ];
+    updateField("questions", newQuestions);
+    setExpandedSubQuestions((prev) => new Set([...prev, newQuestion.link_id]));
+    setTimeout(() => {
+      scrollToQuestion(newQuestion.link_id);
+    }, 100);
+  };
+
   return (
     <Collapsible
       open={isExpanded}
@@ -2124,61 +2143,74 @@ function QuestionEditor({
             <ChevronsUpDown className="size-4 text-gray-500" />
           )}
         </CollapsibleTrigger>
-        {!(depth > 0 && totalSiblings === 1) && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-8">
-                <CareIcon icon="l-ellipsis-v" className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {!isFirst && (
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveUp?.();
-                  }}
-                >
-                  <ChevronUp className="mr-2 size-4" />
-                  {t("move_up")}
-                </DropdownMenuItem>
-              )}
-              {!isLast && (
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveDown?.();
-                  }}
-                >
-                  <ChevronDown className="mr-2 size-4" />
-                  {t("move_down")}
-                </DropdownMenuItem>
-              )}
-              {addQuestion && (
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addQuestion();
-                  }}
-                >
-                  <CareIcon icon="l-plus" className="mr-2 size-4" />
-                  {t("add_question_below")}
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="size-8">
+              <CareIcon icon="l-ellipsis-v" className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {!isFirst && (
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete();
+                  onMoveUp?.();
                 }}
-                className="text-destructive"
               >
-                <CareIcon icon="l-trash-alt" className="mr-2 size-4" />
-                {t("delete")}
+                <ChevronUp className="mr-2 size-4" />
+                {t("move_up")}
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+            )}
+            {!isLast && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveDown?.();
+                }}
+              >
+                <ChevronDown className="mr-2 size-4" />
+                {t("move_down")}
+              </DropdownMenuItem>
+            )}
+            {addQuestionAtIndex && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addQuestionAtIndex(index);
+                }}
+              >
+                <CareIcon icon="l-plus" className="mr-2 size-4" />
+                {t("add_question_above")}
+              </DropdownMenuItem>
+            )}
+            {addQuestionAtIndex && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addQuestionAtIndex(index + 1);
+                }}
+              >
+                <CareIcon icon="l-plus" className="mr-2 size-4" />
+                {t("add_question_below")}
+              </DropdownMenuItem>
+            )}
+            {!(depth > 0 && totalSiblings === 1) && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                  }}
+                  className="text-destructive"
+                >
+                  <CareIcon icon="l-trash-alt" className="mr-2 size-4" />
+                  {t("delete")}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <CollapsibleContent>
@@ -2839,23 +2871,7 @@ function QuestionEditor({
                   className="underline text-gray-950 font-semibold"
                   onClick={(e) => {
                     e.preventDefault();
-                    const newQuestion: Question = {
-                      id: crypto.randomUUID(),
-                      link_id: `Q-${Date.now()}`,
-                      text: "New Sub-Question",
-                      type: "string",
-                      questions: [],
-                    };
-                    updateField("questions", [
-                      ...(questions || []),
-                      newQuestion,
-                    ]);
-                    setExpandedSubQuestions(
-                      (prev) => new Set([...prev, newQuestion.link_id]),
-                    );
-                    setTimeout(() => {
-                      scrollToQuestion(newQuestion.link_id);
-                    }, 100);
+                    handleAddSubQuestionAtIndex((questions || []).length);
                   }}
                 >
                   <CareIcon icon="l-plus" className="size-4" />
@@ -2926,6 +2942,7 @@ function QuestionEditor({
                           updateField("questions", newQuestions);
                         }
                       }}
+                      addQuestionAtIndex={handleAddSubQuestionAtIndex}
                       isFirst={idx === 0}
                       isLast={idx === (questions?.length || 0) - 1}
                       expandPath={expandPath?.slice(1)}

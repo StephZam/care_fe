@@ -19,11 +19,7 @@ import {
 
 import Loading from "@/components/Common/Loading";
 import PrintFooter from "@/components/Common/PrintFooter";
-import {
-  formatDosage,
-  formatFrequency,
-  formatSig,
-} from "@/components/Medicine/utils";
+import { formatDosage, formatFrequency } from "@/components/Medicine/utils";
 
 import encounterApi from "@/types/emr/encounter/encounterApi";
 import { MedicationAdministrationRead } from "@/types/emr/medicationAdministration/medicationAdministration";
@@ -473,40 +469,9 @@ const DrugChartTable = ({
                     ) : null;
                   })}
                   {group.requests.map((request) => {
-                    const instructions = request.dosage_instruction;
-                    const hasTitration = instructions.length > 1;
                     const note = request.note?.trim();
                     return (
                       <div key={request.id}>
-                        {instructions.map((instruction, instructionIdx) => {
-                          const dosageText = formatDosage(instruction);
-                          const frequencyText = isPRN
-                            ? t("as_needed")
-                            : formatFrequency(instruction);
-                          const dosageInstructions = formatSig(instruction);
-                          return (
-                            <div
-                              key={`${request.id}-${instructionIdx}`}
-                              className={cn(
-                                "text-[9px] text-gray-600 leading-snug mt-0.5",
-                                hasTitration &&
-                                  instructionIdx > 0 &&
-                                  "pt-0.5 border-t border-dashed border-gray-300",
-                              )}
-                            >
-                              <div>
-                                {[dosageText, frequencyText]
-                                  .filter(Boolean)
-                                  .join(" · ")}
-                              </div>
-                              {dosageInstructions && (
-                                <div className="text-gray-500 italic">
-                                  {dosageInstructions}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
                         {note && (
                           <div className="text-[9px] text-gray-500 italic mt-0.5">
                             {note}
@@ -516,7 +481,7 @@ const DrugChartTable = ({
                     );
                   })}
                   {group.requests.length > 1 && (
-                    <div className="text-[9px] text-gray-400 mt-0.5">
+                    <div className="text-[9px] text-gray-400 mt-0.5 bg-red-500">
                       ({group.requests.length} {t("orders")})
                     </div>
                   )}

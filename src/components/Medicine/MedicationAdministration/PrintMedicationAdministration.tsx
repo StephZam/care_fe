@@ -481,7 +481,7 @@ const DrugChartTable = ({
                     );
                   })}
                   {group.requests.length > 1 && (
-                    <div className="text-[9px] text-gray-400 mt-0.5 bg-red-500">
+                    <div className="text-[9px] text-gray-400 mt-0.5">
                       ({group.requests.length} {t("orders")})
                     </div>
                   )}

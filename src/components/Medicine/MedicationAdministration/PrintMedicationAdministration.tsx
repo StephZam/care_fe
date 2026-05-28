@@ -307,46 +307,46 @@ export const PrintMedicationAdministration = (props: {
       <div className="p-4 max-w-[297mm] mx-auto text-[11px] print:p-0 print:max-w-none print:text-[9px]">
         {/* Header */}
         <div className="border-2 border-gray-400 mb-4">
-          <div className="flex flex-wrap justify-between items-start gap-3 p-3 border-b-2 border-gray-400 bg-gray-100">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-base sm:text-lg md:text-xl font-bold uppercase tracking-wide wrap-break-word">
+          <div className="flex justify-between items-start p-3 border-b-2 border-gray-400 bg-gray-100">
+            <div>
+              <h1 className="text-xl font-bold uppercase tracking-wide">
                 {t("medication_administration_record")}
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 wrap-break-word">
+              <p className="text-sm text-gray-600 mt-1">
                 {encounter?.facility?.name}
               </p>
             </div>
             <img
               src={careConfig.mainLogo?.dark}
               alt="Logo"
-              className="h-8 sm:h-10 md:h-12 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </div>
 
           {/* Patient Info - Simplified */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 divide-y-2 sm:divide-y-0 sm:divide-x-2 divide-gray-400">
-            <div className="p-2 sm:col-span-2 min-w-0">
+          <div className="grid grid-cols-4 divide-x-2 divide-gray-400">
+            <div className="p-2 col-span-2">
               <div className="font-bold text-xs text-gray-500 uppercase">
                 {t("patient_name")}
               </div>
-              <div className="font-bold text-base wrap-break-word">
+              <div className="font-bold text-base">
                 {encounter?.patient.name}
               </div>
             </div>
-            <div className="p-2 min-w-0">
+            <div className="p-2">
               <div className="font-bold text-xs text-gray-500 uppercase">
                 {t("age")} / {t("sex")}
               </div>
-              <div className="font-semibold wrap-break-word">
+              <div className="font-semibold">
                 {encounter?.patient &&
                   `${formatPatientAge(encounter.patient, true)}, ${t(`GENDER__${encounter.patient.gender}`)}`}
               </div>
             </div>
-            <div className="p-2 min-w-0">
+            <div className="p-2">
               <div className="font-bold text-xs text-gray-500 uppercase">
                 {t("encounter_date")}
               </div>
-              <div className="font-semibold wrap-break-word">
+              <div className="font-semibold">
                 {encounter?.period?.start &&
                   format(new Date(encounter.period.start), "dd MMM yyyy")}
               </div>
@@ -537,7 +537,7 @@ const DrugChartTable = ({
                     );
                   })}
                   {group.requests.length > 1 && (
-                    <div className="text-[9px] text-gray-400 mt-0.5">
+                    <div className="text-[8px] text-gray-400 mt-0.5">
                       ({group.requests.length} {t("orders")})
                     </div>
                   )}

@@ -57,7 +57,6 @@ import {
   TableSkeleton,
 } from "@/components/Common/SkeletonLoading";
 
-import useAppHistory from "@/hooks/useAppHistory";
 import useFilters, { FilterState } from "@/hooks/useFilters";
 
 import { getPermissions } from "@/common/Permissions";
@@ -82,6 +81,7 @@ import {
   dateQueryString,
   formatDateTime,
   formatPatientAge,
+  goBack,
 } from "@/Utils/utils";
 
 import { booleanFromString } from "@/common/utils";
@@ -208,7 +208,6 @@ export default function AppointmentsPage({ resourceType, resourceId }: Props) {
     .filter(Boolean) as TagConfig[];
 
   const { hasPermission } = usePermissions();
-  const { goBack } = useAppHistory();
 
   const { canViewAppointments } = getPermissions(
     hasPermission,
@@ -842,7 +841,7 @@ function AppointmentRow(props: {
         tags: props.tags,
         tags_behavior: props.tags_behavior,
         limit: props.resultsPerPage,
-        offset: ((props.page ?? 1) - 1) * props.resultsPerPage,
+        offset: ((props.page || 1) - 1) * props.resultsPerPage,
         patient: props.patient,
         resource_type: props.resourceType,
         resource_ids: props.resourceIds.join(","),

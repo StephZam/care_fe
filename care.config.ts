@@ -196,6 +196,10 @@ const careConfig = {
       })
     : [],
 
+  appStore: {
+    indexUrl: env.REACT_APP_STORE_INDEX_URL,
+  },
+
   plotsConfigUrl:
     env.REACT_OBSERVATION_PLOTS_CONFIG_URL || "/config/plots.json",
 
@@ -247,6 +251,11 @@ const careConfig = {
 
     minimalPatientRegistration: booleanFromString(
       env.REACT_ENABLE_MINIMAL_PATIENT_REGISTRATION,
+      false,
+    ),
+
+    globalPatientEditAccessEnabled: booleanFromString(
+      env.REACT_PATIENT_GLOBAL_EDIT_ACCESS_ENABLED,
       false,
     ),
   },
